@@ -154,9 +154,13 @@ const database = [
     }
 ];
 
+// loadProblem関数内のview設定を修正
 function loadProblem() {
     const q = database[Math.floor(Math.random() * database.length)];
+    // 文言を「図のまわりをドラッグ」に変更
     document.getElementById('prob-text').innerHTML = q.text;
+    document.querySelector('.hint-badge').innerText = "図のまわりをドラッグして回転させてみよう！";
+    
     document.getElementById('ans').innerHTML = "正解：" + q.ans;
     document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
     document.getElementById('ans-area').style.display = 'none';
@@ -168,19 +172,17 @@ function loadProblem() {
         keepaspectratio: false, 
         axis: false, 
         showCopyright: false,
-        pan: { enabled: false } // パン（平行移動）をオフにして回転に集中
+        pan: { enabled: false } 
     });
 
-    // 視点の設定。view3dの第3引数で、回転を可能にするための「面」を定義します。
+    // 視点操作用の「不可視の板」を配置して、どこを触っても回転するように設定
     let view = board.create('view3d', 
         [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], 
         {
             azimuth: 0.8,
             elevation: 0.5,
-            // 以下の設定で、背景ドラッグによる回転を有効にします
             xPlaneOpts: {visible: false},
-            yPlaneOpts: {visible: false},
-            zPlaneOpts: {visible: false}
+            yPlaneOpts: {visible: false}
         }
     );
     
@@ -188,6 +190,16 @@ function loadProblem() {
     board.update();
     MathJax.typesetPromise();
 }
+
+// database内のdraw関数で、すべての点を固定(fixed: true)にする
+// 例：立方体の場合
+/*
+draw: (view) => {
+    let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]]
+            .map(c => view.create('point3d', c, {size:1, name:'', fixed:true})); // ここをfixedに！
+    ...
+}
+*/
 
 function showAnswer() {
     document.getElementById('ans-area').style.display = 'block';
