@@ -45,30 +45,114 @@ const database = [
         exp: String.raw`円周角の定理より、同じ弧に対する円周角は中心角の半分です。$80 \div 2 = 40^{\circ}$。`,
         draw: (brd) => {
             let o = brd.create('point', [0,0], {name:'O', fixed:true});
-            let c1 = brd.create('circle', [o, 3], {strokeColor:'#ccc'});
             let b = brd.create('point', [3,0], {name:'B', fixed:true});
             let c = brd.create('point', [3*Math.cos(80*Math.PI/180), 3*Math.sin(80*Math.PI/180)], {name:'C', fixed:true});
+            let c1 = brd.create('circle', [o, 3], {strokeColor:'#ccc'});
             let a = brd.create('glider', [-2, 2.2, c1], {name:'A'});
             brd.create('polygon', [o, b, c], {fillColor:'#FF3B30', fillOpacity:0.1});
             brd.create('segment', [a, b]); brd.create('segment', [a, c]);
-            brd.create('angle', [b, a, c], {radius:0.7, name:''});
-            brd.create('angle', [b, o, c], {radius:0.5, name:'80°'});
         }
     },
     {
-        text: String.raw`右の図で、$l // m$ のとき、$\angle x$ の大きさを求めなさい。`,
+        text: String.raw`平行な2直線 $l, m$ の間に折れ線があります。$\angle x$ の大きさを求めなさい。`,
         ans: String.raw`$60^{\circ}$`,
-        exp: String.raw`平行線の錯角を利用します。折れ曲がった点を通る平行な補助線を引くと、$25 + 35 = 60^{\circ}$ となります。`,
+        exp: String.raw`折れ曲がった点を通る平行な補助線を引くと、錯角により $25^{\circ} + 35^{\circ} = 60^{\circ}$ となります。`,
         draw: (brd) => {
             brd.create('line', [[-3,2], [3,2]], {name:'l', withLabel:true, fixed:true});
             brd.create('line', [[-3,-2], [3,-2]], {name:'m', withLabel:true, fixed:true});
-            let p1 = brd.create('point', [-1, 2], {visible:false});
-            let p2 = brd.create('point', [1, 0], {name:'P'});
-            let p3 = brd.create('point', [-1, -2], {visible:false});
-            brd.create('segment', [p1, p2]); brd.create('segment', [p2, p3]);
-            brd.create('text', [-0.5, 1.5, "25°"]);
-            brd.create('text', [-0.5, -1.5, "35°"]);
+            brd.create('segment', [[-1.5,2], [1,0]]); brd.create('segment', [1,0], [-1.5,-2]]);
+            brd.create('text', [-0.8, 1.6, "25°"]); brd.create('text', [-0.8, -1.6, "35°"]);
             brd.create('text', [0.3, 0, "x"]);
+        }
+    },
+    {
+        text: String.raw`線分ABを直径とする円Oがあります。円周上の点Cに対し、$\angle ABC = 55^{\circ}$ のとき、$\angle BAC$ を求めなさい。`,
+        ans: String.raw`$35^{\circ}$`,
+        exp: String.raw`直径に対する円周角は $90^{\circ}$ です。$\angle BAC = 180 - (90 + 55) = 35^{\circ}$。`,
+        draw: (brd) => {
+            let o = brd.create('point', [0,0], {name:'O', fixed:true});
+            brd.create('circle', [o, 3], {strokeColor:'#ccc'});
+            let a = brd.create('point', [-3,0], {name:'A', fixed:true});
+            let b = brd.create('point', [3,0], {name:'B', fixed:true});
+            let c = brd.create('point', [3*Math.cos(110*Math.PI/180), 3*Math.sin(110*Math.PI/180)], {name:'C', fixed:true});
+            brd.create('polygon', [a, b, c], {fillColor:'blue', fillOpacity:0.1});
+        }
+    },
+    {
+        text: String.raw`正五角形ABCDEの1つの内角の大きさを求めなさい。`,
+        ans: String.raw`$108^{\circ}$`,
+        exp: String.raw`多角形の内角の和は $180 \times (n-2)$。正五角形は $180 \times 3 \div 5 = 108^{\circ}$。`,
+        draw: (brd) => {
+            brd.create('regularpolygon', [[-1,-1.5], [1,-1.5], 5], {name:'ABCDE'});
+        }
+    },
+    {
+        text: String.raw`$\triangle ABC$ で、辺BCに平行な直線 $DE$ が辺AB, ACと交わっています。$AD=4, DB=2, AE=6$ のとき、$EC$ の長さを求めなさい。`,
+        ans: String.raw`$3$`,
+        exp: String.raw`平行線と線分の比より、$AD:DB = AE:EC$ です。$4:2 = 6:x \Rightarrow 4x = 12 \Rightarrow x = 3$。`,
+        draw: (brd) => {
+            let a = brd.create('point', [0,2], {name:'A'});
+            let b = brd.create('point', [-2,-2], {name:'B'});
+            let c = brd.create('point', [2,-2], {name:'C'});
+            brd.create('polygon', [a,b,c]);
+            brd.create('segment', [[-0.66, 0.66], [0.66, 0.66]], {name:'DE', color:'red'});
+        }
+    },
+    {
+        text: String.raw`円周上に4点A, B, C, Dがあります。$\angle ABD = 30^{\circ}$ のとき、$\angle ACD$ の大きさを求めなさい。`,
+        ans: String.raw`$30^{\circ}$`,
+        exp: String.raw`円周角の定理より、同じ弧ADに対する円周角は等しくなります。`,
+        draw: (brd) => {
+            let o = brd.create('point', [0,0], {visible:false});
+            let c1 = brd.create('circle', [o, 3], {strokeColor:'#ccc'});
+            let a = brd.create('point', [-1, 2.8], {name:'A'});
+            let d = brd.create('point', [1, 2.8], {name:'D'});
+            let b = brd.create('point', [-2.5, -1.6], {name:'B'});
+            let c = brd.create('point', [2.5, -1.6], {name:'C'});
+            brd.create('segment', [b,a]); brd.create('segment', [b,d]);
+            brd.create('segment', [c,a]); brd.create('segment', [c,d]);
+        }
+    },
+    {
+        text: String.raw`$\triangle ABC$ と $\triangle DEF$ が相似で、相似比が $2:3$ のとき、面積の比を求めなさい。`,
+        ans: String.raw`$4:9$`,
+        exp: String.raw`面積の比は、相似比の2乗になります。$2^2:3^2 = 4:9$。`,
+        draw: (brd) => {
+            brd.create('polygon', [[-3,0], [-1,0], [-2,1.5]], {name:'ABC'});
+            brd.create('polygon', [[0,0], [3,0], [1.5, 2.25]], {name:'DEF'});
+        }
+    },
+    {
+        text: String.raw`長方形ABCDの対角線の交点をOとします。$\angle AOB = 60^{\circ}$ のとき、$\angle OAB$ の大きさを求めなさい。`,
+        ans: String.raw`$60^{\circ}$`,
+        exp: String.raw`長方形の対角線は等しく、中点で交わるので $OA=OB$。$\triangle OAB$ は二等辺三角形で、頂角 $60^{\circ}$ なので正三角形になります。`,
+        draw: (brd) => {
+            brd.create('polygon', [[-2,1], [2,1], [2,-1], [-2,-1]]);
+            brd.create('segment', [[-2,1], [2,-1]], {dash:1}); brd.create('segment', [[2,1], [-2,-1]], {dash:1});
+            brd.create('text', [-0.2, 0.2, "60°"]);
+        }
+    },
+    {
+        text: String.raw`円Oの外にある点Pから引いた2本の接線の接点をA, Bとします。$\angle APB = 50^{\circ}$ のとき、中心角 $\angle AOB$ を求めなさい。`,
+        ans: String.raw`$130^{\circ}$`,
+        exp: String.raw`接線と半径は垂直なので、四角形OAPBの内角の和 $360^{\circ}$ から引くと、$360 - (90+90+50) = 130^{\circ}$。`,
+        draw: (brd) => {
+            let o = brd.create('point', [0,0], {name:'O'});
+            brd.create('circle', [o, 2]);
+            brd.create('point', [4,0], {name:'P'});
+            brd.create('segment', [[1.2, 1.6], [4,0]]); brd.create('segment', [[1.2, -1.6], [4,0]]);
+        }
+    },
+    {
+        text: String.raw`△ABCの辺AB, ACの中点をそれぞれD, Eとします。$BC=10$ のとき、$DE$ の長さを求めなさい。`,
+        ans: String.raw`$5$`,
+        exp: String.raw`中点連結定理より、$DE = \frac{1}{2}BC$ です。$10 \div 2 = 5$。`,
+        draw: (brd) => {
+            let a = brd.create('point', [0,2], {name:'A'});
+            let b = brd.create('point', [-3,-1], {name:'B'});
+            let c = brd.create('point', [3,-1], {name:'C'});
+            brd.create('polygon', [a,b,c]);
+            brd.create('segment', [[-1.5, 0.5], [1.5, 0.5]], {name:'DE', color:'red'});
         }
     }
 ];
