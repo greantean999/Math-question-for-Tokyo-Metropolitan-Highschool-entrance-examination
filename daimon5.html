@@ -12,7 +12,8 @@
         .back-link { text-decoration: none; color: #859900; font-weight: bold; margin-bottom: 15px; display: inline-block; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #859900; }
         #prob-text { font-size: 1.1em; line-height: 1.6; margin: 10px 0; min-height: 60px; font-weight: bold; }
-        .jxgbox { width: 100%; height: 400px; margin: 15px 0; border-radius: 10px; background: white; }
+        .jxgbox { width: 100%; height: 400px; margin: 15px 0; border-radius: 10px; background: white; cursor: grab; }
+        .jxgbox:active { cursor: grabbing; }
         .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #859900; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
         .ans-box { display: none; margin-top: 15px; padding: 15px; background: #f9fdf0; border-radius: 10px; border: 2px solid #859900; }
         .hint-badge { display: inline-block; background: #268bd2; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8em; margin-bottom: 5px; }
@@ -23,7 +24,7 @@
 <a href="index.html" class="back-link">← メニューに戻る</a>
 
 <div class="card">
-    <div class="hint-badge">図形をドラッグして回転させてみよう！</div>
+    <div class="hint-badge">図のまわりをドラッグして回転させてみよう！</div>
     <div id="prob-text">問題読み込み中...</div>
     <div id="jxgbox" class="jxgbox"></div>
     <button id="show-btn" class="action-btn" onclick="showAnswer()">答え合わせ</button>
@@ -38,14 +39,16 @@
 <script>
 let board = null;
 
+// 点を生成する際の共通設定（fixed:trueで固定）
+const pOpts = {size: 1, name: '', fixed: true};
+
 const database = [
     {
         text: String.raw`1辺が $6\text{cm}$ の立方体があります。この立方体の体積を求めなさい。`,
         ans: String.raw`$216\text{cm}^3$`,
         exp: String.raw`立方体の体積は（1辺）$^3$ です。$6 \times 6 \times 6 = 216$。`,
         draw: (view) => {
-            let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, {size:1, name:''}));
-            // 面を描画（前後上下左右）
+            let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, pOpts));
             [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,3,7,4]].forEach(f => 
                 view.create('polygon3d', f.map(i=>p[i]), {fillColor:'#859900', fillOpacity:0.2, borderLine:{strokeWidth:1}})
             );
@@ -56,8 +59,8 @@ const database = [
         ans: String.raw`$32\text{cm}^3$`,
         exp: String.raw`錐体の体積は「底面積 $\times$ 高さ $\div 3$」です。$(4 \times 4) \times 6 \div 3 = 32$。`,
         draw: (view) => {
-            let pts = [[-2,-2,0],[2,-2,0],[2,2,0],[-2,2,0]].map(c => view.create('point3d', c, {size:1, name:''}));
-            let top = view.create('point3d', [0,0,4], {name:'V'});
+            let pts = [[-2,-2,0],[2,-2,0],[2,2,0],[-2,2,0]].map(c => view.create('point3d', c, pOpts));
+            let top = view.create('point3d', [0,0,4], {name:'V', fixed:true});
             view.create('polygon3d', pts, {fillColor:'#268bd2', fillOpacity:0.1});
             pts.forEach((pt, i) => view.create('polygon3d', [pt, pts[(i+1)%4], top], {fillColor:'#268bd2', fillOpacity:0.3}));
         }
@@ -65,11 +68,10 @@ const database = [
     {
         text: String.raw`立方体の辺ABと「ねじれの位置」にある辺は全部でいくつありますか。`,
         ans: String.raw`$4$ つ`,
-        exp: String.raw`同じ平面上になく、平行でも交わりもしない辺を探します。底面の2辺、側面の2辺が該当します。`,
+        exp: String.raw`同じ平面上になく、平行でも交わりもしない辺を探します。`,
         draw: (view) => {
-            let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, {size:1, name:''}));
-            view.create('segment3d', [p[0], p[1]], {strokeColor:'red', strokeWidth:5}); // 辺AB
-            // 全ての辺を描画
+            let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, pOpts));
+            view.create('segment3d', [p[0], p[1]], {strokeColor:'red', strokeWidth:5}); 
             [[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(e => view.create('segment3d', [p[e[0]], p[e[1]]]));
         }
     },
@@ -78,8 +80,6 @@ const database = [
         ans: String.raw`$36\pi \text{cm}^2$`,
         exp: String.raw`球の表面積の公式は $4\pi r^2$ です。$4 \times \pi \times 3^2 = 36\pi$。`,
         draw: (view) => {
-            view.create('point3d', [0,0,0], {name:'O'});
-            // 緯線・経線で球を表現
             for(let i=0; i<=180; i+=30) {
                 let r = 3 * Math.sin(i * Math.PI / 180);
                 let z = 3 * Math.cos(i * Math.PI / 180);
@@ -90,10 +90,10 @@ const database = [
     {
         text: String.raw`底面の半径が $3\text{cm}$、高さが $4\text{cm}$ の円錐の母線の長さを求めなさい。`,
         ans: String.raw`$5\text{cm}$`,
-        exp: String.raw`半径、高さ、母線で直角三角形ができます。三平方の定理より $\sqrt{3^2 + 4^2} = 5$。`,
+        exp: String.raw`三平方の定理より $\sqrt{3^2 + 4^2} = 5$。`,
         draw: (view) => {
             view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillOpacity:0.1});
-            let top = view.create('point3d', [0,0,4], {name:'V'});
+            let top = view.create('point3d', [0,0,4], {name:'V', fixed:true});
             view.create('segment3d', [[0,0,0], [3,0,0]], {dash:2});
             view.create('segment3d', [[0,0,0], top], {dash:2});
             view.create('segment3d', [[3,0,0], top], {strokeColor:'red', strokeWidth:3});
@@ -115,16 +115,16 @@ const database = [
         ans: String.raw`$36\text{cm}$`,
         exp: String.raw`正四面体の辺の数は 6 本です。$6 \times 6 = 36$。`,
         draw: (view) => {
-            let pts = [[2,2,2],[2,-2,-2],[-2,2,-2],[-2,-2,2]].map(c => view.create('point3d', c, {size:1}));
+            let pts = [[2,2,2],[2,-2,-2],[-2,2,-2],[-2,-2,2]].map(c => view.create('point3d', c, pOpts));
             [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]].forEach(e => view.create('segment3d', [pts[e[0]], pts[e[1]]]));
         }
     },
     {
         text: String.raw`縦 $3\text{cm}$, 横 $4\text{cm}$, 高さ $5\text{cm}$ の直方体の対角線の長さを求めなさい。`,
         ans: String.raw`$5\sqrt{2}\text{cm}$`,
-        exp: String.raw`対角線は $\sqrt{3^2 + 4^2 + 5^2} = \sqrt{50} = 5\sqrt{2}$ です。`,
+        exp: String.raw`対角線は $\sqrt{3^2 + 4^2 + 5^2} = 5\sqrt{2}$ です。`,
         draw: (view) => {
-            let p = [[0,0,0],[2,0,0],[2,3,0],[0,3,0],[0,0,4],[2,0,4],[2,3,4],[0,3,4]].map(c => view.create('point3d', c, {size:1, name:''}));
+            let p = [[0,0,0],[2,0,0],[2,3,0],[0,3,0],[0,0,4],[2,0,4],[2,3,4],[0,3,4]].map(c => view.create('point3d', c, pOpts));
             view.create('segment3d', [p[0], p[6]], {strokeColor:'red', strokeWidth:3});
             [[0,1,2,3,0],[4,5,6,7,4],[0,4],[1,5],[2,6],[3,7]].forEach(f => {
                 for(let i=0; i<f.length-1; i++) view.create('segment3d', [p[f[i]], p[f[i+1]]]);
@@ -134,7 +134,7 @@ const database = [
     {
         text: String.raw`半径 $3\text{cm}$ の球を、中心を通る平面で切ったときの切り口の面積を求めなさい。`,
         ans: String.raw`$9\pi \text{cm}^2$`,
-        exp: String.raw`切り口は半径 $3\text{cm}$ の円になります。面積は $\pi \times 3^2 = 9\pi$。`,
+        exp: String.raw`切り口は半径 $3\text{cm}$ の円になります。$\pi \times 3^2 = 9\pi$。`,
         draw: (view) => {
             view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillColor:'yellow', fillOpacity:0.4});
             view.create('ellipse3d', [[0,0,0], [3,0,0], [0,0,3]], {strokeColor:'#ccc'});
@@ -146,7 +146,7 @@ const database = [
         ans: String.raw`$3$ つ`,
         exp: String.raw`側面は長方形で、底面の辺の数と同じだけ存在します。`,
         draw: (view) => {
-            let p = [[0,0,0],[2.5,0,0],[0,2,0],[0,0,4],[2.5,0,4],[0,2,4]].map(c => view.create('point3d', c, {size:1}));
+            let p = [[0,0,0],[2.5,0,0],[0,2,0],[0,0,4],[2.5,0,4],[0,2,4]].map(c => view.create('point3d', c, pOpts));
             view.create('polygon3d', [p[0],p[1],p[2]], {fillColor:'blue', fillOpacity:0.1});
             view.create('polygon3d', [p[3],p[4],p[5]], {fillColor:'blue', fillOpacity:0.1});
             [[0,3],[1,4],[2,5]].forEach(e => view.create('segment3d', [p[e[0]], p[e[1]]]));
@@ -154,13 +154,9 @@ const database = [
     }
 ];
 
-// loadProblem関数内のview設定を修正
 function loadProblem() {
     const q = database[Math.floor(Math.random() * database.length)];
-    // 文言を「図のまわりをドラッグ」に変更
     document.getElementById('prob-text').innerHTML = q.text;
-    document.querySelector('.hint-badge').innerText = "図のまわりをドラッグして回転させてみよう！";
-    
     document.getElementById('ans').innerHTML = "正解：" + q.ans;
     document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
     document.getElementById('ans-area').style.display = 'none';
@@ -175,7 +171,6 @@ function loadProblem() {
         pan: { enabled: false } 
     });
 
-    // 視点操作用の「不可視の板」を配置して、どこを触っても回転するように設定
     let view = board.create('view3d', 
         [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], 
         {
@@ -188,18 +183,8 @@ function loadProblem() {
     
     q.draw(view);
     board.update();
-    MathJax.typesetPromise();
+    if(window.MathJax) MathJax.typesetPromise();
 }
-
-// database内のdraw関数で、すべての点を固定(fixed: true)にする
-// 例：立方体の場合
-/*
-draw: (view) => {
-    let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]]
-            .map(c => view.create('point3d', c, {size:1, name:'', fixed:true})); // ここをfixedに！
-    ...
-}
-*/
 
 function showAnswer() {
     document.getElementById('ans-area').style.display = 'block';
