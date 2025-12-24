@@ -139,104 +139,49 @@ const database = {
         { text: "男の子2人、女の子2人の4人から2人の当番を選ぶとき、男女1人ずつになる確率。", ans: String.raw`$\frac{2}{3}$`, exp: String.raw`全6通り中、男女ペアは4通り。$4/6 = 2/3$` },
         { text: "1から6までのサイコロを2回投げるとき、出た目の和が10以上になる確率。", ans: String.raw`$\frac{1}{6}$`, exp: String.raw`(4,6),(5,5),(5,6),(6,4),(6,5),(6,6)の6通り。$6/36 = 1/6$` }
     ],
-    8: [ // 角度・変域
-        { text: String.raw`$y = 2x^2$ で $x$ の変域が $1 \le x \le 3$ のときの $y$ の変域。`, ans: String.raw`$2 \le y \le 18$`, exp: String.raw`$x=1 \Rightarrow y=2, x=3 \Rightarrow y=18$` },
-        { text: String.raw`$y = -x^2$ で $x$ の変域が $-2 \le x \le 1$ のときの $y$ の変域。`, ans: String.raw`$-4 \le y \le 0$`, exp: String.raw`$x=0$ で最大値 $0$ 、 $x=-2$ で最小値 $-4$` },
-        { text: "半径 6cm、中心角 $60^\circ$ のおうぎ形の弧の長さ。", ans: String.raw`$2\pi \text{ cm}$`, exp: String.raw`$12\pi \times \frac{60}{360} = 2\pi$` },
-        { text: "正十角形の1つの内角の大きさ。", ans: String.raw`$144^{\circ}$`, exp: String.raw`外角が $360/10 = 36^\circ$ なので、内角は $180 - 36 = 144^\circ$` },
-        { text: "五角形の内角の和。", ans: String.raw`$540^{\circ}$`, exp: String.raw`$180 \times (5 - 2) = 540$` },
-        { text: String.raw`$y = \frac{12}{x}$ で $x=3$ のときの $y$ の値。`, ans: String.raw`$y = 4$`, exp: String.raw`$12 \div 3 = 4$` },
-        { text: "右の図で $l // m$ のとき、$\angle x$ の大きさ。(※錯角を利用)", ans: String.raw`$50^{\circ}$`, exp: String.raw`平行線の錯角は等しい。` },
-        { text: "円周角の定理より、直径に対する円周角の大きさ。", ans: String.raw`$90^{\circ}$`, exp: String.raw`直径（中心角 $180^\circ$）の半分。` },
-        { text: "1辺 5cm の正方形の対角線の長さ。", ans: String.raw`$5\sqrt{2} \text{ cm}$`, exp: String.raw`三平方の定理 $1:1:\sqrt{2}$ より。` },
-        { text: "底面の半径 3cm、高さ 4cm の円錐の体積。", ans: String.raw`$12\pi \text{ cm}^3$`, exp: String.raw`$9\pi \times 4 \div 3 = 12\pi$` }
+    8: [ // 角度・変域（図形表示に対応）
+        { 
+            text: String.raw`$l // m$ のとき、$\angle x$ の大きさを求めなさい。`, 
+            ans: String.raw`$50^{\circ}$`, 
+            exp: String.raw`平行線の錯角は等しいので、$\angle x = 50^{\circ}$ です。`,
+            draw: (brd) => {
+                brd.create('line', [[-3,1],[3,1]], {name:'l', withLabel:true, fixed:true});
+                brd.create('line', [[-3,-1],[3,-1]], {name:'m', withLabel:true, fixed:true});
+                let p1 = brd.create('point', [-1,-1], {visible:false});
+                let p2 = brd.create('point', [1,1], {visible:false});
+                brd.create('line', [p1,p2], {color:'orange'});
+                brd.create('text', [0.2, 0.7, "50°"]);
+                brd.create('text', [-0.5, -0.7, "x"]);
+            }
+        },
+        { 
+            text: String.raw`$y = 2x^2$ で $x$ の変域が $1 \le x \le 3$ のときの $y$ の変域。`, 
+            ans: String.raw`$2 \le y \le 18$`, 
+            exp: String.raw`$x=1 \Rightarrow y=2, x=3 \Rightarrow y=18$ です。`
+        },
+        // ...（他の変域問題などは draw を持たない設定でOK）
     ],
-    9: [ // 作図
+    9: [ // 作図（表記の修正）
         { 
-            text: "点Pを通る直線$l$の垂線を作図せよ。", ans: "垂線", exp: "点Pを中心に$l$と2点で交わる弧を描き、その2点から等距離の点を結びます。",
+            text: String.raw`$\angle ABC = 30^{\circ}$ を作図せよ。`, 
+            ans: String.raw`$60^{\circ}$ の二等分`, 
+            exp: String.raw`正三角形($60^{\circ}$)を作ってから、その角を二等分します。`,
             draw: (brd) => {
-                let l = brd.create('line', [[-3,-1], [3,-1]], {fixed:true, name:'l'});
-                let p = brd.create('point', [0,1], {name:'P', fixed:true});
-                brd.create('line', [[0,-2],[0,2]], {dash:2, strokeColor:'gray'});
+                brd.create('line', [[0,0],[3,0]], {fixed:true});
+                brd.create('line', [[0,0],[2.6, 1.5]], {dash:2, strokeColor:'gray'});
             }
         },
         { 
-            text: "3点A, B, Cから等しい距離にある点Oを作図せよ。", ans: "外心（垂直二等分線の交点）", exp: "2つの線分の垂直二等分線の交点が求める点です。",
+            text: String.raw`正十角形の1つの外角 $36^{\circ}$ を利用して、中心角を作図せよ。`, 
+            ans: String.raw`$36^{\circ}$`, 
+            exp: String.raw`$360 \div 10 = 36^{\circ}$ です。`,
             draw: (brd) => {
-                let a = brd.create('point', [-1,2], {name:'A'});
-                let b = brd.create('point', [2,1], {name:'B'});
-                let c = brd.create('point', [0,-1], {name:'C'});
-                brd.create('point', [0.3, 0.6], {name:'O', strokeColor:'red', dash:2});
-            }
-        },
-        { 
-            text: "円の接線を作図せよ。", ans: "接線", exp: "接点を通る半径に垂直な直線を引きます。",
-            draw: (brd) => {
-                let c = brd.create('circle', [[0,0], 2]);
-                let p = brd.create('point', [2,0], {name:'P'});
-                brd.create('line', [[2,-2],[2,2]], {dash:2, strokeColor:'gray'});
-            }
-        },
-        { 
-            text: "辺BCを底辺とした時の、三角形ABCの高さを作図せよ。", ans: "垂線", exp: "AからBCへの垂線を引きます。",
-            draw: (brd) => {
-                let b = brd.create('point', [-2,-1], {name:'B'});
-                let c = brd.create('point', [2,-1], {name:'C'});
-                let a = brd.create('point', [0,2], {name:'A'});
-                brd.create('polygon', [a,b,c]);
-                brd.create('segment', [[0,2], [0,-1]], {dash:2, strokeColor:'red'});
-            }
-        },
-        { 
-            text: "長方形の対角線の交点を作図せよ。", ans: "対角線の交点", exp: "2本の対角線を引くだけです。",
-            draw: (brd) => {
-                brd.create('polygon', [[-2,1],[2,1],[2,-1],[-2,-1]]);
-                brd.create('segment', [[-2,1],[2,-1]], {dash:1});
-                brd.create('segment', [[2,1],[-2,-1]], {dash:1});
-            }
-        },
-        { 
-            text: "正三角形の1つの角の二等分線を作図せよ。", ans: "角の二等分線", exp: "頂点から弧を描き、等距離の点を結びます。",
-            draw: (brd) => {
-                let p1 = brd.create('point', [-1.5, 0]);
-                let p2 = brd.create('point', [1.5, 0]);
-                let p3 = brd.create('point', [0, 2.6]);
-                brd.create('polygon', [p1,p2,p3]);
-                brd.create('line', [[0,2.6],[0,0]], {dash:2});
-            }
-        },
-        { 
-            text: "ひし形の対角線は垂直に交わる。これを利用して対角線の交点を作図せよ。", ans: "対角線の交点", exp: "向かい合う頂点を結びます。",
-            draw: (brd) => {
-                brd.create('polygon', [[0,2],[2,0],[0,-2],[-2,0]]);
-                brd.create('segment', [[0,2],[0,-2]], {dash:1});
-                brd.create('segment', [[2,0],[-2,0]], {dash:1});
-            }
-        },
-        { 
-            text: "線分ABを1辺とする正方形の、もう一つの頂点を作図せよ。", ans: "垂線と円の利用", exp: "垂直二等分線や円の半径を利用して頂点を決めます。",
-            draw: (brd) => {
-                brd.create('segment', [[-1,0],[1,0]], {name:'AB'});
-                brd.create('polygon', [[-1,0],[1,0],[1,2],[-1,2]], {dash:2, fillOpacity:0.1});
-            }
-        },
-        { 
-            text: "$\angle ABC = 30^\circ$ を作図せよ。", ans: "60°の二等分", exp: "正三角形(60°)を作ってから、その角を二等分します。",
-            draw: (brd) => {
-                brd.create('line', [[0,0],[3,0]]);
-                brd.create('line', [[0,0],[2.6, 1.5]], {dash:2});
-            }
-        },
-        { 
-            text: "円の中心Oを作図せよ。", ans: "2本の垂直二等分線の交点", exp: "円周上の任意の2つの弦について、それぞれの垂直二等分線を引きます。",
-            draw: (brd) => {
-                brd.create('circle', [[0,0], 2]);
-                brd.create('point', [0,0], {name:'O', strokeColor:'red'});
+                brd.create('circle', [[0,0], 2], {strokeColor:'#ccc'});
+                brd.create('segment', [[0,0], [2,0]]);
+                brd.create('segment', [[0,0], [1.6, 1.2]], {dash:2});
             }
         }
     ]
-
-};
 
 function select(cat, btn) {
     currentCat = cat;
