@@ -4,83 +4,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>都立数学特訓 - 大問2規則性</title>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f0f4f8; }
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; font-size: 0.9rem; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .visualizer { background: #eee; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; min-height: 150px; }
-        .tile-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; max-width: 300px; margin: auto; }
-        .tile { width: 30px; height: 30px; background: #007AFF; border: 1px solid #fff; border-radius: 4px; animation: pop 0.3s ease; }
-        .tile.highlight { background: #FF9500; }
-        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .visualizer { background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; min-height: 180px; display: flex; justify-content: center; align-items: center; border: 1px solid #eee; }
+        .tile-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+        .tile { width: 25px; height: 25px; background: #007AFF; border: 1px solid #fff; border-radius: 4px; }
         .control-panel { margin: 20px 0; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 10px; }
         input[type="range"] { width: 100%; margin: 10px 0; }
-        .prob-box { font-size: 1.1em; line-height: 1.6; margin-bottom: 20px; }
-        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; }
+        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 100px; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
         .ans-box { display: none; margin-top: 20px; padding: 15px; background: #fff9e6; border-radius: 10px; border: 2px solid #FF9500; }
     </style>
 </head>
 <body>
 
+<div class="nav-header">
+    <a href="index.html" class="back-link">← メニューに戻る</a>
+    <span style="color:#666; font-size:0.8rem;">第2問：規則性</span>
+</div>
+
 <div class="card">
-    <h2 style="text-align:center; color:#333;">第2問：規則性の攻略</h2>
-    
-    <div class="prob-box" id="question">
-        【例題】1辺に $n$ 個ずつタイルを並べて正方形を作るとき、全体の枚数 $S$ を $n$ を用いて表しなさい。
-    </div>
+    <div id="question" class="prob-box">問題読み込み中...</div>
 
     <div class="control-panel">
-        <label>図形の段階 ($n$): <span id="n-val" style="font-weight:bold; color:#007AFF;">3</span></label>
-        <input type="range" id="n-slider" min="1" max="6" value="3" oninput="updateVisualizer()">
+        <label>図形の段階 ($n$): <span id="n-val" style="font-weight:bold; color:#007AFF;">1</span></label>
+        <input type="range" id="n-slider" min="1" max="5" value="1" oninput="updateVisualizer()">
     </div>
 
-    <div class="visualizer" id="viz">
-        </div>
+    <div class="visualizer" id="viz"></div>
 
-    <button class="action-btn" onclick="showAnswer()">考え方と答えを見る</button>
+    <button id="ans-show-btn" class="action-btn" onclick="showAnswer()">考え方と答えを見る</button>
+    <button class="action-btn" style="background:#8E8E93;" onclick="nextProblem()">次の問題</button>
 
     <div id="ans-area" class="ans-box">
-        <div style="font-weight:bold; color:#FF9500;">答え：$S = 4n - 4$ (または $4(n-1)$)</div>
-        <p style="font-size: 0.9em; color:#555;">
-            【ポイント】<br>
-            4つの角が重なっていることに注目します。1辺を $(n-1)$ 枚として4セットあると考えると、式が立てやすくなります！
-        </p>
+        <div id="ans-text" style="font-weight:bold; color:#FF9500; font-size:1.2rem; margin-bottom:10px;"></div>
+        <div id="hint-text" style="font-size: 0.9rem; color:#555; line-height:1.6;"></div>
     </div>
 </div>
 
+<div style="text-align:center; margin-top:30px;">
+    <a href="index.html" class="back-link">TOPメニューへ</a>
+</div>
+
 <script>
+    const problems = [
+        {
+            text: "1辺に $n$ 個ずつタイルを並べて中が空洞の正方形を作るとき、全体の枚数 $S$ を $n$ を用いて表せ。",
+            ans: "$S = 4n - 4$",
+            hint: "4つの角が重なっていることに注目。1辺を $(n-1)$ 個と考えれば、それが4セット分になります。",
+            type: "square"
+        },
+        {
+            text: "$n$ 段のピラミッド型にタイルを並べるとき、全体の枚数 $S$ を $n$ を用いて表せ。",
+            ans: "$S = \\frac{n(n+1)}{2}$",
+            hint: "1段目1枚、2段目2枚...と増えます。同じ図形を逆さまにくっつけると、$n \\times (n+1)$ の長方形になる半分です。",
+            type: "pyramid"
+        },
+        {
+            text: "横に $n$ 個の正方形を並べる。必要な棒の数 $S$ を $n$ を用いて表せ。",
+            ans: "$S = 3n + 1$",
+            hint: "最初の1個は4本、次からは3本ずつ増えます。$4 + 3(n-1)$ を計算すると $3n+1$ になります。",
+            type: "line"
+        }
+    ];
+
+    let currentProb = null;
+
+    function nextProblem() {
+        currentProb = problems[Math.floor(Math.random() * problems.length)];
+        document.getElementById('question').innerHTML = "【問題】" + currentProb.text;
+        document.getElementById('ans-area').style.display = 'none';
+        document.getElementById('n-slider').value = 1;
+        updateVisualizer();
+        MathJax.typesetPromise();
+    }
+
     function updateVisualizer() {
-        const n = document.getElementById('n-slider').value;
+        const n = parseInt(document.getElementById('n-slider').value);
         document.getElementById('n-val').innerText = n;
         const viz = document.getElementById('viz');
         viz.innerHTML = '';
-        
         const container = document.createElement('div');
         container.className = 'tile-container';
-        container.style.width = (n * 35) + 'px';
 
-        // 簡易的な正方形タイルのシミュレーション
-        for (let i = 0; i < n * n; i++) {
-            const row = Math.floor(i / n);
-            const col = i % n;
-            // 外枠だけ描画
-            if (row === 0 || row === n-1 || col === 0 || col === n-1) {
-                const tile = document.createElement('div');
-                tile.className = 'tile';
-                container.appendChild(tile);
+        if (currentProb.type === "square") {
+            container.style.width = (n * 30) + 'px';
+            for (let i = 0; i < n * n; i++) {
+                const r = Math.floor(i / n), c = i % n;
+                if (r === 0 || r === n-1 || c === 0 || c === n-1) {
+                    const t = document.createElement('div'); t.className = 'tile'; container.appendChild(t);
+                }
+            }
+        } else if (currentProb.type === "pyramid") {
+            container.style.width = '100%';
+            for (let i = 1; i <= n; i++) {
+                const row = document.createElement('div');
+                row.style.width = '100%';
+                for (let j = 0; j < i; j++) {
+                    const t = document.createElement('div'); t.className = 'tile'; 
+                    t.style.display = 'inline-block'; row.appendChild(t);
+                }
+                container.appendChild(row);
+            }
+        } else {
+            // line
+            for (let i = 0; i < (3 * n + 1); i++) {
+                const t = document.createElement('div'); t.className = 'tile'; 
+                t.style.backgroundColor = '#34C759'; container.appendChild(t);
             }
         }
         viz.appendChild(container);
     }
 
     function showAnswer() {
+        document.getElementById('ans-text').innerHTML = "答え： " + currentProb.ans;
+        document.getElementById('hint-text').innerHTML = "【考え方】<br>" + currentProb.hint;
         document.getElementById('ans-area').style.display = 'block';
+        MathJax.typesetPromise();
     }
 
-    // 初回読み込み
-    updateVisualizer();
+    // 初回実行
+    nextProblem();
 </script>
-
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
 </body>
 </html>
