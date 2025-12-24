@@ -3,31 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>都立数学完全攻略ポータル</title>
+    <title>都立数学 完全特訓プレミアム</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .menu-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { color: #333; font-size: 1.5rem; margin-bottom: 30px; }
-        .btn { 
-            display: block; width: 100%; padding: 20px; margin-bottom: 15px; 
-            background: #007AFF; color: white; text-decoration: none; 
-            border-radius: 12px; font-weight: bold; font-size: 1.1rem;
-            transition: transform 0.2s, background 0.2s;
+        :root {
+            --primary-color: #1a2a6c;
+            --accent-color: #fdbb2d;
+            --bg-color: #f4f7f6;
         }
-        .btn:hover { background: #0056b3; transform: scale(1.02); }
-        .btn.disabled { background: #ccc; cursor: not-allowed; }
-        .subtitle { font-size: 0.9rem; color: #666; margin-top: 20px; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .menu-grid {
+            display: grid;
+            gap: 15px;
+        }
+        .menu-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 6px solid var(--primary-color);
+        }
+        .menu-item:active {
+            transform: scale(0.98);
+        }
+        .menu-item:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 40px;
+            text-align: center;
+        }
+        .text-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .desc {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        /* 各ボタンの色分け（オプション） */
+        .m1 { border-color: #007AFF; }
+        .m2 { border-color: #34C759; }
+        .m3 { border-color: #FF9500; }
+        .m4 { border-color: #AF52DE; }
+        .m5 { border-color: #FF3B30; }
     </style>
 </head>
 <body>
-    <div class="menu-card">
-    <h1>都立数学 完全特訓</h1>
-    <a href="daimon1.html" class="btn">第1問：小問集合</a>
-    <a href="daimon2.html" class="btn">第2問：規則性</a>
-    <a href="daimon3.html" class="btn">第3問：一次関数</a>
-    <a href="daimon4.html" class="btn">第4問：平面図形と証明</a>
-    <a href="daimon5.html" class="btn">第5問：空間図形</a>
-    <p class="subtitle">※ 学習したい大問を選んでください</p>
+
+<div class="container">
+    <div class="header">
+        <h1>都立数学 完全特訓</h1>
+        <p>〜 目指せ共通問題 満点 〜</p>
     </div>
+
+    <div class="menu-grid">
+        <a href="daimon1.html" class="menu-item m1">
+            <span class="icon">①</span>
+            <div class="text-group">
+                <span class="title">第1問：計算・小問集合</span>
+                <span class="desc">配点46点。確実に取る基礎固め。</span>
+            </div>
+        </a>
+
+        <a href="daimon2.html" class="menu-item m2">
+            <span class="icon">②</span>
+            <div class="text-group">
+                <span class="title">第2問：文字式の規則性</span>
+                <span class="desc">タイルや棒の規則を式にする。</span>
+            </div>
+        </a>
+
+        <a href="daimon3.html" class="menu-item m3">
+            <span class="icon">③</span>
+            <div class="text-group">
+                <span class="title">第3問：一次関数</span>
+                <span class="desc">グラフと座標・面積をマスター。</span>
+            </div>
+        </a>
+
+        <a href="daimon4.html" class="menu-item m4">
+            <span class="icon">④</span>
+            <div class="text-group">
+                <span class="title">第4問：平面図形・証明</span>
+                <span class="desc">合同・相似を論理的に攻略。</span>
+            </div>
+        </a>
+
+        <a href="daimon5.html" class="menu-item m5">
+            <span class="icon">⑤</span>
+            <div class="text-group">
+                <span class="title">第5問：空間図形</span>
+                <span class="desc">三次元の感覚を3Dで養う。</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 都立数学特訓プロジェクト
+    </div>
+</div>
+
 </body>
 </html>
