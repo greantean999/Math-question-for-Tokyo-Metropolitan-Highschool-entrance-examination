@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都立数学完全攻略ポータル</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .menu-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { color: #333; font-size: 1.5rem; margin-bottom: 30px; }
+        .btn { 
+            display: block; width: 100%; padding: 20px; margin-bottom: 15px; 
+            background: #007AFF; color: white; text-decoration: none; 
+            border-radius: 12px; font-weight: bold; font-size: 1.1rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn:hover { background: #0056b3; transform: scale(1.02); }
+        .btn.disabled { background: #ccc; cursor: not-allowed; }
+        .subtitle { font-size: 0.9rem; color: #666; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="menu-card">
+        <h1>都立数学 完全特訓</h1>
+        
+        <a href="daimon1.html" class="btn">第1問：小問集合</a>
+        
+        <a href="daimon2.html" class="btn">第2問：規則性 (Coming Soon)</a>
+        
+        <a href="#" class="btn disabled">第3問：一次関数</a>
+        <a href="#" class="btn disabled">第4問：平面図形</a>
+        <a href="#" class="btn disabled">第5問：空間図形</a>
+
+        <p class="subtitle">※ 学習したい大問を選んでください</p>
+    </div>
+</body>
+</html>
