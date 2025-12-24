@@ -3,148 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>都立数学 完全特訓プレミアム</title>
+    <title>都立数学 完全特訓 2025</title>
     <style>
         :root {
-            --primary-color: #1a2a6c;
-            --accent-color: #fdbb2d;
-            --bg-color: #f4f7f6;
+            --primary: #007AFF;
+            --success: #34C759;
+            --warning: #FF9500;
+            --danger: #FF3B30;
+            --bg: #F2F2F7;
         }
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1C1C1E; }
+        .header { text-align: center; padding: 20px 0; }
+        .header h1 { margin: 0; font-size: 24px; color: #000; }
+        .header p { color: #8E8E93; font-size: 14px; }
+
+        /* セクションスタイル */
+        .section-title { font-size: 18px; font-weight: bold; margin: 25px 0 10px 5px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* カードリスト */
+        .grid { display: grid; gap: 15px; }
+        .menu-card { 
+            background: white; padding: 18px; border-radius: 16px; 
+            display: flex; align-items: center; text-decoration: none; color: inherit;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s;
         }
-        .container {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
+        .menu-card:active { transform: scale(0.98); }
+        .icon { width: 45px; height: 45px; border-radius: 12px; margin-right: 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
+        
+        .info h3 { margin: 0; font-size: 16px; }
+        .info p { margin: 3px 0 0; font-size: 12px; color: #8E8E93; }
+
+        /* ストアバナー */
+        .store-banner {
+            background: linear-gradient(135deg, #5856D6, #007AFF);
+            border-radius: 20px; padding: 20px; color: white; margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(88,86,214,0.3);
         }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
+        .store-banner h2 { margin: 0 0 10px; font-size: 20px; }
+        .store-btn { 
+            background: white; color: #5856D6; border: none; padding: 10px 20px; 
+            border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
-        .header h1 {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            margin-bottom: 5px;
+
+        /* モーダル（ストア画面） */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: flex-end;
         }
-        .header p {
-            color: #666;
-            font-size: 0.9rem;
+        .modal-content { 
+            background: var(--bg); width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; 
+            padding: 25px; max-height: 80vh; overflow-y: auto; 
         }
-        .menu-grid {
-            display: grid;
-            gap: 15px;
+        .price-card {
+            background: white; border-radius: 15px; padding: 15px; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .menu-item {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-decoration: none;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-left: 6px solid var(--primary-color);
-        }
-        .menu-item:active {
-            transform: scale(0.98);
-        }
-        .menu-item:hover {
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        }
-        .icon {
-            font-size: 1.5rem;
-            margin-right: 15px;
-            width: 40px;
-            text-align: center;
-        }
-        .text-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .title {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        .desc {
-            font-size: 0.8rem;
-            color: #888;
-        }
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #aaa;
-        }
-        /* 各ボタンの色分け（オプション） */
-        .m1 { border-color: #007AFF; }
-        .m2 { border-color: #34C759; }
-        .m3 { border-color: #FF9500; }
-        .m4 { border-color: #AF52DE; }
-        .m5 { border-color: #FF3B30; }
+        .price-info h4 { margin: 0; font-size: 15px; }
+        .price-info p { margin: 4px 0 0; font-size: 11px; color: #8E8E93; }
+        .buy-btn { background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 15px; font-weight: bold; }
+        .best-value { border: 2px solid var(--warning); position: relative; }
+        .badge { background: var(--warning); color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; position: absolute; top: -10px; right: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>都立数学 完全特訓</h1>
-        <p>〜 目指せ共通問題 満点 〜</p>
-    </div>
+<div class="header">
+    <h1>都立数学 完全特訓</h1>
+    <p>2025年度入試対応 ビジュアライザー搭載</p>
+</div>
 
-    <div class="menu-grid">
-        <a href="daimon1.html" class="menu-item m1">
-            <span class="icon">①</span>
-            <div class="text-group">
-                <span class="title">第1問：計算・小問集合</span>
-                <span class="desc">配点46点。確実に取る基礎固め。</span>
+<div class="store-banner">
+    <h2>フルアクセスを解放</h2>
+    <p>全130問と詳細解説、3Dモデル操作機能がすべてあなたのものに。</p>
+    <button class="store-btn" onclick="openStore()">ストアを見る</button>
+</div>
+
+<div class="section-title">トレーニングメニュー</div>
+<div class="grid">
+    <a href="daimon1.html" class="menu-card">
+        <div class="icon" style="background: var(--primary);">1</div>
+        <div class="info">
+            <h3>大問1：基礎・小問集合</h3>
+            <p>全90問 | 45点分を確実に奪取する</p>
+        </div>
+    </a>
+    <a href="daimon2.html" class="menu-card">
+        <div class="icon" style="background: var(--success);">2</div>
+        <div class="info">
+            <h3>大問2：数と式の利用</h3>
+            <p>全10問 | 規則性と証明のコツを掴む</p>
+        </div>
+    </a>
+    <a href="daimon3.html" class="menu-card">
+        <div class="icon" style="background: #5856D6;">3</div>
+        <div class="info">
+            <h3>大問3：一次関数</h3>
+            <p>全10問 | グラフと面積の連動を体感</p>
+        </div>
+    </a>
+    <a href="daimon4.html" class="menu-card">
+        <div class="icon" style="background: var(--danger);">4</div>
+        <div class="info">
+            <h3>大問4：平面図形</h3>
+            <p>全10問 | 円周角と相似の動的理解</p>
+        </div>
+    </a>
+    <a href="daimon5.html" class="menu-card">
+        <div class="icon" style="background: var(--warning);">5</div>
+        <div class="info">
+            <h3>大問5：空間図形</h3>
+            <p>全10問 | 3Dモデルを回して断面を攻略</p>
+        </div>
+    </a>
+</div>
+
+<div id="storeModal" class="modal">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <h2 style="margin:0;">ストア</h2>
+            <button onclick="closeStore()" style="border:none; background:none; font-size:20px;">✕</button>
+        </div>
+
+        <div class="section-title">まとめ買いパック</div>
+        <div class="price-card best-value">
+            <div class="badge">一番人気</div>
+            <div class="price-info">
+                <h4>コンプリートパッケージ</h4>
+                <p>全大問(1-5)・130問すべてを解放</p>
             </div>
-        </a>
-
-        <a href="daimon2.html" class="menu-item m2">
-            <span class="icon">②</span>
-            <div class="text-group">
-                <span class="title">第2問：文字式の規則性</span>
-                <span class="desc">タイルや棒の規則を式にする。</span>
+            <button class="buy-btn">¥3,500</button>
+        </div>
+        <div class="price-card">
+            <div class="price-info">
+                <h4>大問1 フルパック</h4>
+                <p>90問の圧倒的演習量で基礎固め</p>
             </div>
-        </a>
-
-        <a href="daimon3.html" class="menu-item m3">
-            <span class="icon">③</span>
-            <div class="text-group">
-                <span class="title">第3問：一次関数</span>
-                <span class="desc">グラフと座標・面積をマスター。</span>
+            <button class="buy-btn">¥2,000</button>
+        </div>
+        <div class="price-card">
+            <div class="price-info">
+                <h4>応用問題パック (大問2-5)</h4>
+                <p>ビジュアライザーをフル活用</p>
             </div>
-        </a>
+            <button class="buy-btn">¥1,500</button>
+        </div>
 
-        <a href="daimon4.html" class="menu-item m4">
-            <span class="icon">④</span>
-            <div class="text-group">
-                <span class="title">第4問：平面図形・証明</span>
-                <span class="desc">合同・相似を論理的に攻略。</span>
+        <div class="section-title">単品販売</div>
+        <div class="price-card">
+            <div class="price-info">
+                <h4>大問1：作図（問9）のみ</h4>
+                <p>苦手な作図をピンポイント攻略</p>
             </div>
-        </a>
-
-        <a href="daimon5.html" class="menu-item m5">
-            <span class="icon">⑤</span>
-            <div class="text-group">
-                <span class="title">第5問：空間図形</span>
-                <span class="desc">三次元の感覚を3Dで養う。</span>
+            <button class="buy-btn">¥300</button>
+        </div>
+        <div class="price-card">
+            <div class="price-info">
+                <h4>大問5：空間図形のみ</h4>
+                <p>3Dギミックで空間認識を鍛える</p>
             </div>
-        </a>
-    </div>
-
-    <div class="footer">
-        &copy; 2025 都立数学特訓プロジェクト
+            <button class="buy-btn">¥500</button>
+        </div>
     </div>
 </div>
+
+<script>
+    function openStore() { document.getElementById('storeModal').style.display = 'flex'; }
+    function closeStore() { document.getElementById('storeModal').style.display = 'none'; }
+    
+    // 背景クリックで閉じる
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('storeModal')) closeStore();
+    }
+</script>
 
 </body>
 </html>
