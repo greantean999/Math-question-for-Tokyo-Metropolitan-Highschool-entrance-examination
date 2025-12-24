@@ -42,6 +42,8 @@ let board = null;
 // 点を生成する際の共通設定（fixed:trueで固定）
 const pOpts = {size: 1, name: '', fixed: true};
 
+const pOpts = {size: 1, name: '', fixed: true};
+
 const database = [
     {
         text: String.raw`1辺が $6\text{cm}$ の立方体があります。この立方体の体積を求めなさい。`,
@@ -80,11 +82,11 @@ const database = [
         ans: String.raw`$36\pi \text{cm}^2$`,
         exp: String.raw`球の表面積の公式は $4\pi r^2$ です。$4 \times \pi \times 3^2 = 36\pi$。`,
         draw: (view) => {
-            for(let i=0; i<=180; i+=30) {
-                let r = 3 * Math.sin(i * Math.PI / 180);
-                let z = 3 * Math.cos(i * Math.PI / 180);
-                view.create('ellipse3d', [[0,0,z], [r,0,z], [0,r,z]], {strokeWidth:1, strokeColor:'#ccc'});
-            }
+            // 3方向の輪っかを描画して球を表現
+            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {strokeColor:'#ccc'});
+            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,0,3]], {strokeColor:'#ccc'});
+            view.create('ellipse3d', [[0,0,0], [0,3,0], [0,0,3]], {strokeColor:'#ccc'});
+            view.create('point3d', [0,0,0], {name:'O', size:2, fixed:true});
         }
     },
     {
@@ -94,9 +96,12 @@ const database = [
         draw: (view) => {
             view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillOpacity:0.1});
             let top = view.create('point3d', [0,0,4], {name:'V', fixed:true});
-            view.create('segment3d', [[0,0,0], [3,0,0]], {dash:2});
+            let p1 = view.create('point3d', [3,0,0], pOpts);
+            let p2 = view.create('point3d', [-3,0,0], pOpts);
+            view.create('segment3d', [[0,0,0], p1], {dash:2});
             view.create('segment3d', [[0,0,0], top], {dash:2});
-            view.create('segment3d', [[3,0,0], top], {strokeColor:'red', strokeWidth:3});
+            view.create('segment3d', [p1, top], {strokeColor:'red', strokeWidth:3});
+            view.create('segment3d', [p2, top], {strokeColor:'#333'});
         }
     },
     {
@@ -104,10 +109,10 @@ const database = [
         ans: String.raw`$20\pi \text{cm}^3$`,
         exp: String.raw`底面積 $\times$ 高さ です。$(\pi \times 2^2) \times 5 = 20\pi$。`,
         draw: (view) => {
-            view.create('ellipse3d', [[0,0,0], [2,0,0], [0,2,0]], {fillOpacity:0.1});
-            view.create('ellipse3d', [[0,0,4], [2,0,4], [0,2,4]], {fillOpacity:0.1});
-            view.create('segment3d', [[2,0,0], [2,0,4]]);
-            view.create('segment3d', [[-2,0,0], [-2,0,4]]);
+            view.create('ellipse3d', [[0,0,-2], [2,0,-2], [0,2,-2]], {fillOpacity:0.1});
+            view.create('ellipse3d', [[0,0,2], [2,0,2], [0,2,2]], {fillOpacity:0.1});
+            view.create('segment3d', [[2,0,-2], [2,0,2]]);
+            view.create('segment3d', [[-2,0,-2], [-2,0,2]]);
         }
     },
     {
@@ -115,7 +120,8 @@ const database = [
         ans: String.raw`$36\text{cm}$`,
         exp: String.raw`正四面体の辺の数は 6 本です。$6 \times 6 = 36$。`,
         draw: (view) => {
-            let pts = [[2,2,2],[2,-2,-2],[-2,2,-2],[-2,-2,2]].map(c => view.create('point3d', c, pOpts));
+            // 座標を調整して綺麗な正四面体に
+            let pts = [[2,0,-1.4], [-2,0,-1.4], [0,1.7,1.4], [0,-1.7,1.4]].map(c => view.create('point3d', c, pOpts));
             [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]].forEach(e => view.create('segment3d', [pts[e[0]], pts[e[1]]]));
         }
     },
@@ -137,8 +143,8 @@ const database = [
         exp: String.raw`切り口は半径 $3\text{cm}$ の円になります。$\pi \times 3^2 = 9\pi$。`,
         draw: (view) => {
             view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillColor:'yellow', fillOpacity:0.4});
-            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,0,3]], {strokeColor:'#ccc'});
-            view.create('ellipse3d', [[0,0,0], [0,3,0], [0,0,3]], {strokeColor:'#ccc'});
+            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,0,3]], {strokeWidth:1});
+            view.create('ellipse3d', [[0,0,0], [0,3,0], [0,0,3]], {strokeWidth:1});
         }
     },
     {
@@ -150,6 +156,8 @@ const database = [
             view.create('polygon3d', [p[0],p[1],p[2]], {fillColor:'blue', fillOpacity:0.1});
             view.create('polygon3d', [p[3],p[4],p[5]], {fillColor:'blue', fillOpacity:0.1});
             [[0,3],[1,4],[2,5]].forEach(e => view.create('segment3d', [p[e[0]], p[e[1]]]));
+            view.create('segment3d', [p[0], p[1]]); view.create('segment3d', [p[1], p[2]]); view.create('segment3d', [p[2], p[0]]);
+            view.create('segment3d', [p[3], p[4]]); view.create('segment3d', [p[4], p[5]]); view.create('segment3d', [p[5], p[3]]);
         }
     }
 ];
@@ -171,6 +179,7 @@ function loadProblem() {
         pan: { enabled: false } 
     });
 
+    // azimuth/elevationを明示的に指定して再描画を安定させる
     let view = board.create('view3d', 
         [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], 
         {
@@ -182,7 +191,9 @@ function loadProblem() {
     );
     
     q.draw(view);
-    board.update();
+    
+    // 重要：すべてのオブジェクトが生成された後に全ボードを強制アップデート
+    board.fullUpdate(); 
     if(window.MathJax) MathJax.typesetPromise();
 }
 
