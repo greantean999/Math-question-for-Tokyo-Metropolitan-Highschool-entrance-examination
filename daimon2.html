@@ -4,23 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>都立数学特訓 - 大問2規則性</title>
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$']] }
-        };
-    </script>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f0f4f8; }
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; font-size: 0.9rem; }
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .visualizer { background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; min-height: 180px; display: flex; justify-content: center; align-items: center; border: 1px solid #eee; }
-        .tile-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
-        .tile { width: 25px; height: 25px; background: #007AFF; border: 1px solid #fff; border-radius: 4px; }
+        .visualizer { background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; min-height: 200px; display: flex; justify-content: center; align-items: center; border: 1px solid #eee; position: relative; }
+        .tile-grid { display: grid; gap: 4px; }
+        .tile { width: 30px; height: 30px; background: #007AFF; border-radius: 4px; }
+        .empty-tile { width: 30px; height: 30px; background: transparent; }
+        .match-container { position: relative; height: 100px; }
+        .match { position: absolute; background: #8B4513; border-radius: 2px; }
+        .match-h { width: 40px; height: 4px; } /* 横棒 */
+        .match-v { width: 4px; height: 40px; } /* 縦棒 */
         .control-panel { margin: 20px 0; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 10px; }
-        input[type="range"] { width: 100%; margin: 10px 0; }
-        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 100px; }
+        input[type="range"] { width: 100%; }
+        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 80px; font-weight: bold; }
         .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
         .ans-box { display: none; margin-top: 20px; padding: 15px; background: #fff9e6; border-radius: 10px; border: 2px solid #FF9500; }
     </style>
@@ -29,51 +30,42 @@
 
 <div class="nav-header">
     <a href="index.html" class="back-link">← メニューに戻る</a>
-    <span style="color:#666; font-size:0.8rem;">第2問：規則性</span>
 </div>
 
 <div class="card">
-    <div id="question" class="prob-box">問題読み込み中...</div>
-
+    <div id="question" class="prob-box">読み込み中...</div>
     <div class="control-panel">
-        <label>図形の段階 ($n$): <span id="n-val" style="font-weight:bold; color:#007AFF;">1</span></label>
+        <label>図の段階 ($n$): <span id="n-val" style="color:#007AFF;">1</span></label>
         <input type="range" id="n-slider" min="1" max="5" value="1" oninput="updateVisualizer()">
     </div>
-
     <div class="visualizer" id="viz"></div>
-
-    <button id="ans-show-btn" class="action-btn" onclick="showAnswer()">考え方と答えを見る</button>
+    <button class="action-btn" onclick="showAnswer()">答え合わせ</button>
     <button class="action-btn" style="background:#8E8E93;" onclick="nextProblem()">次の問題</button>
-
     <div id="ans-area" class="ans-box">
         <div id="ans-text" style="font-weight:bold; color:#FF9500; font-size:1.2rem; margin-bottom:10px;"></div>
-        <div id="hint-text" style="font-size: 0.9rem; color:#555; line-height:1.6;"></div>
+        <div id="hint-text" style="font-size: 0.9rem; color:#555;"></div>
     </div>
-</div>
-
-<div style="text-align:center; margin-top:30px;">
-    <a href="index.html" class="back-link">TOPメニューへ</a>
 </div>
 
 <script>
     const problems = [
         {
-            text: "1辺に $n$ 個ずつタイルを並べて中が空洞の正方形を作るとき、全体の枚数 $S$ を $n$ を用いて表せ。",
+            text: "1辺に $n$ 個ずつタイルを並べて、中が空洞の正方形を作ります。全体の枚数 $S$ を $n$ を用いて表せ。($n \ge 2$)",
             ans: "$S = 4n - 4$",
-            hint: "4つの角が重なっていることに注目。1辺を $(n-1)$ 個と考えれば、それが4セット分になります。",
+            hint: "4つの角が重複していることに注目しましょう。1辺 $(n-1)$ 個が4セットあると考えます。",
             type: "square"
         },
         {
-            text: "$n$ 段のピラミッド型にタイルを並べるとき、全体の枚数 $S$ を $n$ を用いて表せ。",
-            ans: "$S = \\frac{n(n+1)}{2}$",
-            hint: "1段目1枚、2段目2枚...と増えます。同じ図形を逆さまにくっつけると、$n \\times (n+1)$ の長方形になる半分です。",
-            type: "pyramid"
+            text: "マッチ棒を並べて横に $n$ 個の正方形を作ります。必要な棒の数 $S$ を $n$ を用いて表せ。",
+            ans: "$S = 3n + 1$",
+            hint: "1個目は4本必要ですが、2個目からは「コの字型（3本）」を追加するだけになります。$4 + 3(n-1) = 3n+1$",
+            type: "stick"
         },
         {
-            text: "横に $n$ 個の正方形を並べる。必要な棒の数 $S$ を $n$ を用いて表せ。",
-            ans: "$S = 3n + 1$",
-            hint: "最初の1個は4本、次からは3本ずつ増えます。$4 + 3(n-1)$ を計算すると $3n+1$ になります。",
-            type: "line"
+            text: "$n$ 段のピラミッド型にタイルを並べます。全体の枚数 $S$ を $n$ を用いて表せ。",
+            ans: "$S = \\frac{n(n+1)}{2}$",
+            hint: "1+2+3+...+n の和になります。同じ図形を逆さまに合わせると $n(n+1)$ の長方形ができる、その半分です。",
+            type: "pyramid"
         }
     ];
 
@@ -81,7 +73,7 @@
 
     function nextProblem() {
         currentProb = problems[Math.floor(Math.random() * problems.length)];
-        document.getElementById('question').innerHTML = "【問題】" + currentProb.text;
+        document.getElementById('question').innerHTML = currentProb.text;
         document.getElementById('ans-area').style.display = 'none';
         document.getElementById('n-slider').value = 1;
         updateVisualizer();
@@ -93,36 +85,53 @@
         document.getElementById('n-val').innerText = n;
         const viz = document.getElementById('viz');
         viz.innerHTML = '';
-        const container = document.createElement('div');
-        container.className = 'tile-container';
 
         if (currentProb.type === "square") {
-            container.style.width = (n * 30) + 'px';
+            const grid = document.createElement('div');
+            grid.className = 'tile-grid';
+            grid.style.gridTemplateColumns = `repeat(${n}, 30px)`;
             for (let i = 0; i < n * n; i++) {
                 const r = Math.floor(i / n), c = i % n;
-                if (r === 0 || r === n-1 || c === 0 || c === n-1) {
-                    const t = document.createElement('div'); t.className = 'tile'; container.appendChild(t);
-                }
+                const t = document.createElement('div');
+                t.className = (r === 0 || r === n-1 || c === 0 || c === n-1) ? 'tile' : 'empty-tile';
+                grid.appendChild(t);
             }
+            viz.appendChild(grid);
+        } else if (currentProb.type === "stick") {
+            const container = document.createElement('div');
+            container.className = 'match-container';
+            container.style.width = (n * 40 + 4) + 'px';
+            for (let i = 0; i < n; i++) {
+                // 上の横棒
+                addMatch(container, i*40, 0, 'h');
+                // 下の横棒
+                addMatch(container, i*40, 40, 'h');
+                // 左の縦棒
+                addMatch(container, i*40, 0, 'v');
+                // 最後の右の縦棒
+                if (i === n - 1) addMatch(container, (i+1)*40, 0, 'v');
+            }
+            viz.appendChild(container);
         } else if (currentProb.type === "pyramid") {
-            container.style.width = '100%';
+            const container = document.createElement('div');
             for (let i = 1; i <= n; i++) {
                 const row = document.createElement('div');
-                row.style.width = '100%';
                 for (let j = 0; j < i; j++) {
-                    const t = document.createElement('div'); t.className = 'tile'; 
-                    t.style.display = 'inline-block'; row.appendChild(t);
+                    const t = document.createElement('div'); t.className = 'tile';
+                    t.style.display = 'inline-block'; t.style.margin = '2px';
+                    row.appendChild(t);
                 }
                 container.appendChild(row);
             }
-        } else {
-            // line
-            for (let i = 0; i < (3 * n + 1); i++) {
-                const t = document.createElement('div'); t.className = 'tile'; 
-                t.style.backgroundColor = '#34C759'; container.appendChild(t);
-            }
+            viz.appendChild(container);
         }
-        viz.appendChild(container);
+    }
+
+    function addMatch(parent, x, y, dir) {
+        const m = document.createElement('div');
+        m.className = 'match ' + (dir === 'h' ? 'match-h' : 'match-v');
+        m.style.left = x + 'px'; m.style.top = y + 'px';
+        parent.appendChild(m);
     }
 
     function showAnswer() {
@@ -132,7 +141,6 @@
         MathJax.typesetPromise();
     }
 
-    // 初回実行
     nextProblem();
 </script>
 </body>
