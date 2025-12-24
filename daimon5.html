@@ -164,17 +164,28 @@ function loadProblem() {
     if(board) JXG.JSXGraph.freeBoard(board);
     
     board = JXG.JSXGraph.initBoard('jxgbox', {
-        boundingbox: [-5, 5, 5, -5], keepaspectratio: false, axis: false, showCopyright: false
+        boundingbox: [-5, 5, 5, -5], 
+        keepaspectratio: false, 
+        axis: false, 
+        showCopyright: false,
+        pan: { enabled: false } // パン（平行移動）をオフにして回転に集中
     });
 
-    // 初期角度を少し斜めに設定して立体的中に見せる
-    let view = board.create('view3d', [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], {
-        azimuth: 0.8,
-        elevation: 0.5
-    });
+    // 視点の設定。view3dの第3引数で、回転を可能にするための「面」を定義します。
+    let view = board.create('view3d', 
+        [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], 
+        {
+            azimuth: 0.8,
+            elevation: 0.5,
+            // 以下の設定で、背景ドラッグによる回転を有効にします
+            xPlaneOpts: {visible: false},
+            yPlaneOpts: {visible: false},
+            zPlaneOpts: {visible: false}
+        }
+    );
     
     q.draw(view);
-    board.update(); // 描画を確定させる
+    board.update();
     MathJax.typesetPromise();
 }
 
