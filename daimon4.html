@@ -60,7 +60,8 @@ const database = [
         draw: (brd) => {
             brd.create('line', [[-3,2], [3,2]], {name:'l', withLabel:true, fixed:true});
             brd.create('line', [[-3,-2], [3,-2]], {name:'m', withLabel:true, fixed:true});
-            brd.create('segment', [[-1.5,2], [1,0]]); brd.create('segment', [1,0], [-1.5,-2]]);
+            brd.create('segment', [[-1.5,2], [1,0]]); 
+            brd.create('segment', [[1,0], [-1.5,-2]]); // 修正：カッコを閉じました
             brd.create('text', [-0.8, 1.6, "25°"]); brd.create('text', [-0.8, -1.6, "35°"]);
             brd.create('text', [0.3, 0, "x"]);
         }
@@ -95,7 +96,7 @@ const database = [
             let b = brd.create('point', [-2,-2], {name:'B'});
             let c = brd.create('point', [2,-2], {name:'C'});
             brd.create('polygon', [a,b,c]);
-            brd.create('segment', [[-0.66, 0.66], [0.66, 0.66]], {name:'DE', color:'red'});
+            brd.create('segment', [[-0.66, 0.66], [0.66, 0.66]], {name:'DE', color:'red', withLabel:true});
         }
     },
     {
@@ -128,7 +129,8 @@ const database = [
         exp: String.raw`長方形の対角線は等しく、中点で交わるので $OA=OB$。$\triangle OAB$ は二等辺三角形で、頂角 $60^{\circ}$ なので正三角形になります。`,
         draw: (brd) => {
             brd.create('polygon', [[-2,1], [2,1], [2,-1], [-2,-1]]);
-            brd.create('segment', [[-2,1], [2,-1]], {dash:1}); brd.create('segment', [[2,1], [-2,-1]], {dash:1});
+            brd.create('segment', [[-2,1], [2,-1]], {dash:1}); 
+            brd.create('segment', [[2,1], [-2,-1]], {dash:1});
             brd.create('text', [-0.2, 0.2, "60°"]);
         }
     },
@@ -139,8 +141,9 @@ const database = [
         draw: (brd) => {
             let o = brd.create('point', [0,0], {name:'O'});
             brd.create('circle', [o, 2]);
-            brd.create('point', [4,0], {name:'P'});
-            brd.create('segment', [[1.2, 1.6], [4,0]]); brd.create('segment', [[1.2, -1.6], [4,0]]);
+            let p = brd.create('point', [4,0], {name:'P'});
+            brd.create('segment', [[1.2, 1.6], [4,0]]); 
+            brd.create('segment', [[1.2, -1.6], [4,0]]);
         }
     },
     {
@@ -152,7 +155,7 @@ const database = [
             let b = brd.create('point', [-3,-1], {name:'B'});
             let c = brd.create('point', [3,-1], {name:'C'});
             brd.create('polygon', [a,b,c]);
-            brd.create('segment', [[-1.5, 0.5], [1.5, 0.5]], {name:'DE', color:'red'});
+            brd.create('segment', [[-1.5, 0.5], [1.5, 0.5]], {name:'DE', color:'red', strokeWidth:3});
         }
     }
 ];
