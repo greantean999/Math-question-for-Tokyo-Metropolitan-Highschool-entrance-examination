@@ -95,8 +95,39 @@ const database = {
         { text: String.raw`$(\sqrt{6}+\sqrt{2})(\sqrt{6}-\sqrt{2})$`, ans: String.raw`$4$`, exp: String.raw`$6 - 2 = 4$` },
         { text: String.raw`$\sqrt{20} - \frac{5}{\sqrt{5}}$`, ans: String.raw`$\sqrt{5}$`, exp: String.raw`$2\sqrt{5} - \sqrt{5} = \sqrt{5}$` }
     ],
-    // 長くなるのでまずは(1)〜(3)の30問を！ 
-    // 反映されたら(4)〜(9)も送ります。
+        4: [ // 1次方程式
+        { text: String.raw`$4x - 7 = x + 5$`, ans: String.raw`$x = 4$`, exp: String.raw`$3x = 12 \Rightarrow x = 4$` },
+        { text: String.raw`$3(x - 2) = x + 4$`, ans: String.raw`$x = 5$`, exp: String.raw`$3x - 6 = x + 4 \Rightarrow 2x = 10$` },
+        { text: String.raw`$0.5x + 1.2 = 0.2x + 3$`, ans: String.raw`$x = 6$`, exp: String.raw`$3x = 18 \Rightarrow x = 6$` },
+        { text: String.raw`$\frac{x-1}{2} = 3$`, ans: String.raw`$x = 7$`, exp: String.raw`$x - 1 = 6 \Rightarrow x = 7$` },
+        { text: String.raw`$2x + 9 = 5x$`, ans: String.raw`$x = 3$`, exp: String.raw`$3x = 9 \Rightarrow x = 3$` },
+        { text: String.raw`$4 - 2(x - 1) = 10$`, ans: String.raw`$x = -2$`, exp: String.raw`$4 - 2x + 2 = 10 \Rightarrow -2x = 4$` },
+        { text: String.raw`$\frac{1}{3}x = \frac{1}{4}x + 1$`, ans: String.raw`$x = 12$`, exp: String.raw`両辺12倍して $4x = 3x + 12$` },
+        { text: String.raw`$7x + 2 = 4x - 1$`, ans: String.raw`$x = -1$`, exp: String.raw`$3x = -3 \Rightarrow x = -1$` },
+        { text: String.raw`$5(x - 1) = 2(x + 5)$`, ans: String.raw`$x = 5$`, exp: String.raw`$5x - 5 = 2x + 10 \Rightarrow 3x = 15$` },
+        { text: String.raw`$x - 8 = -3x$`, ans: String.raw`$x = 2$`, exp: String.raw`$4x = 8 \Rightarrow x = 2$` }
+    ],
+    5: [ // 連立方程式
+        { text: String.raw`$\begin{cases} x+y=7 \\ x-y=1 \end{cases}$`, ans: String.raw`$x=4, y=3$`, exp: String.raw`足して $2x=8 \Rightarrow x=4$` },
+        { text: String.raw`$\begin{cases} 2x+y=10 \\ x+y=7 \end{cases}$`, ans: String.raw`$x=3, y=4$`, exp: String.raw`引いて $x=3$` },
+        { text: String.raw`$\begin{cases} y=x+2 \\ 2x+y=11 \end{cases}$`, ans: String.raw`$x=3, y=5$`, exp: String.raw`代入法で $2x + (x+2) = 11 \Rightarrow 3x=9$` },
+        { text: String.raw`$\begin{cases} 3x+2y=12 \\ x=y+4 \end{cases}$`, ans: String.raw`$x=4, y=0$`, exp: String.raw`代入法で $3(y+4)+2y=12 \Rightarrow 5y=0$` },
+        { text: String.raw`$\begin{cases} 4x-3y=1 \\ 2x+y=3 \end{cases}$`, ans: String.raw`$x=1, y=1$`, exp: String.raw`下を3倍して足すと $10x=10$` }
+        // ※連立は計算が複雑なので、まずは厳選5問！
+    ],
+    6: [ // 2次方程式
+        { text: String.raw`$x^2 - 6x + 8 = 0$`, ans: String.raw`$x=2, 4$`, exp: String.raw`$(x-2)(x-4)=0$` },
+        { text: String.raw`$x^2 + 5x + 6 = 0$`, ans: String.raw`$x=-2, -3$`, exp: String.raw`$(x+2)(x+3)=0$` },
+        { text: String.raw`$x^2 - 9 = 0$`, ans: String.raw`$x=\pm 3$`, exp: String.raw`$x^2 = 9$` },
+        { text: String.raw`$x^2 - 5x = 0$`, ans: String.raw`$x=0, 5$`, exp: String.raw`$x(x-5)=0$` },
+        { text: String.raw`$x^2 + 2x - 1 = 0$`, ans: String.raw`$x=-1 \pm \sqrt{2}$`, exp: String.raw`解の公式 $x = \frac{-2 \pm \sqrt{4 - 4(1)(-1)}}{2}$` },
+        { text: String.raw`$x^2 - 3x + 1 = 0$`, ans: String.raw`$x = \frac{3 \pm \sqrt{5}}{2}$`, exp: String.raw`解の公式を使用` },
+        { text: String.raw`$(x-3)^2 = 5$`, ans: String.raw`$x=3 \pm \sqrt{5}$`, exp: String.raw`$x-3 = \pm\sqrt{5}$` },
+        { text: String.raw`$2x^2 - 4x - 6 = 0$`, ans: String.raw`$x=-1, 3$`, exp: String.raw`$x^2-2x-3=0 \Rightarrow (x+1)(x-3)=0$` },
+        { text: String.raw`$x^2 + 10x + 25 = 0$`, ans: String.raw`$x=-5$`, exp: String.raw`$(x+5)^2 = 0$` },
+        { text: String.raw`$x^2 = 7x$`, ans: String.raw`$x=0, 7$`, exp: String.raw`$x^2 - 7x = 0$` }
+    ],
+
 };
 
 function select(cat, btn) {
