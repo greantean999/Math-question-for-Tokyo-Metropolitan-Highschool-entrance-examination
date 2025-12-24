@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>都立数学特訓 - 大問3一次関数</title>
+    <title>都立数学特訓 - 大問3一次関数 完全版</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
@@ -11,13 +11,15 @@
         body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #f0f4f8; }
         .nav-header { margin-bottom: 10px; }
         .back-link { text-decoration: none; color: #007AFF; font-weight: bold; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .jxgbox { width: 100%; height: 350px; border-radius: 10px; margin: 20px 0; background-color: white; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #FF9500; }
+        .jxgbox { width: 100%; height: 350px; border-radius: 10px; margin: 15px 0; background-color: white; }
         .control-panel { background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #ddd; }
-        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 80px; font-weight: bold; }
+        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 100px; font-weight: bold; color: #333; }
         .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .ans-box { display: none; margin-top: 20px; padding: 15px; background: #fff9e6; border-radius: 10px; border: 2px solid #FF9500; }
-        .formula-display { text-align: center; font-size: 1.2rem; color: #007AFF; margin: 10px 0; font-weight: bold; }
+        .formula-display { text-align: center; font-size: 1.2rem; color: #007AFF; margin: 10px 0; font-weight: bold; background: #eef7ff; padding: 5px; border-radius: 8px; }
+        input[type="range"] { width: 70%; vertical-align: middle; }
+        .val-span { font-weight: bold; color: #007AFF; width: 30px; display: inline-block; text-align: right; }
     </style>
 </head>
 <body>
@@ -27,48 +29,123 @@
 </div>
 
 <div class="card">
-    <div id="question" class="prob-box">
-        【問題】スライダーを動かして、直線 $y = ax + b$ が点 $(2, 5)$ を通るときの $b$ の値を求めなさい。（$a=2$ とする）
-    </div>
+    <div id="question" class="prob-box">問題読み込み中...</div>
 
     <div class="control-panel">
-        <div>傾き $a$: <input type="range" id="a-slider" min="-3" max="3" step="0.5" value="2" oninput="updateGraph()"> <span id="a-val">2</span></div>
-        <div>切片 $b$: <input type="range" id="b-slider" min="-5" max="5" step="0.5" value="0" oninput="updateGraph()"> <span id="b-val">0</span></div>
+        <div>傾き $a$: <input type="range" id="a-slider" min="-4" max="4" step="0.5" value="1" oninput="updateGraph()"> <span id="a-val" class="val-span">1</span></div>
+        <div>切片 $b$: <input type="range" id="b-slider" min="-6" max="6" step="0.5" value="0" oninput="updateGraph()"> <span id="b-val" class="val-span">0</span></div>
     </div>
 
-    <div id="formula" class="formula-display">$y = 2x + 0$</div>
+    <div id="formula" class="formula-display">$y = 1x + 0$</div>
     <div id="jxgbox" class="jxgbox"></div>
 
     <button class="action-btn" onclick="showAnswer()">答え合わせ</button>
+    <button class="action-btn" style="background:#8E8E93;" onclick="loadProblem()">次の問題</button>
     
     <div id="ans-area" class="ans-box">
-        <div style="font-weight:bold; color:#FF9500; font-size:1.2rem;">正解： $b = 1$</div>
-        <p style="font-size: 0.9rem; color:#555; line-height:1.6;">
-            【解説】<br>
-            $y = 2x + b$ に $x=2, y=5$ を代入すると、<br>
-            $5 = 2(2) + b$ <br>
-            $5 = 4 + b$ より $b = 1$ となります。<br>
-            グラフで切片を 1 に合わせると、ちょうど点(2, 5)を通るのが確認できますね！
-        </p>
+        <div id="ans-title" style="font-weight:bold; color:#FF9500; font-size:1.2rem; margin-bottom:8px;"></div>
+        <div id="ans-exp" style="font-size: 0.9rem; color:#555; line-height:1.6;"></div>
     </div>
 </div>
 
 <script>
     let board = JXG.JSXGraph.initBoard('jxgbox', {
-        boundingbox: [-6, 8, 6, -6], axis: true, showCopyright: false, showNavigation: false
+        boundingbox: [-7, 8, 7, -8], axis: true, showCopyright: false, showNavigation: false
     });
 
-    let line, p_fixed;
+    let activeLine, targetPoint, targetLine;
+    let currentIdx = -1;
 
-    function initGraph() {
-        // 目標の点 (2, 5)
-        p_fixed = board.create('point', [2, 5], {name: '(2,5)', fixed: true, color: 'red'});
-        // 直線の描画
-        line = board.create('line', [
-            () => -parseFloat(document.getElementById('b-slider').value), // 定数項 (ax + by + c = 0 の形式)
-            () => -parseFloat(document.getElementById('a-slider').value), // xの係数
-            1 // yの係数
+    const database = [
+        {
+            text: "直線 $y = 2x + b$ が点 $(2, 6)$ を通るとき、$b$ の値を求めなさい。",
+            ans: "$b = 2$",
+            exp: "$6 = 2(2) + b$ より $6 = 4 + b$ なので $b=2$。グラフを $a=2, b=2$ に合わせると点を通ります。",
+            setup: () => { targetPoint = board.create('point', [2, 6], {name: '(2,6)', color: 'red'}); }
+        },
+        {
+            text: "2点 $(-2, -1), (2, 7)$ を通る直線の式を求めなさい。",
+            ans: "$y = 2x + 3$",
+            exp: "傾き $a = (7 - (-1)) / (2 - (-2)) = 8/4 = 2$。 $y=2x+b$ に代入して $b=3$。",
+            setup: () => {
+                board.create('point', [-2, -1], {name: '', color: 'red', size: 2});
+                board.create('point', [2, 7], {name: '', color: 'red', size: 2});
+            }
+        },
+        {
+            text: "直線 $y = ax - 2$ が点 $(4, 6)$ を通るとき、$a$ の値を求めなさい。",
+            ans: "$a = 2$",
+            exp: "$6 = 4a - 2$ より $4a = 8$ なので $a=2$。",
+            setup: () => { targetPoint = board.create('point', [4, 6], {name: '(4,6)', color: 'red'}); }
+        },
+        {
+            text: "直線 $y = x + 2$ と $x$ 軸、 $y$ 軸で囲まれた三角形の面積を求めなさい。",
+            ans: "$2$",
+            exp: "$x$切片は $-2$、 $y$切片は $2$。 底辺$2 \times$ 高さ$2 \div 2 = 2$。",
+            setup: () => { /* 特になし */ }
+        },
+        {
+            text: "直線 $y = -x + 4$ と $y = 2x + 1$ の交点の座標を求めなさい。",
+            ans: "$(1, 3)$",
+            exp: "$-x + 4 = 2x + 1$ より $3x = 3$ なので $x=1$。 代入して $y=3$。",
+            setup: () => { targetLine = board.create('line', [-1, -2, 1], {strokeColor: 'orange', dash: 2}); }
+        },
+        {
+            text: "変化の割合が $-3$ で、点 $(1, 2)$ を通る直線の式を求めなさい。",
+            ans: "$y = -3x + 5$",
+            exp: "$a = -3$。 $2 = -3(1) + b$ より $b=5$。",
+            setup: () => { targetPoint = board.create('point', [1, 2], {name: '(1,2)', color: 'red'}); }
+        },
+        {
+            text: "直線 $y = \frac{1}{2}x + 3$ に平行で、点 $(4, 2)$ を通る直線の式を求めなさい。",
+            ans: "$y = 0.5x + 0$",
+            exp: "平行なので傾き $a=0.5$。 $2 = 0.5(4) + b$ より $b=0$。",
+            setup: () => { 
+                board.create('line', [-3, -0.5, 1], {strokeColor: 'gray', dash: 2});
+                targetPoint = board.create('point', [4, 2], {name: '(4,2)', color: 'red'});
+            }
+        },
+        {
+            text: "$x$ の変域が $-2 \le x \le 4$ のとき、 $y = 0.5x + 2$ の $y$ の変域を求めなさい。",
+            ans: "$1 \le y \le 4$",
+            exp: "$x=-2$ のとき $y=1$、 $x=4$ のとき $y=4$。",
+            setup: () => { board.create('segment', [[-2,-10],[-2,10]], {dash:1, strokeColor:'#ccc'}); board.create('segment', [[4,-10],[4,10]], {dash:1, strokeColor:'#ccc'}); }
+        },
+        {
+            text: "直線 $y = ax + b$ が $x$ 軸と $(4, 0)$ で交わり、傾きが $-1$ のとき $b$ を求めなさい。",
+            ans: "$b = 4$",
+            exp: "$0 = -1(4) + b$ より $b=4$。",
+            setup: () => { targetPoint = board.create('point', [4, 0], {name: '(4,0)', color: 'red'}); }
+        },
+        {
+            text: "直線 $y = 2x - 4$ と $x$ 軸との交点の座標を求めなさい。",
+            ans: "$(2, 0)$",
+            exp: $0 = 2x - 4$ より $2x = 4$ なので $x=2$。$,
+            setup: () => { /* 特になし */ }
+        }
+    ];
+
+    function loadProblem() {
+        board.clearTraces();
+        JXG.JSXGraph.freeBoard(board);
+        board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-7, 8, 7, -8], axis: true, showCopyright: false, showNavigation: false});
+
+        let nextIdx;
+        do { nextIdx = Math.floor(Math.random() * database.length); } while (nextIdx === currentIdx);
+        currentIdx = nextIdx;
+        const q = database[currentIdx];
+
+        document.getElementById('question').innerHTML = "【問題】" + q.text;
+        document.getElementById('ans-area').style.display = 'none';
+        
+        q.setup();
+        activeLine = board.create('line', [
+            () => -parseFloat(document.getElementById('b-slider').value),
+            () => -parseFloat(document.getElementById('a-slider').value),
+            1
         ], {strokeColor: '#007AFF', strokeWidth: 3});
+
+        updateGraph();
     }
 
     function updateGraph() {
@@ -77,17 +154,19 @@
         document.getElementById('a-val').innerText = a;
         document.getElementById('b-val').innerText = b;
         document.getElementById('formula').innerHTML = `$y = ${a}x + ${b}$`;
-        
         MathJax.typesetPromise([document.getElementById('formula')]);
         board.update();
     }
 
     function showAnswer() {
+        const q = database[currentIdx];
+        document.getElementById('ans-title').innerHTML = "正解： " + q.ans;
+        document.getElementById('ans-exp').innerHTML = "【解説】<br>" + q.exp;
         document.getElementById('ans-area').style.display = 'block';
+        MathJax.typesetPromise([document.getElementById('ans-area')]);
     }
 
-    initGraph();
-    updateGraph();
+    loadProblem();
 </script>
 </body>
 </html>
