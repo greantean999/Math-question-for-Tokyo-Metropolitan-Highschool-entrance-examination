@@ -2,107 +2,96 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>都立数学特訓 - 大問4平面図形</title>
+    <title>都立数学特訓 - 大問4 平面図形</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #fdfdfd; }
-        .nav-header { margin-bottom: 10px; }
-        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #AF52DE; }
-        .jxgbox { width: 100%; height: 350px; border-radius: 10px; margin: 15px 0; background-color: white; }
-        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 100px; font-weight: bold; color: #333; }
-        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .ans-box { display: none; margin-top: 20px; padding: 15px; background: #f4eefc; border-radius: 10px; border: 2px solid #AF52DE; }
-        .step { margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #AF52DE; }
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #fff5f5; }
+        .back-link { text-decoration: none; color: #FF3B30; font-weight: bold; margin-bottom: 15px; display: inline-block; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #FF3B30; }
+        #prob-text { font-size: 1.1em; line-height: 1.6; margin: 10px 0; min-height: 60px; font-weight: bold; }
+        .jxgbox { width: 100%; height: 350px; margin: 15px 0; border-radius: 10px; background: white; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #FF3B30; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .ans-box { display: none; margin-top: 15px; padding: 15px; background: #fff0f0; border-radius: 10px; border: 2px solid #FF3B30; }
+        .hint-badge { display: inline-block; background: #FF9500; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8em; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="nav-header">
-    <a href="index.html" class="back-link">← メニューに戻る</a>
-</div>
+<a href="index.html" class="back-link">← メニューに戻る</a>
 
 <div class="card">
-    <div id="question" class="prob-box">
-        【問題】右の図で、$\triangle ABC$ と $\triangle ADE$ が正三角形であるとき、$\triangle ABD \equiv \triangle ACE$ であることを証明しなさい。
-    </div>
-
+    <div class="hint-badge">図の点を動かして考えてみよう！</div>
+    <div id="prob-text">問題読み込み中...</div>
     <div id="jxgbox" class="jxgbox"></div>
-    <p style="font-size: 0.8rem; color: #666; text-align: center;">※点Dをドラッグして動かしてみよう！</p>
-
-    <button class="action-btn" onclick="showAnswer()">証明の流れを確認する</button>
+    <button id="show-btn" class="action-btn" onclick="showAnswer()">答え合わせ</button>
+    <button class="action-btn" style="background:#8E8E93;" onclick="loadProblem()">次の問題</button>
     
     <div id="ans-area" class="ans-box">
-        <h3 style="margin-top:0; color:#AF52DE;">証明の構成</h3>
-        <div class="step">
-            <strong>1. 注目する三角形</strong><br>
-            $\triangle ABD$ と $\triangle ACE$ において
-        </div>
-        <div class="step">
-            <strong>2. 等しい辺を見つける</strong><br>
-            正三角形の辺は等しいので：<br>
-            $AB = AC$ …①<br>
-            $AD = AE$ …②
-        </div>
-        <div class="step">
-            <strong>3. 間の角を攻略する</strong><br>
-            $\angle BAD = 60^\circ - \angle DAC$<br>
-            $\angle CAE = 60^\circ - \angle DAC$<br>
-            よって $\angle BAD = \angle CAE$ …③
-        </div>
-        <div class="step">
-            <strong>4. 結論</strong><br>
-            ①②③より、2辺とその間の角がそれぞれ等しいので<br>
-            $\triangle ABD \equiv \triangle ACE$
-        </div>
+        <div id="ans" style="font-weight:bold; font-size:1.3em; color:#FF3B30; border-bottom:1px solid #ccc; padding-bottom:5px;"></div>
+        <div id="exp" style="font-size: 0.95em; color: #444; line-height: 1.7; margin-top: 10px;"></div>
     </div>
 </div>
 
 <script>
-    let board = JXG.JSXGraph.initBoard('jxgbox', {
-        boundingbox: [-2, 5, 6, -1], axis: false, showCopyright: false, showNavigation: false
-    });
+let board = null;
 
-    // 正三角形 ABC
-    let pA = board.create('point', [2, 4], {name: 'A', fixed: true, color: 'black'});
-    let pB = board.create('point', [0, 0], {name: 'B', fixed: true, color: 'black'});
-    let pC = board.create('point', [4, 0], {name: 'C', fixed: true, color: 'black'});
-    board.create('polygon', [pA, pB, pC], {fillColor: '#Eef', borders: {strokeColor: '#007AFF'}});
-
-    // 動かせる点 D
-    let pD = board.create('point', [0.5, 2.5], {name: 'D', color: '#AF52DE'});
-
-    // 点 D を A 中心に -60度回転させて E を作成
-    let pE = board.create('transform', [() => -Math.PI/3, pA], {type: 'rotate'}).applyOnce(pD);
-    // 常にA中心に回転するよう制約をかけるための定義
-    let pE_dynamic = board.create('point', [
-        () => {
-            let dx = pD.X() - pA.X();
-            let dy = pD.Y() - pA.Y();
-            let angle = -Math.PI/3;
-            return pA.X() + dx * Math.cos(angle) - dy * Math.sin(angle);
-        },
-        () => {
-            let dx = pD.X() - pA.X();
-            let dy = pD.Y() - pA.Y();
-            let angle = -Math.PI/3;
-            return pA.Y() + dx * Math.sin(angle) + dy * Math.cos(angle);
+const database = [
+    {
+        text: String.raw`円Oの周上に3点A, B, Cがあり、$\angle BOC = 80^{\circ}$ です。$\angle BAC$ の大きさを求めなさい。`,
+        ans: String.raw`$40^{\circ}$`,
+        exp: String.raw`円周角の定理より、同じ弧に対する円周角は中心角の半分です。$80 \div 2 = 40^{\circ}$。`,
+        draw: (brd) => {
+            let o = brd.create('point', [0,0], {name:'O', fixed:true});
+            let c1 = brd.create('circle', [o, 3], {strokeColor:'#ccc'});
+            let b = brd.create('point', [3,0], {name:'B', fixed:true});
+            let c = brd.create('point', [3*Math.cos(80*Math.PI/180), 3*Math.sin(80*Math.PI/180)], {name:'C', fixed:true});
+            let a = brd.create('glider', [-2, 2.2, c1], {name:'A'});
+            brd.create('polygon', [o, b, c], {fillColor:'#FF3B30', fillOpacity:0.1});
+            brd.create('segment', [a, b]); brd.create('segment', [a, c]);
+            brd.create('angle', [b, a, c], {radius:0.7, name:''});
+            brd.create('angle', [b, o, c], {radius:0.5, name:'80°'});
         }
-    ], {name: 'E', color: '#AF52DE'});
-
-    // 正三角形 ADE
-    board.create('polygon', [pA, pD, pE_dynamic], {fillColor: '#Fef', borders: {strokeColor: '#AF52DE'}});
-
-    // 注目する三角形を強調（半透明）
-    board.create('polygon', [pA, pB, pD], {fillColor: 'yellow', fillOpacity: 0.2, borders: {strokeWidth: 0}});
-    board.create('polygon', [pA, pC, pE_dynamic], {fillColor: 'green', fillOpacity: 0.2, borders: {strokeWidth: 0}});
-
-    function showAnswer() {
-        document.getElementById('ans-area').style.display = 'block';
+    },
+    {
+        text: String.raw`右の図で、$l // m$ のとき、$\angle x$ の大きさを求めなさい。`,
+        ans: String.raw`$60^{\circ}$`,
+        exp: String.raw`平行線の錯角を利用します。折れ曲がった点を通る平行な補助線を引くと、$25 + 35 = 60^{\circ}$ となります。`,
+        draw: (brd) => {
+            brd.create('line', [[-3,2], [3,2]], {name:'l', withLabel:true, fixed:true});
+            brd.create('line', [[-3,-2], [3,-2]], {name:'m', withLabel:true, fixed:true});
+            let p1 = brd.create('point', [-1, 2], {visible:false});
+            let p2 = brd.create('point', [1, 0], {name:'P'});
+            let p3 = brd.create('point', [-1, -2], {visible:false});
+            brd.create('segment', [p1, p2]); brd.create('segment', [p2, p3]);
+            brd.create('text', [-0.5, 1.5, "25°"]);
+            brd.create('text', [-0.5, -1.5, "35°"]);
+            brd.create('text', [0.3, 0, "x"]);
+        }
     }
+];
+
+function loadProblem() {
+    const q = database[Math.floor(Math.random() * database.length)];
+    document.getElementById('prob-text').innerHTML = q.text;
+    document.getElementById('ans').innerHTML = "正解：" + q.ans;
+    document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
+    document.getElementById('ans-area').style.display = 'none';
+    
+    if(board) JXG.JSXGraph.freeBoard(board);
+    board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-4, 4, 4, -4], axis:false, showCopyright:false});
+    q.draw(board);
+    
+    MathJax.typesetPromise();
+}
+
+function showAnswer() {
+    document.getElementById('ans-area').style.display = 'block';
+}
+
+window.onload = loadProblem;
 </script>
 </body>
 </html>
