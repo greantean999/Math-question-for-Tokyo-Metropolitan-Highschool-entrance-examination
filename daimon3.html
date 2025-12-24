@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>都立数学特訓 - 大問3一次関数</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #f0f4f8; }
+        .nav-header { margin-bottom: 10px; }
+        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .jxgbox { width: 100%; height: 350px; border-radius: 10px; margin: 20px 0; background-color: white; }
+        .control-panel { background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #ddd; }
+        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 80px; font-weight: bold; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .ans-box { display: none; margin-top: 20px; padding: 15px; background: #fff9e6; border-radius: 10px; border: 2px solid #FF9500; }
+        .formula-display { text-align: center; font-size: 1.2rem; color: #007AFF; margin: 10px 0; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="nav-header">
+    <a href="index.html" class="back-link">← メニューに戻る</a>
+</div>
+
+<div class="card">
+    <div id="question" class="prob-box">
+        【問題】スライダーを動かして、直線 $y = ax + b$ が点 $(2, 5)$ を通るときの $b$ の値を求めなさい。（$a=2$ とする）
+    </div>
+
+    <div class="control-panel">
+        <div>傾き $a$: <input type="range" id="a-slider" min="-3" max="3" step="0.5" value="2" oninput="updateGraph()"> <span id="a-val">2</span></div>
+        <div>切片 $b$: <input type="range" id="b-slider" min="-5" max="5" step="0.5" value="0" oninput="updateGraph()"> <span id="b-val">0</span></div>
+    </div>
+
+    <div id="formula" class="formula-display">$y = 2x + 0$</div>
+    <div id="jxgbox" class="jxgbox"></div>
+
+    <button class="action-btn" onclick="showAnswer()">答え合わせ</button>
+    
+    <div id="ans-area" class="ans-box">
+        <div style="font-weight:bold; color:#FF9500; font-size:1.2rem;">正解： $b = 1$</div>
+        <p style="font-size: 0.9rem; color:#555; line-height:1.6;">
+            【解説】<br>
+            $y = 2x + b$ に $x=2, y=5$ を代入すると、<br>
+            $5 = 2(2) + b$ <br>
+            $5 = 4 + b$ より $b = 1$ となります。<br>
+            グラフで切片を 1 に合わせると、ちょうど点(2, 5)を通るのが確認できますね！
+        </p>
+    </div>
+</div>
+
+<script>
+    let board = JXG.JSXGraph.initBoard('jxgbox', {
+        boundingbox: [-6, 8, 6, -6], axis: true, showCopyright: false, showNavigation: false
+    });
+
+    let line, p_fixed;
+
+    function initGraph() {
+        // 目標の点 (2, 5)
+        p_fixed = board.create('point', [2, 5], {name: '(2,5)', fixed: true, color: 'red'});
+        // 直線の描画
+        line = board.create('line', [
+            () => -parseFloat(document.getElementById('b-slider').value), // 定数項 (ax + by + c = 0 の形式)
+            () => -parseFloat(document.getElementById('a-slider').value), // xの係数
+            1 // yの係数
+        ], {strokeColor: '#007AFF', strokeWidth: 3});
+    }
+
+    function updateGraph() {
+        const a = document.getElementById('a-slider').value;
+        const b = document.getElementById('b-slider').value;
+        document.getElementById('a-val').innerText = a;
+        document.getElementById('b-val').innerText = b;
+        document.getElementById('formula').innerHTML = `$y = ${a}x + ${b}$`;
+        
+        MathJax.typesetPromise([document.getElementById('formula')]);
+        board.update();
+    }
+
+    function showAnswer() {
+        document.getElementById('ans-area').style.display = 'block';
+    }
+
+    initGraph();
+    updateGraph();
+</script>
+</body>
+</html>
