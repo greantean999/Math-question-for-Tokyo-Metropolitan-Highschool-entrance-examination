@@ -6,10 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$']] },
-            chtml: { matchFontHeight: false }
-        };
+        window.MathJax = { tex: { inlineMath: [['$', '$']] }, chtml: { matchFontHeight: false } };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
@@ -33,7 +30,7 @@
 </div>
 
 <div class="card">
-    <div class="nav-grid" id="nav-buttons">
+    <div class="nav-grid">
         <button class="nav-btn" onclick="select(1, this)">(1)四則</button>
         <button class="nav-btn" onclick="select(2, this)">(2)文字式</button>
         <button class="nav-btn" onclick="select(3, this)">(3)平方根</button>
@@ -45,13 +42,13 @@
         <button class="nav-btn" onclick="select(9, this)">(9)作図</button>
     </div>
 
-    <div id="prob-text">項目を選んでください</div>
+    <div id="prob-text">学習したい項目を選んでください。</div>
     <div id="jxgbox" class="jxgbox"></div>
     <button id="show-btn" class="action-btn" onclick="showAnswer()" style="display:none;">答え合わせ</button>
     
     <div id="ans-area" class="ans-box">
-        <div id="ans" style="font-weight:bold; font-size:1.3em; color:#d00;"></div>
-        <div id="exp" style="margin-top:10px; color:#444; line-height:1.6;"></div>
+        <div id="ans" style="font-weight:bold; font-size:1.4em; color:#d00; border-bottom:1px solid #ffcccc; padding-bottom:5px;"></div>
+        <div id="exp" style="font-size: 0.95em; color: #444; line-height: 1.8; margin-top: 10px; background: white; padding: 10px; border-radius: 5px;"></div>
         <button class="action-btn" style="background:#8E8E93; margin-top:15px;" onclick="loadProblem()">次の問題</button>
     </div>
 </div>
@@ -59,42 +56,56 @@
 <script>
 let board = null;
 let currentCat = 0;
-let lastProbIdx = -1;
+let lastIdx = -1;
 
 const database = {
-    1: [ /* 四則 */
-        { text: String.raw`$5 + (-3) \times 4$`, ans: String.raw`$-7$`, exp: String.raw`$5 - 12 = -7$` },
-        { text: String.raw`$(-6)^2 \div 4 - 10$`, ans: String.raw`$-1$`, exp: String.raw`$36 \div 4 - 10 = 9 - 10 = -1$` },
-        { text: String.raw`$8 - 2 \times (-3)^2$`, ans: String.raw`$-10$`, exp: String.raw`$8 - 2 \times 9 = 8 - 18 = -10$` }
+    1: [
+        { text: String.raw`$(-4)^2 + 6 \div (-2)$`, ans: String.raw`$13$`, exp: String.raw`$16 + (-3) = 13$` },
+        { text: String.raw`$5 - 2 \times (-4)$`, ans: String.raw`$13$`, exp: String.raw`$5 - (-8) = 13$` },
+        { text: String.raw`$(-3) \times 7 + 10$`, ans: String.raw`$-11$`, exp: String.raw`$-21 + 10 = -11$` },
+        { text: String.raw`$8 - (-3)^2$`, ans: String.raw`$-1$`, exp: String.raw`$8 - 9 = -1$` },
+        { text: String.raw`$(-6)^2 \div 9 - 4$`, ans: String.raw`$0$`, exp: String.raw`$36 \div 9 - 4 = 0$` }
     ],
-    2: [ /* 文字式 */
-        { text: String.raw`$4(x-y) - (3x-2y)$`, ans: String.raw`$x-2y$`, exp: String.raw`$4x-4y-3x+2y = x-2y$` },
-        { text: String.raw`$\frac{1}{2}(4a+6b) - 3b$`, ans: String.raw`$2a$`, exp: String.raw`$2a+3b-3b = 2a$` }
+    2: [
+        { text: String.raw`$3(x - 2y) - 2(2x - y)$`, ans: String.raw`$-x - 4y$`, exp: String.raw`$3x - 6y - 4x + 2y = -x - 4y$` },
+        { text: String.raw`$4a + 5b - (2a - b)$`, ans: String.raw`$2a + 6b$`, exp: String.raw`$4a + 5b - 2a + b = 2a + 6b$` },
+        { text: String.raw`$8x^2y \div 4x$`, ans: String.raw`$2xy$`, exp: String.raw`数字は $8 \div 4=2$ 、文字は $x^2y \div x = xy$` }
     ],
-    // ... 中略 ...
-    9: [ /* 作図（ここを大幅強化） */
+    3: [
+        { text: String.raw`$\sqrt{18} + \sqrt{8}$`, ans: String.raw`$5\sqrt{2}$`, exp: String.raw`$3\sqrt{2} + 2\sqrt{2} = 5\sqrt{2}$` },
+        { text: String.raw`$(\sqrt{5}+1)(\sqrt{5}-1)$`, ans: String.raw`$4$`, exp: String.raw`$(\sqrt{5})^2 - 1^2 = 5 - 1 = 4$` },
+        { text: String.raw`$\frac{6}{\sqrt{3}} - \sqrt{3}$`, ans: String.raw`$\sqrt{3}$`, exp: String.raw`有理化して $2\sqrt{3} - \sqrt{3} = \sqrt{3}$` }
+    ],
+    4: [
+        { text: String.raw`$4x - 7 = x + 5$`, ans: String.raw`$x = 4$`, exp: String.raw`$3x = 12 \Rightarrow x = 4$` },
+        { text: String.raw`$2(x - 3) = 10$`, ans: String.raw`$x = 8$`, exp: String.raw`$2x - 6 = 10 \Rightarrow 2x = 16$` }
+    ],
+    5: [
+        { text: String.raw`$\begin{cases} x+y=5 \\ x-y=1 \end{cases}$`, ans: String.raw`$x=3, y=2$`, exp: String.raw`加減法で $2x=6 \Rightarrow x=3$ 、代入して $y=2$` }
+    ],
+    6: [
+        { text: String.raw`$x^2 - 5x + 6 = 0$`, ans: String.raw`$x=2, 3$`, exp: String.raw`$(x-2)(x-3)=0$ より $x=2, 3$` },
+        { text: String.raw`$x^2 + 2x - 1 = 0$`, ans: String.raw`$x=-1 \pm \sqrt{2}$`, exp: String.raw`解の公式 $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$ を使用。` }
+    ],
+    7: [
+        { text: "サイコロを2度振る時、出た目の和が7になる確率。", ans: String.raw`$\frac{1}{6}$`, exp: String.raw`(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)の6通り。$6/36 = 1/6$` }
+    ],
+    8: [
+        { text: String.raw`$y=x^2$ で $x$ の変域が $-2 \le x \le 3$ のときの $y$ の変域。`, ans: String.raw`$0 \le y \le 9$`, exp: String.raw`$x=0$ を通るので最小値は $0$ 、最大値は $3^2=9$` },
+        { text: "正八角形の1つの外角の大きさ。", ans: String.raw`$45^{\circ}$`, exp: String.raw`$360 \div 8 = 45$` }
+    ],
+    9: [
         { 
-            text: "線分ABの垂直二等分線を作図せよ。", 
-            ans: "垂直二等分線", exp: "A,Bから等しい半径の円を描き、2つの交点を結びます。",
+            text: "線分ABの垂直二等分線を作図せよ。", ans: "垂直二等分線", exp: "A, Bから等しい半径の円を描き、その交点を結びます。",
             draw: (brd) => {
                 let a = brd.create('point', [-2,0], {name:'A', fixed:true});
                 let b = brd.create('point', [2,0], {name:'B', fixed:true});
                 brd.create('segment', [a,b]);
-                brd.create('line', [[0,-1],[0,1]], {dash:2, strokeColor:'gray'});
+                brd.create('line', [[0,-2],[0,2]], {dash:2, strokeColor:'gray'});
             }
         },
         { 
-            text: "点Pを通り、直線Lに垂直な線（垂線）を作図せよ。", 
-            ans: "垂線", exp: "PからLに弧を描き、Lとの交点2つから等距離の点を探します。",
-            draw: (brd) => {
-                let l = brd.create('line', [[-3,-1],[3,-1]], {name:'L', withLabel:true, fixed:true});
-                let p = brd.create('point', [0,1], {name:'P', fixed:true});
-                brd.create('line', [[0,-1],[0,2]], {dash:2, strokeColor:'gray'});
-            }
-        },
-        { 
-            text: "角ABCの二等分線を作図せよ。", 
-            ans: "角の二等分線", exp: "Bを中心とした弧を描き、辺AB,BCとの交点から等距離の点を結びます。",
+            text: "角ABCの二等分線を作図せよ。", ans: "角の二等分線", exp: "Bを中心とした弧を描き、辺との交点からさらに等距離の点を結びます。",
             draw: (brd) => {
                 let b = brd.create('point', [-1,-1], {name:'B', fixed:true});
                 let a = brd.create('point', [-1,2], {name:'A', fixed:true});
@@ -102,35 +113,13 @@ const database = {
                 brd.create('segment', [b,a]); brd.create('segment', [b,c]);
                 brd.create('line', [b, [1,1]], {dash:2, strokeColor:'gray'});
             }
-        },
-        { 
-            text: "点Aを通り、半直線ABに対して30度の角を作図せよ。", 
-            ans: "30度の作図", exp: "正三角形（60度）を作図し、その角を二等分します。",
-            draw: (brd) => {
-                let a = brd.create('point', [0,0], {name:'A', fixed:true});
-                let b = brd.create('point', [3,0], {name:'B', fixed:true});
-                brd.create('segment', [a,b]);
-                brd.create('line', [a, [2, 1.15]], {dash:2, strokeColor:'gray'});
-            }
-        },
-        { 
-            text: "3点A,B,Cを通る円の中心Oを作図せよ。", 
-            ans: "円の中心", exp: "ABとBCの垂直二等分線をそれぞれ描き、その交点が中心Oです。",
-            draw: (brd) => {
-                let a = brd.create('point', [-1,2], {name:'A', fixed:true});
-                let b = brd.create('point', [2,1], {name:'B', fixed:true});
-                let c = brd.create('point', [0,-2], {name:'C', fixed:true});
-                brd.create('point', [0.1, 0.1], {name:'O', strokeColor:'red', dash:2});
-            }
         }
     ]
 };
 
-// 既存の1-8も同様に保持（簡易化のため上記では省略していますが、お持ちのコードをそのまま使えます）
-
 function select(cat, btn) {
     currentCat = cat;
-    lastProbIdx = -1; // カテゴリが変わったらリセット
+    lastIdx = -1;
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     loadProblem();
@@ -141,11 +130,8 @@ function loadProblem() {
     if(!list) return;
 
     let newIdx;
-    do {
-        newIdx = Math.floor(Math.random() * list.length);
-    } while (newIdx === lastProbIdx && list.length > 1); // 2問以上あれば連続を避ける
-
-    lastProbIdx = newIdx;
+    do { newIdx = Math.floor(Math.random() * list.length); } while (newIdx === lastIdx && list.length > 1);
+    lastIdx = newIdx;
     const q = list[newIdx];
     
     document.getElementById('prob-text').innerHTML = q.text;
