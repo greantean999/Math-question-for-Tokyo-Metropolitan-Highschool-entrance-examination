@@ -45,7 +45,10 @@ const database = [
         exp: String.raw`立方体の体積は（1辺）$^3$ です。$6 \times 6 \times 6 = 216$。`,
         draw: (view) => {
             let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, {size:1, name:''}));
-            [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6]].forEach(f => view.create('polygon3d', f.map(i=>p[i]), {fillColor:'#859900', fillOpacity:0.1}));
+            // 面を描画（前後上下左右）
+            [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,3,7,4]].forEach(f => 
+                view.create('polygon3d', f.map(i=>p[i]), {fillColor:'#859900', fillOpacity:0.2, borderLine:{strokeWidth:1}})
+            );
         }
     },
     {
@@ -55,17 +58,18 @@ const database = [
         draw: (view) => {
             let pts = [[-2,-2,0],[2,-2,0],[2,2,0],[-2,2,0]].map(c => view.create('point3d', c, {size:1, name:''}));
             let top = view.create('point3d', [0,0,4], {name:'V'});
-            view.create('polygon3d', pts, {fillOpacity:0.1});
-            pts.forEach((pt, i) => view.create('polygon3d', [pt, pts[(i+1)%4], top], {fillOpacity:0.2}));
+            view.create('polygon3d', pts, {fillColor:'#268bd2', fillOpacity:0.1});
+            pts.forEach((pt, i) => view.create('polygon3d', [pt, pts[(i+1)%4], top], {fillColor:'#268bd2', fillOpacity:0.3}));
         }
     },
     {
         text: String.raw`立方体の辺ABと「ねじれの位置」にある辺は全部でいくつありますか。`,
         ans: String.raw`$4$ つ`,
-        exp: String.raw`同じ平面上になく、平行でも交わりもしない辺を探します。垂直な4本と平行な3本、交わる4本を除いた4本です。`,
+        exp: String.raw`同じ平面上になく、平行でも交わりもしない辺を探します。底面の2辺、側面の2辺が該当します。`,
         draw: (view) => {
             let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, {size:1, name:''}));
             view.create('segment3d', [p[0], p[1]], {strokeColor:'red', strokeWidth:5}); // 辺AB
+            // 全ての辺を描画
             [[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]].forEach(e => view.create('segment3d', [p[e[0]], p[e[1]]]));
         }
     },
@@ -74,21 +78,25 @@ const database = [
         ans: String.raw`$36\pi \text{cm}^2$`,
         exp: String.raw`球の表面積の公式は $4\pi r^2$ です。$4 \times \pi \times 3^2 = 36\pi$。`,
         draw: (view) => {
-            // JSXGraphでの球の表現（円の組み合わせ）
             view.create('point3d', [0,0,0], {name:'O'});
-            for(let i=0; i<3; i++) view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillOpacity:0});
+            // 緯線・経線で球を表現
+            for(let i=0; i<=180; i+=30) {
+                let r = 3 * Math.sin(i * Math.PI / 180);
+                let z = 3 * Math.cos(i * Math.PI / 180);
+                view.create('ellipse3d', [[0,0,z], [r,0,z], [0,r,z]], {strokeWidth:1, strokeColor:'#ccc'});
+            }
         }
     },
     {
         text: String.raw`底面の半径が $3\text{cm}$、高さが $4\text{cm}$ の円錐の母線の長さを求めなさい。`,
         ans: String.raw`$5\text{cm}$`,
-        exp: String.raw`半径、高さ、母線で直角三角形ができます。三平方の定理より $\sqrt{3^2 + 4^2} = \sqrt{25} = 5$。`,
+        exp: String.raw`半径、高さ、母線で直角三角形ができます。三平方の定理より $\sqrt{3^2 + 4^2} = 5$。`,
         draw: (view) => {
-            let center = view.create('point3d', [0,0,0]);
-            let top = view.create('point3d', [0,0,4]);
-            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]]);
-            view.create('segment3d', [center, top], {dash:2});
-            view.create('segment3d', [[3,0,0], top], {strokeColor:'red'});
+            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillOpacity:0.1});
+            let top = view.create('point3d', [0,0,4], {name:'V'});
+            view.create('segment3d', [[0,0,0], [3,0,0]], {dash:2});
+            view.create('segment3d', [[0,0,0], top], {dash:2});
+            view.create('segment3d', [[3,0,0], top], {strokeColor:'red', strokeWidth:3});
         }
     },
     {
@@ -96,9 +104,10 @@ const database = [
         ans: String.raw`$20\pi \text{cm}^3$`,
         exp: String.raw`底面積 $\times$ 高さ です。$(\pi \times 2^2) \times 5 = 20\pi$。`,
         draw: (view) => {
-            view.create('ellipse3d', [[0,0,0], [2,0,0], [0,2,0]]);
-            view.create('ellipse3d', [[0,0,4], [2,0,4], [0,2,4]]);
-            view.create('segment3d', [[2,0,0], [2,0,4]]); view.create('segment3d', [[-2,0,0], [-2,0,4]]);
+            view.create('ellipse3d', [[0,0,0], [2,0,0], [0,2,0]], {fillOpacity:0.1});
+            view.create('ellipse3d', [[0,0,4], [2,0,4], [0,2,4]], {fillOpacity:0.1});
+            view.create('segment3d', [[2,0,0], [2,0,4]]);
+            view.create('segment3d', [[-2,0,0], [-2,0,4]]);
         }
     },
     {
@@ -106,36 +115,38 @@ const database = [
         ans: String.raw`$36\text{cm}$`,
         exp: String.raw`正四面体の辺の数は 6 本です。$6 \times 6 = 36$。`,
         draw: (view) => {
-            let s = 3;
-            let pts = [[s,0,-s/Math.sqrt(2)], [-s,0,-s/Math.sqrt(2)], [0,s,s/Math.sqrt(2)], [0,-s,s/Math.sqrt(2)]].map(c => view.create('point3d', c, {size:1}));
+            let pts = [[2,2,2],[2,-2,-2],[-2,2,-2],[-2,-2,2]].map(c => view.create('point3d', c, {size:1}));
             [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]].forEach(e => view.create('segment3d', [pts[e[0]], pts[e[1]]]));
         }
     },
     {
-        text: String.raw`直方体の対角線の長さを求めます。縦 $3$, 横 $4$, 高さ $5$ のとき、対角線の長さは？`,
-        ans: String.raw`$5\sqrt{2}$`,
-        exp: String.raw`対角線は $\sqrt{a^2 + b^2 + c^2}$ で求められます。$\sqrt{3^2 + 4^2 + 5^2} = \sqrt{50} = 5\sqrt{2}$。`,
+        text: String.raw`縦 $3\text{cm}$, 横 $4\text{cm}$, 高さ $5\text{cm}$ の直方体の対角線の長さを求めなさい。`,
+        ans: String.raw`$5\sqrt{2}\text{cm}$`,
+        exp: String.raw`対角線は $\sqrt{3^2 + 4^2 + 5^2} = \sqrt{50} = 5\sqrt{2}$ です。`,
         draw: (view) => {
             let p = [[0,0,0],[2,0,0],[2,3,0],[0,3,0],[0,0,4],[2,0,4],[2,3,4],[0,3,4]].map(c => view.create('point3d', c, {size:1, name:''}));
             view.create('segment3d', [p[0], p[6]], {strokeColor:'red', strokeWidth:3});
-            [[0,1,2,3,0,4,5,6,7,4],[1,5],[2,6],[3,7]].flat().forEach((v,i,a)=> {if(i<a.length-1 && a[i+1]!==undefined) view.create('segment3d', [p[a[i]], p[a[i+1]]])});
+            [[0,1,2,3,0],[4,5,6,7,4],[0,4],[1,5],[2,6],[3,7]].forEach(f => {
+                for(let i=0; i<f.length-1; i++) view.create('segment3d', [p[f[i]], p[f[i+1]]]);
+            });
         }
     },
     {
         text: String.raw`半径 $3\text{cm}$ の球を、中心を通る平面で切ったときの切り口の面積を求めなさい。`,
         ans: String.raw`$9\pi \text{cm}^2$`,
-        exp: String.raw`切り口は半径 $3\text{cm}$ の円になります。$\pi \times 3^2 = 9\pi$。`,
+        exp: String.raw`切り口は半径 $3\text{cm}$ の円になります。面積は $\pi \times 3^2 = 9\pi$。`,
         draw: (view) => {
-            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillColor:'yellow', fillOpacity:0.3});
-            for(let i=0; i<2; i++) view.create('ellipse3d', [[0,0,0], [3,0,0], [0,0,3]], {fillOpacity:0});
+            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,3,0]], {fillColor:'yellow', fillOpacity:0.4});
+            view.create('ellipse3d', [[0,0,0], [3,0,0], [0,0,3]], {strokeColor:'#ccc'});
+            view.create('ellipse3d', [[0,0,0], [0,3,0], [0,0,3]], {strokeColor:'#ccc'});
         }
     },
     {
         text: String.raw`三角柱の側面は全部でいくつありますか。`,
         ans: String.raw`$3$ つ`,
-        exp: String.raw`三角柱は底面が2つ、側面が3つの長方形で構成されています。`,
+        exp: String.raw`側面は長方形で、底面の辺の数と同じだけ存在します。`,
         draw: (view) => {
-            let p = [[0,0,0],[2,0,0],[0,2,0],[0,0,4],[2,0,4],[0,2,4]].map(c => view.create('point3d', c, {size:1}));
+            let p = [[0,0,0],[2.5,0,0],[0,2,0],[0,0,4],[2.5,0,4],[0,2,4]].map(c => view.create('point3d', c, {size:1}));
             view.create('polygon3d', [p[0],p[1],p[2]], {fillColor:'blue', fillOpacity:0.1});
             view.create('polygon3d', [p[3],p[4],p[5]], {fillColor:'blue', fillOpacity:0.1});
             [[0,3],[1,4],[2,5]].forEach(e => view.create('segment3d', [p[e[0]], p[e[1]]]));
@@ -152,17 +163,18 @@ function loadProblem() {
     
     if(board) JXG.JSXGraph.freeBoard(board);
     
-    // 3D用のボード初期化
     board = JXG.JSXGraph.initBoard('jxgbox', {
-        boundingbox: [-5, 5, 5, -5], 
-        keepaspectratio: false, 
-        axis: false, 
-        showCopyright: false
+        boundingbox: [-5, 5, 5, -5], keepaspectratio: false, axis: false, showCopyright: false
     });
 
-    let view = board.create('view3d', [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], {});
-    q.draw(view);
+    // 初期角度を少し斜めに設定して立体的中に見せる
+    let view = board.create('view3d', [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], {
+        azimuth: 0.8,
+        elevation: 0.5
+    });
     
+    q.draw(view);
+    board.update(); // 描画を確定させる
     MathJax.typesetPromise();
 }
 
