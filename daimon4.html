@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>都立数学特訓 - 大問4平面図形</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #fdfdfd; }
+        .nav-header { margin-bottom: 10px; }
+        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #AF52DE; }
+        .jxgbox { width: 100%; height: 350px; border-radius: 10px; margin: 15px 0; background-color: white; }
+        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 100px; font-weight: bold; color: #333; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .ans-box { display: none; margin-top: 20px; padding: 15px; background: #f4eefc; border-radius: 10px; border: 2px solid #AF52DE; }
+        .step { margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid #AF52DE; }
+    </style>
+</head>
+<body>
+
+<div class="nav-header">
+    <a href="index.html" class="back-link">← メニューに戻る</a>
+</div>
+
+<div class="card">
+    <div id="question" class="prob-box">
+        【問題】右の図で、$\triangle ABC$ と $\triangle ADE$ が正三角形であるとき、$\triangle ABD \equiv \triangle ACE$ であることを証明しなさい。
+    </div>
+
+    <div id="jxgbox" class="jxgbox"></div>
+    <p style="font-size: 0.8rem; color: #666; text-align: center;">※点Dをドラッグして動かしてみよう！</p>
+
+    <button class="action-btn" onclick="showAnswer()">証明の流れを確認する</button>
+    
+    <div id="ans-area" class="ans-box">
+        <h3 style="margin-top:0; color:#AF52DE;">証明の構成</h3>
+        <div class="step">
+            <strong>1. 注目する三角形</strong><br>
+            $\triangle ABD$ と $\triangle ACE$ において
+        </div>
+        <div class="step">
+            <strong>2. 等しい辺を見つける</strong><br>
+            正三角形の辺は等しいので：<br>
+            $AB = AC$ …①<br>
+            $AD = AE$ …②
+        </div>
+        <div class="step">
+            <strong>3. 間の角を攻略する</strong><br>
+            $\angle BAD = 60^\circ - \angle DAC$<br>
+            $\angle CAE = 60^\circ - \angle DAC$<br>
+            よって $\angle BAD = \angle CAE$ …③
+        </div>
+        <div class="step">
+            <strong>4. 結論</strong><br>
+            ①②③より、2辺とその間の角がそれぞれ等しいので<br>
+            $\triangle ABD \equiv \triangle ACE$
+        </div>
+    </div>
+</div>
+
+<script>
+    let board = JXG.JSXGraph.initBoard('jxgbox', {
+        boundingbox: [-2, 5, 6, -1], axis: false, showCopyright: false, showNavigation: false
+    });
+
+    // 正三角形 ABC
+    let pA = board.create('point', [2, 4], {name: 'A', fixed: true, color: 'black'});
+    let pB = board.create('point', [0, 0], {name: 'B', fixed: true, color: 'black'});
+    let pC = board.create('point', [4, 0], {name: 'C', fixed: true, color: 'black'});
+    board.create('polygon', [pA, pB, pC], {fillColor: '#Eef', borders: {strokeColor: '#007AFF'}});
+
+    // 動かせる点 D
+    let pD = board.create('point', [0.5, 2.5], {name: 'D', color: '#AF52DE'});
+
+    // 点 D を A 中心に -60度回転させて E を作成
+    let pE = board.create('transform', [() => -Math.PI/3, pA], {type: 'rotate'}).applyOnce(pD);
+    // 常にA中心に回転するよう制約をかけるための定義
+    let pE_dynamic = board.create('point', [
+        () => {
+            let dx = pD.X() - pA.X();
+            let dy = pD.Y() - pA.Y();
+            let angle = -Math.PI/3;
+            return pA.X() + dx * Math.cos(angle) - dy * Math.sin(angle);
+        },
+        () => {
+            let dx = pD.X() - pA.X();
+            let dy = pD.Y() - pA.Y();
+            let angle = -Math.PI/3;
+            return pA.Y() + dx * Math.sin(angle) + dy * Math.cos(angle);
+        }
+    ], {name: 'E', color: '#AF52DE'});
+
+    // 正三角形 ADE
+    board.create('polygon', [pA, pD, pE_dynamic], {fillColor: '#Fef', borders: {strokeColor: '#AF52DE'}});
+
+    // 注目する三角形を強調（半透明）
+    board.create('polygon', [pA, pB, pD], {fillColor: 'yellow', fillOpacity: 0.2, borders: {strokeWidth: 0}});
+    board.create('polygon', [pA, pC, pE_dynamic], {fillColor: 'green', fillOpacity: 0.2, borders: {strokeWidth: 0}});
+
+    function showAnswer() {
+        document.getElementById('ans-area').style.display = 'block';
+    }
+</script>
+</body>
+</html>
