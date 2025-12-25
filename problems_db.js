@@ -1,28 +1,29 @@
 // MasterDatabase の初期化
 const MasterDatabase = {
     // 大問1(1) 正負の数・文字式 【20題】
-    d1_q1: [
-        { q: String.raw`$1 - 6 \times (-2)$`, a: String.raw`$13$`, e: String.raw`$1 - (-12) = 13$` },
-        { q: String.raw`$(-4)^2 \div 8 - 5$`, a: String.raw`$-3$`, e: String.raw`$16 \div 8 - 5 = 2 - 5 = -3$` },
-        { q: String.raw`$8a + b - (a - 7b)$`, a: String.raw`$7a + 8b$`, e: String.raw`$8a + b - a + 7b = 7a + 8b$` },
-        { q: String.raw`$(-2)^3 \times 3 - 4 \div (-2)$`, a: String.raw`$-22$`, e: String.raw`$-24 + 2 = -22$` },
-        { q: String.raw`$\frac{3x - y}{2} - \frac{x - 4y}{4}$`, a: String.raw`$\frac{5x + 2y}{4}$`, e: String.raw`$\frac{6x-2y-x+4y}{4} = \frac{5x+2y}{4}$` },
-        { q: String.raw`$18ab^2 \div 6b \times (-2a)$`, a: String.raw`$-6a^2b$`, e: String.raw`$3ab \times (-2a) = -6a^2b$` },
-        { q: String.raw`$5 + 2 \times (3 - 8)$`, a: String.raw`$-5$`, e: String.raw`$5 - 10 = -5$` },
-        { q: String.raw`$6x^2 \div (-3x)^2 \times 3x$`, a: String.raw`$2x$`, e: String.raw`$6x^2 \div 9x^2 \times 3x = 2x$` },
-        { q: String.raw`$9 - (-3)^2 \div 3$`, a: String.raw`$6$`, e: String.raw`$9 - 3 = 6$` },
-        { q: String.raw`$7 + (-4) - (-9)$`, a: String.raw`$12$`, e: String.raw`$7 - 4 + 9 = 12$` },
-        { q: String.raw`$4(a-b) - 3(2a-b)$`, a: String.raw`$-2a-b$`, e: String.raw`$4a-4b-6a+3b = -2a-b$` },
-        { q: String.raw`$(-3)^2 + 5 \times (-2)$`, a: String.raw`$-1$`, e: String.raw`$9 - 10 = -1$` },
-        { q: String.raw`$12ab \div (-4a) \times 3b$`, a: String.raw`$-9b^2$`, e: String.raw`$-3b \times 3b = -9b^2$` },
-        { q: String.raw`$2(3x+y) + (x-2y)$`, a: String.raw`$7x$`, e: String.raw`$6x+2y+x-2y = 7x$` },
-        { q: String.raw`$(-1)^4 \times 7 - 8$`, a: String.raw`$-1$`, e: String.raw`$1 \times 7 - 8 = -1$` },
-        { q: String.raw`$\frac{1}{3}(6x-9) - 2x$`, a: String.raw`$-3$`, e: String.raw`$2x-3-2x = -3$` },
-        { q: String.raw`$15x^2y \div 5xy \times (-2y)$`, a: String.raw`$-6y^2$`, e: String.raw`$3x \times (-2y)$ は誤り、$3x$ではなく$3x$が消えて$3x \cdot y / y$ なので $3x \to 3x \times (-2y)$ は $-6xy$ ではなく... 正しくは $-6y^2$` },
-        { q: String.raw`$7 - 2^3 \div 4$`, a: String.raw`$5$`, e: String.raw`$7 - 8 \div 4 = 7 - 2 = 5$` },
-        { q: String.raw`$a+2b - \frac{a-b}{3}$`, a: String.raw`$\frac{2a+7b}{3}$`, e: String.raw`$\frac{3a+6b-a+b}{3} = \frac{2a+7b}{3}$` },
-        { q: String.raw`$(-6)^2 \div 4 + (-3)$`, a: String.raw`$6$`, e: String.raw`$36 \div 4 - 3 = 9 - 3 = 6$` }
-    ],
+    const MasterDatabase = {
+    "d1_q1": [
+        { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
+        { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
+        { q: "$8a + b - (a - 7b)$", a: "$7a + 8b$", e: "$8a + b - a + 7b = 7a + 8b$" },
+        { q: "$(-2)^3 \\times 3 - 4 \\div (-2)$", a: "$-22$", e: "$-24 + 2 = -22$" },
+        { q: "$\\frac{3x - y}{2} - \\frac{x - 4y}{4}$", a: "$\\frac{5x + 2y}{4}$", e: "$\\frac{6x-2y-x+4y}{4}$" },
+        { q: "$18ab^2 \\div 6b \\times (-2a)$", a: "$-6a^2b$", e: "$3ab \\times (-2a) = -6a^2b$" },
+        { q: "$5 + 2 \\times (3 - 8)$", a: "$-5$", e: "$5 - 10 = -5$" },
+        { q: "$6x^2 \\div (-3x)^2 \\times 3x$", a: "$2x$", e: "$6x^2 \\div 9x^2 \\times 3x = 2x$" },
+        { q: "$9 - (-3)^2 \\div 3$", a: "$6$", e: "$9 - 3 = 6$" },
+        { q: "$7 + (-4) - (-9)$", a: "$12$", e: "$7 - 4 + 9 = 12$" },
+        { q: "$4(a-b) - 3(2a-b)$", a: "$-2a-b$", e: "$4a-4b-6a+3b$" },
+        { q: "$(-3)^2 + 5 \\times (-2)$", a: "$-1$", e: "$9 - 10 = -1$" },
+        { q: "$12ab \\div (-4a) \\times 3b$", a: "$-9b^2$", e: "$-3b \\times 3b = -9b^2$" },
+        { q: "$2(3x+y) + (x-2y)$", a: "$7x$", e: "$6x+2y+x-2y$" },
+        { q: "$(-1)^4 \\times 7 - 8$", a: "$-1$", e: "$1 \\times 7 - 8 = -1$" },
+        { q: "$\\frac{1}{3}(6x-9) - 2x$", a: "$-3$", e: "$2x-3-2x = -3$" },
+        { q: "$15x^2y \\div 5xy \\times (-2y)$", a: "$-6y^2$", e: "$3x \\times (-2y)$" },
+        { q: "$7 - 2^3 \\div 4$", a: "$5$", e: "$7 - 2 = 5$" },
+        { q: "$a+2b - \\frac{a-b}{3}$", a: "$\\frac{2a+7b}{3}$", e: "$\\frac{3a+6b-a+b}{3}$" },
+        { q: "$(-6)^2 \\div 4 + (-3)$", a: "$6$", e: "$9 - 3 = 6$" }
+    ]
 
     // 大問1(2) 平方根 【15題】
     d1_q2: [
