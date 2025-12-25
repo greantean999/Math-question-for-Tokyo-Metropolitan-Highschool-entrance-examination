@@ -67,16 +67,13 @@
 
     let currentProb = null;
 
-    function nextProblem() {
-        // 1. 大問2の解放状況をチェック
+        function nextProblem() {
+        // 1. 解放状況チェック
         const isUnlocked = AuthManager.isUnlocked('daimon2_all'); 
 
-        // 2. 問題の選定
+        let qIndex;
         if (!isUnlocked) {
-            // 未購入なら最初の1問（center-square）に固定
-            currentProb = database[0];
-            
-            // お試し通知を出す
+            qIndex = 0; // お試しは最初の1問
             const qBox = document.getElementById('question');
             if(!document.getElementById('trial-msg')){
                 const msg = document.createElement('div');
@@ -86,17 +83,14 @@
                 qBox.parentNode.insertBefore(msg, qBox);
             }
         } else {
-            // 購入済みならランダムに選ぶ
-            currentProb = database[Math.floor(Math.random() * database.length)];
-            // 通知があれば消す
+            qIndex = Math.floor(Math.random() * database.length);
             if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
         }
 
-        // 3. 表示の更新
+        currentProb = database[qIndex];
         document.getElementById('question').innerHTML = currentProb.text;
         document.getElementById('ans-area').style.display = 'none';
         
-        // スライダーの範囲調整
         const slider = document.getElementById('n-slider');
         if (currentProb.type.startsWith('calendar') || currentProb.type.startsWith('table')) {
             slider.min = 8; slider.max = 20; slider.value = 11;
@@ -108,21 +102,6 @@
         if(window.MathJax) MathJax.typesetPromise();
     }
 
-        currentProb = database[Math.floor(Math.random() * database.length)];
-        document.getElementById('question').innerHTML = currentProb.text;
-        document.getElementById('ans-area').style.display = 'none';
-        
-        // スライダーの範囲調整
-        const slider = document.getElementById('n-slider');
-        if (currentProb.type.startsWith('calendar') || currentProb.type.startsWith('table')) {
-            slider.min = 8; slider.max = 20; slider.value = 11;
-        } else {
-            slider.min = 1; slider.max = 6; slider.value = 2;
-        }
-        
-        updateVisualizer();
-        MathJax.typesetPromise();
-    }
 
     function updateVisualizer() {
         const n = parseInt(document.getElementById('n-slider').value);
