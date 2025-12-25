@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <script src="auth.js"></script>
+    <meta charset="UTF-8">
+    <title>都立数学特訓 - 大問1(2) 平方根・展開</title>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #fdf6e3; }
+        .back-link { text-decoration: none; color: #268bd2; font-weight: bold; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .prob-text { font-size: 1.8rem; margin: 40px 0; min-height: 80px; color: #073642; line-height: 1.4; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #268bd2; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .ans-box { display: none; margin-top: 20px; padding: 20px; background: #eee8d5; border-radius: 10px; border: 2px solid #268bd2; }
+        .step { text-align: left; font-size: 0.9rem; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<a href="daimon1.html" class="back-link">← 大問1メニューへ</a>
+
+<div class="card">
+    <div id="prob-text" class="prob-text">読み込み中...</div>
+    <button class="action-btn" onclick="showAnswer()">答えを表示</button>
+    <button class="action-btn" style="background:#859900;" onclick="nextProblem()">次の問題</button>
+
+    <div id="ans-area" class="ans-box">
+        <div id="ans-text" style="font-size: 1.5rem; font-weight: bold; color: #d33682; margin-bottom: 10px;"></div>
+        <div id="exp-text" class="step"></div>
+    </div>
+</div>
+
+<script>
+    const database = [
+        { q: String.raw`$(\sqrt{3} + 1)^2$`, a: String.raw`$4 + 2\sqrt{3}$`, e: String.raw`$(\sqrt{3})^2 + 2 \times \sqrt{3} \times 1 + 1^2 = 3 + 2\sqrt{3} + 1 = 4 + 2\sqrt{3}$` },
+        { q: String.raw`$(\sqrt{5} + 2)(\sqrt{5} - 2)$`, a: String.raw`$1$`, e: String.raw`$(\sqrt{5})^2 - 2^2 = 5 - 4 = 1$` },
+        { q: String.raw`$\sqrt{50} - \sqrt{18}$`, a: String.raw`$2\sqrt{2}$`, e: String.raw`$5\sqrt{2} - 3\sqrt{2} = 2\sqrt{2}$` },
+        { q: String.raw`$\frac{12}{\sqrt{6}} - \sqrt{24}$`, a: String.raw`$0$`, e: String.raw`有理化：$\frac{12\sqrt{6}}{6} = 2\sqrt{6}$。<br>簡略化：$\sqrt{24} = 2\sqrt{6}$。<br>$2\sqrt{6} - 2\sqrt{6} = 0$` },
+        { q: String.raw`$(\sqrt{7} + 1)(\sqrt{7} + 3)$`, a: String.raw`$10 + 4\sqrt{7}$`, e: String.raw`$7 + 3\sqrt{7} + \sqrt{7} + 3 = 10 + 4\sqrt{7}$` },
+        { q: String.raw`$\sqrt{3}( \sqrt{12} + \sqrt{27} )$`, a: String.raw`$15$`, e: String.raw`$\sqrt{3}( 2\sqrt{3} + 3\sqrt{3} ) = \sqrt{3} \times 5\sqrt{3} = 5 \times 3 = 15$` },
+        { q: String.raw`$a = \sqrt{2}+1$ のとき、$a^2 - 2a$ の値を求めなさい。`, a: String.raw`$1$`, e: String.raw`$a^2 - 2a = a(a - 2)$ と因数分解してから代入。<br>$(\sqrt{2}+1)(\sqrt{2}-1) = 2 - 1 = 1$` },
+        { q: String.raw`$\sqrt{48} \div \sqrt{2} \times \sqrt{6}$`, a: String.raw`$12$`, e: String.raw`$\sqrt{24} \times \sqrt{6} = \sqrt{144} = 12$。または $\sqrt{\frac{48 \times 6}{2}} = \sqrt{144} = 12$` },
+        { q: String.raw`$(2\sqrt{2})^2 - \sqrt{2} \times \sqrt{8}$`, a: String.raw`$4$`, e: String.raw`$8 - \sqrt{16} = 8 - 4 = 4$` },
+        { q: String.raw`$(\sqrt{6} + \sqrt{2})(\sqrt{6} - \sqrt{2})$`, a: String.raw`$4$`, e: String.raw`$(\sqrt{6})^2 - (\sqrt{2})^2 = 6 - 2 = 4$` }
+    ];
+
+    let currentProb = null;
+
+    function nextProblem() {
+        // キーを q2 に変更
+        const isUnlocked = AuthManager.isUnlocked('daimon1_q2');
+        
+        let qIndex;
+        if (!isUnlocked) {
+            qIndex = 0;
+        } else {
+            qIndex = Math.floor(Math.random() * database.length);
+        }
+
+        currentProb = database[qIndex];
+        document.getElementById('prob-text').innerHTML = currentProb.q;
+        document.getElementById('ans-area').style.display = 'none';
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    function showAnswer() {
+        document.getElementById('ans-text').innerHTML = currentProb.a;
+        document.getElementById('exp-text').innerHTML = "【解説】<br>" + currentProb.e;
+        document.getElementById('ans-area').style.display = 'block';
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    window.onload = nextProblem;
+</script>
+</body>
+</html>
