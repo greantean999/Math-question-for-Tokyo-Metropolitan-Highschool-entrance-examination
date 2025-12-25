@@ -147,15 +147,12 @@ const database = [
 ];
 
 function loadProblem() {
-    // 1. その大問が解放されているかチェック
-    // ※引数は 'daimon1_all', 'daimon5_all' などファイルに合わせて変えてください
-    const isUnlocked = AuthManager.isUnlocked('daimon5_all'); 
+    // 1. 解放状況チェック
+    const isUnlocked = AuthManager.isUnlocked('daimon3_all'); 
 
     let qIndex;
     if (!isUnlocked) {
-        // 未購入なら「最初の1問」に固定
         qIndex = 0;
-        // お試し通知を出す（オプション）
         const probText = document.getElementById('prob-text');
         if(!document.getElementById('trial-msg')){
             const msg = document.createElement('div');
@@ -165,15 +162,11 @@ function loadProblem() {
             probText.parentNode.insertBefore(msg, probText);
         }
     } else {
-        // 購入済みならランダム
         qIndex = Math.floor(Math.random() * database.length);
         if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
     }
 
     const q = database[qIndex];
-    // --- 以下、既存の描画・表示処理 ---
-
-    const q = database[Math.floor(Math.random() * database.length)];
     document.getElementById('prob-text').innerHTML = q.text;
     document.getElementById('ans').innerHTML = "正解：" + q.ans;
     document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
@@ -183,8 +176,9 @@ function loadProblem() {
     board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-2, 10, 10, -2], axis:true, showCopyright:false});
     q.draw(board);
     
-    MathJax.typesetPromise();
+    if(window.MathJax) MathJax.typesetPromise();
 }
+
 
 function showAnswer() {
     document.getElementById('ans-area').style.display = 'block';
