@@ -3,165 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>都立数学 実戦模試 & 偏差値診断</title>
+    <title>都立数学 - 実戦模試</title>
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="problems_db.js"></script>
+    <script>
+        // 【セキュリティ・ガード】
+        (function() {
+            const status = localStorage.getItem('math_app_status');
+            // 模試は「オールインワンパッケージ」または「マスターキー」保持者のみ
+            if (status !== "full_access") {
+                alert("この機能（実戦模試）はオールインワンパッケージ限定です。");
+                location.href = "index.html";
+            }
+        })();
+    </script>
     <style>
         :root { --base: #fdf6e3; --text: #657b83; --accent: #d33682; --blue: #268bd2; }
         body { font-family: sans-serif; background-color: var(--base); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
-        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 20px 0; }
+        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 20px 0; display:none; }
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; }
         .btn-correct { background-color: #859900; color: white; }
         .btn-wrong { background-color: #dc322f; color: white; }
-        .badge { background: var(--text); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
-        /* 結果画面用スタイル */
         .result-card { text-align: center; display: none; }
         .deviation-circle { width: 120px; height: 120px; line-height: 120px; border-radius: 50%; background: var(--accent); color: white; font-size: 2.5rem; margin: 20px auto; }
-        .advice-box { background: #eee8d5; padding: 15px; border-radius: 10px; text-align: left; margin: 20px 0; }
-        .recommend-link { display: block; background: var(--blue); color: white; text-decoration: none; padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="test-ui">
-        <div class="header">
-            <span id="q-number" style="font-weight: bold;">第 1 問 / 13</span>
-            <span id="q-badge" class="badge">計算</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span id="q-number" style="font-weight:bold;">第 1 問 / 13</span>
+            <span id="q-badge" style="background:#eee; padding:2px 8px; border-radius:4px; font-size:0.8rem;">カテゴリ</span>
         </div>
-        
-        <div id="question-text" style="font-size: 1.2rem; min-height: 80px;">問題読み込み中...</div>
-        
+        <div id="question-text" style="font-size: 1.2rem; min-height: 80px;">読み込み中...</div>
         <div id="jxgbox" class="jxgbox"></div>
-
         <div class="btn-group">
-            <button class="btn-correct" onclick="processAnswer(true)">正解</button>
-            <button class="btn-wrong" onclick="processAnswer(false)">不正解</button>
+            <button class="btn-correct" onclick="processAnswer(true)">正答</button>
+            <button class="btn-wrong" onclick="processAnswer(false)">誤答</button>
         </div>
     </div>
 
     <div id="result-ui" class="result-card">
-        <h2 style="margin:0;">診断結果</h2>
+        <h2>模試結果診断</h2>
         <div class="deviation-circle" id="res-dv">--</div>
-        <p style="font-size: 1.2rem;">得点: <span id="res-score" style="font-weight:bold; color:var(--accent);">0</span> / 100点</p>
-        
-        <div class="advice-box">
-            <strong>【弱点分析】</strong>
-            <p id="res-weakness" style="font-size: 0.9rem;"></p>
-            <div id="recommend-area"></div>
+        <p>得点: <span id="res-score">0</span> / 100点</p>
+        <div style="background:#eee8d5; padding:15px; border-radius:10px; text-align:left; margin:15px 0;">
+            <strong>【分析】</strong><br><span id="res-weakness" style="font-size:0.9rem;"></span>
         </div>
-
-        <button onclick="location.reload()" style="background:#586e75; color:white; width:100%;">もう一度挑戦する</button>
-        <button onclick="location.href='store.html'" style="background:none; color:var(--blue); margin-top:10px; border:1px solid var(--blue);">ストアへ戻る</button>
+        <button onclick="location.href='index.html'" style="background:#586e75; color:white; width:100%;">メニューへ戻る</button>
     </div>
 </div>
 
-<script src="problems_db.js"></script>
 <script>
     let currentIdx = 0;
     let score = 0;
     let testData = [];
-    let wrongCategories = new Set();
+    let wrongCategories = [];
 
-    // 1. 各大問から1問ずつ抽出してシャッフル
     function initTest() {
-        const categories = [
-            { id: 'd1_q1', name: '計算', w: 5, pack: 1 },
-            { id: 'd1_q2', name: '平方根', w: 5, pack: 2 },
-            { id: 'd1_q3', name: '一次方程式', w: 5, pack: 3 },
-            { id: 'd1_q4', name: '連立方程式', w: 5, pack: 4 },
-            { id: 'd1_q5', name: '二次方程式', w: 5, pack: 5 },
-            { id: 'd1_q6', name: '関数基礎', w: 5, pack: 6 },
-            { id: 'd1_q7', name: '図形角度', w: 5, pack: 7 },
-            { id: 'd1_q8', name: '確率・統計', w: 6, pack: 8 },
-            { id: 'd1_q9', name: '作図', w: 6, pack: 9 },
-            { id: 'd2', name: '規則性', w: 12, pack: 11 },
-            { id: 'd3', name: '一次関数', w: 12, pack: 12 },
-            { id: 'd4', name: '平面図形', w: 12, pack: 13 },
-            { id: 'd5', name: '空間図形', w: 12, pack: 14 }
+        // MasterDatabaseから全13問を動的に抽出（各セクション1問ずつ）
+        const config = [
+            { id: 'd1_q1', name: '計算', w: 5 }, { id: 'd1_q2', name: '平方根', w: 5 },
+            { id: 'd1_q3', name: '一次方程式', w: 5 }, { id: 'd1_q4', name: '連立方程式', w: 5 },
+            { id: 'd1_q5', name: '二次方程式', w: 5 }, { id: 'd1_q6', name: '関数基礎', w: 5 },
+            { id: 'd1_q7', name: '角度', w: 5 }, { id: 'd1_q8', name: '確率', w: 6 },
+            { id: 'd1_q9', name: '作図', w: 6 }, { id: 'd2', name: '規則性', w: 12 },
+            { id: 'd3', name: '一次関数', w: 12 }, { id: 'd4', name: '平面図形', w: 12 },
+            { id: 'd5', name: '空間図形', w: 12 }
         ];
 
-        testData = categories.map(cat => {
-            const db = MasterDatabase[cat.id];
-            const prob = db[Math.floor(Math.random() * db.length)];
-            return { ...prob, ...cat };
+        testData = config.map(c => {
+            const db = MasterDatabase[c.id];
+            return { ...db[Math.floor(Math.random() * db.length)], ...c };
         });
         showQuestion();
     }
 
-    // 2. 問題表示
     function showQuestion() {
         const q = testData[currentIdx];
         document.getElementById('q-number').innerText = `第 ${currentIdx + 1} 問 / 13`;
         document.getElementById('q-badge').innerText = q.name;
         document.getElementById('question-text').innerHTML = q.q;
 
-        if (window.MathJax) MathJax.typeset();
+        if (window.MathJax) MathJax.typesetPromise();
 
-        // 描画リセット
-        document.getElementById('jxgbox').style.display = q.draw ? 'block' : 'none';
+        const box = document.getElementById('jxgbox');
         if (q.draw) {
+            box.style.display = 'block';
             const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
             q.draw(brd, false);
+        } else {
+            box.style.display = 'none';
         }
     }
 
-    // 3. 回答処理
     function processAnswer(isCorrect) {
-        const q = testData[currentIdx];
-        if (isCorrect) {
-            score += q.w;
-        } else {
-            wrongCategories.add({name: q.name, pack: q.pack});
-        }
+        if (isCorrect) score += testData[currentIdx].w;
+        else wrongCategories.push(testData[currentIdx].name);
 
         if (currentIdx < testData.length - 1) {
             currentIdx++;
             showQuestion();
         } else {
-            finishTest();
+            showFinalResult();
         }
     }
 
-    // 4. 終了・偏差値計算
-    function finishTest() {
+    function showFinalResult() {
         document.getElementById('test-ui').style.display = 'none';
         document.getElementById('result-ui').style.display = 'block';
-
-        // 簡易偏差値計算 (平均60, 標準偏差15想定)
+        
         const dv = Math.round(((score - 60) / 15) * 10 + 50);
-        const finalDv = Math.max(30, Math.min(75, dv));
-
         document.getElementById('res-score').innerText = score;
-        document.getElementById('res-dv').innerText = finalDv;
-
-        // 弱点分析とレコメンド
-        const weaknessText = document.getElementById('res-weakness');
-        const recommendArea = document.getElementById('recommend-area');
-
-        if (wrongCategories.size === 0) {
-            weaknessText.innerText = "弱点なし！完璧な実力です。";
-        } else {
-            let catNames = Array.from(wrongCategories).map(c => c.name);
-            weaknessText.innerText = catNames.join('、') + " の正解率を上げる必要があります。";
-            
-            // おすすめパックの表示（最初の2つだけ提示）
-            Array.from(wrongCategories).slice(0, 2).forEach(c => {
-                const link = document.createElement('a');
-                link.href = `store.html?pack=${c.pack}`;
-                link.className = 'recommend-link';
-                link.innerText = `パック(${c.pack}) ${c.name}特訓コースを見る`;
-                recommendArea.appendChild(link);
-            });
-        }
+        document.getElementById('res-dv').innerText = Math.max(30, Math.min(75, dv));
+        document.getElementById('res-weakness').innerText = wrongCategories.length > 0 
+            ? "以下の分野を復習しましょう：\n" + wrongCategories.join('、')
+            : "全問正解です！この調子で本番に臨みましょう。";
     }
 
-    initTest();
+    window.onload = initTest;
 </script>
-
 </body>
 </html>
