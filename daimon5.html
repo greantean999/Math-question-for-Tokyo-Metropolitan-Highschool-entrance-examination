@@ -1,236 +1,91 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <script src="auth.js"></script>
     <meta charset="UTF-8">
-    <title>都立数学特訓 - 大問5 空間図形</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都立数学特訓 - 演習</title>
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
-    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="problems_db.js"></script>
+    <script>
+        // 【重要】ファイルごとにここを書き換えてください
+        const PAGE_CONFIG = {
+            catId: "d5", // 開く問題カテゴリ (d1_q1, d1_q2, d2, d3...)
+            allowedKeys: ["full_access", "d5_only"] // 閲覧可能な権限
+        };
+
+        // 閲覧権限チェック
+        (function() {
+            const status = localStorage.getItem('math_app_status');
+            if (!PAGE_CONFIG.allowedKeys.includes(status)) {
+                alert("このページへのアクセス権限がありません。メニューに戻ります。");
+                location.href = "index.html";
+            }
+        })();
+    </script>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #fdf6e3; }
-        .back-link { text-decoration: none; color: #859900; font-weight: bold; margin-bottom: 15px; display: inline-block; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #859900; }
-        #prob-text { font-size: 1.1em; line-height: 1.6; margin: 10px 0; min-height: 60px; font-weight: bold; }
-        .jxgbox { width: 100%; height: 400px; margin: 15px 0; border-radius: 10px; background: white; cursor: grab; }
-        .jxgbox:active { cursor: grabbing; }
-        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #859900; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        .ans-box { display: none; margin-top: 15px; padding: 15px; background: #f9fdf0; border-radius: 10px; border: 2px solid #859900; }
-        .hint-badge { display: inline-block; background: #268bd2; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8em; margin-bottom: 5px; }
+        body { font-family: sans-serif; background: #fdf6e3; color: #657b83; padding: 20px; max-width: 600px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 15px 0; display: none; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn-next { background: #268bd2; color: white; }
+        .btn-ans { background: #859900; color: white; }
+        .answer-area { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; }
+        .nav-link { display: block; text-align: center; color: #268bd2; text-decoration: none; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<a href="index.html" class="back-link">← メニューに戻る</a>
+    <div class="card">
+        <div id="q-text" style="font-size: 1.2rem; min-height: 80px;">読み込み中...</div>
+        <div id="jxgbox" class="jxgbox"></div>
 
-<div class="card">
-    <div class="hint-badge">図のまわりをドラッグして回転させてみよう！</div>
-    <div id="prob-text">問題読み込み中...</div>
-    <div id="jxgbox" class="jxgbox"></div>
-    <button id="show-btn" class="action-btn" onclick="showAnswer()">答え合わせ</button>
-    <button class="action-btn" style="background:#8E8E93;" onclick="loadProblem()">次の問題</button>
-    
-    <div id="ans-area" class="ans-box">
-        <div id="ans" style="font-weight:bold; font-size:1.3em; color:#859900; border-bottom:1px solid #ccc; padding-bottom:5px;"></div>
-        <div id="exp" style="font-size: 0.95em; color: #444; line-height: 1.7; margin-top: 10px;"></div>
+        <button id="show-ans-btn" class="btn btn-ans" onclick="showAnswer()">答え合わせ</button>
+
+        <div id="answer-area" class="answer-area">
+            <div style="color: #dc322f; font-weight: bold;">【正解】</div>
+            <div id="ans-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
+            <div style="color: #268bd2; font-weight: bold;">【解説】</div>
+            <div id="exp-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
+            <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
+        </div>
     </div>
-</div>
 
-<script>
-let board = null;
+    <a href="index.html" class="nav-link">← メニューに戻る</a>
 
-// 点を生成する際の共通設定
-const pOpts = {size: 1, name: '', fixed: true};
+    <script>
+        let currentProblem = null;
 
-const database = [
-    {
-        // テストのため、球を1問目に持ってきました
-        text: String.raw`半径 $3\text{cm}$ の球の表面積を求めなさい。`,
-        ans: String.raw`$36\pi \text{cm}^2$`,
-        exp: String.raw`球の表面積の公式は $4\pi r^2$ です。$4 \times \pi \times 3^2 = 36\pi$。`,
-        draw: (view) => {
-            // 中心点
-            let c = view.create('point3d', [0, 0, 0], {visible: false});
+        function loadQuestion() {
+            document.getElementById('answer-area').style.display = 'none';
+            document.getElementById('show-ans-btn').style.display = 'block';
             
-            // 3つの円（緯線・経線）を描画して球体を表現
-            // 1. 水平方向の円
-            view.create('curve3d', [
-                (t) => 3 * Math.cos(t),
-                (t) => 3 * Math.sin(t),
-                (t) => 0,
-                [0, 2 * Math.PI]
-            ], {strokeColor: '#859900', strokeWidth: 2});
+            const problems = MasterDatabase[PAGE_CONFIG.catId];
+            currentProblem = problems[Math.floor(Math.random() * problems.length)];
+            
+            document.getElementById('q-text').innerHTML = currentProblem.q;
+            document.getElementById('ans-text').innerHTML = currentProblem.a;
+            document.getElementById('exp-text').innerHTML = currentProblem.e || "解説はありません。";
 
-            // 2. 垂直方向の円（縦1）
-            view.create('curve3d', [
-                (t) => 3 * Math.cos(t),
-                (t) => 0,
-                (t) => 3 * Math.sin(t),
-                [0, 2 * Math.PI]
-            ], {strokeColor: '#859900', strokeWidth: 1});
+            if (window.MathJax) MathJax.typesetPromise();
 
-            // 3. 垂直方向の円（縦2）
-            view.create('curve3d', [
-                (t) => 0,
-                (t) => 3 * Math.cos(t),
-                (t) => 3 * Math.sin(t),
-                [0, 2 * Math.PI]
-            ], {strokeColor: '#859900', strokeWidth: 1});
-        }
-    },
-    {
-        text: String.raw`1辺が $6\text{cm}$ の立方体があります。この立方体の体積を求めなさい。`,
-        ans: String.raw`$216\text{cm}^3$`,
-        exp: String.raw`立方体の体積は（1辺）$^3$ です。$6 \times 6 = 36, 36 \times 6 = 216$。`,
-        draw: (view) => {
-            let p = [[0,0,0],[3,0,0],[3,3,0],[0,3,0],[0,0,3],[3,0,3],[3,3,3],[0,3,3]].map(c => view.create('point3d', c, {size:1, name:'', visible:false}));
-            [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,3,7,4]].forEach(f => 
-                view.create('polygon3d', f.map(i=>p[i]), {fillColor:'#859900', fillOpacity:0.2, borderLine:{strokeWidth:1}})
-            );
-        }
-    },
-    {
-        text: String.raw`底面の半径が $3\text{cm}$、高さが $4\text{cm}$ の円柱の体積を求めなさい。`,
-        ans: String.raw`$36\pi \text{cm}^3$`,
-        exp: String.raw`円柱の体積は「底面積 $\times$ 高さ」です。$\pi \times 3^2 \times 4 = 36\pi$。`,
-        draw: (view) => {
-            // 下の円
-            view.create('curve3d', [(t)=>3*Math.cos(t), (t)=>3*Math.sin(t), (t)=>0, [0, 2*Math.PI]], {strokeColor:'#268bd2'});
-            // 上の円
-            view.create('curve3d', [(t)=>3*Math.cos(t), (t)=>3*Math.sin(t), (t)=>4, [0, 2*Math.PI]], {strokeColor:'#268bd2'});
-            // 側面（縦線4本で表現）
-            [[3,0], [-3,0], [0,3], [0,-3]].forEach(pos => {
-                view.create('segment3d', [[pos[0], pos[1], 0], [pos[0], pos[1], 4]], {strokeColor:'#ccc'});
-            });
-        }
-    },
-    {
-        text: String.raw`底面の半径が $5\text{cm}$、母線の長さが $13\text{cm}$ の円錐の高さは何 $\text{cm}$ ですか。`,
-        ans: String.raw`$12\text{cm}$`,
-        exp: String.raw`三平方の定理より、高さ $h = \sqrt{13^2 - 5^2} = \sqrt{169 - 25} = \sqrt{144} = 12$ です。`,
-        draw: (view) => {
-            view.create('curve3d', [(t)=>5*Math.cos(t), (t)=>5*Math.sin(t), (t)=>0, [0, 2*Math.PI]], {strokeColor:'#d33682'});
-            let apex = view.create('point3d', [0,0,12], {visible:false});
-            [[5,0], [-5,0], [0,5], [0,-5]].forEach(pos => {
-                view.create('segment3d', [[pos[0], pos[1], 0], [0,0,12]], {strokeColor:'#ccc'});
-            });
-        }
-    },
-    {
-        text: String.raw`底面の1辺が $6\text{cm}$、高さが $4\text{cm}$ の正四角錐の体積を求めなさい。`,
-        ans: String.raw`$48\text{cm}^3$`,
-        exp: String.raw`四角錐の体積は「底面積 $\times$ 高さ $\div 3$」です。$(6 \times 6) \times 4 \div 3 = 48$。`,
-        draw: (view) => {
-            let p = [[-3,-3,0],[3,-3,0],[3,3,0],[-3,3,0]].map(c => view.create('point3d', c, {visible:false}));
-            let top = view.create('point3d', [0,0,4], {name:'P'});
-            view.create('polygon3d', p, {fillColor:'#b58900', fillOpacity:0.1});
-            p.forEach(basePt => view.create('segment3d', [basePt, top], {strokeColor:'#b58900'}));
-        }
-    },
-    {
-        text: String.raw`半径 $6\text{cm}$ の球の体積を求めなさい。`,
-        ans: String.raw`$288\pi \text{cm}^3$`,
-        exp: String.raw`球の体積の公式は $\frac{4}{3}\pi r^3$ です。$\frac{4}{3} \times \pi \times 6^3 = 4 \times \pi \times 72 = 288\pi$。`,
-        draw: (view) => {
-            const r = 4; // 描画サイズ調整
-            view.create('curve3d', [(t)=>r*Math.cos(t), (t)=>r*Math.sin(t), (t)=>0, [0, 2*Math.PI]], {strokeColor:'#859900'});
-            view.create('curve3d', [(t)=>r*Math.cos(t), (t)=>0, (t)=>r*Math.sin(t), [0, 2*Math.PI]], {strokeColor:'#859900'});
-        }
-    },
-    {
-        text: String.raw`縦 $3\text{cm}$、横 $4\text{cm}$、高さ $5\text{cm}$ の直方体の対角線の長さを求めなさい。`,
-        ans: String.raw`$5\sqrt{2}\text{cm}$`,
-        exp: String.raw`対角線の長さは $\sqrt{3^2 + 4^2 + 5^2} = \sqrt{9 + 16 + 25} = \sqrt{50} = 5\sqrt{2}$ です。`,
-        draw: (view) => {
-            let p = [[0,0,0],[4,0,0],[4,3,0],[0,3,0],[0,0,5],[4,0,5],[4,3,5],[0,3,5]].map(c => view.create('point3d', c, {visible:false}));
-            [[0,1,2,3],[4,5,6,7],[0,1,5,4],[2,3,7,6],[1,2,6,5],[0,3,7,4]].forEach(f => 
-                view.create('polygon3d', f.map(i=>p[i]), {fillColor:'#2aa198', fillOpacity:0.1})
-            );
-            view.create('segment3d', [[0,3,5], [4,0,0]], {strokeColor:'red', strokeWidth:3, dash:2});
-        }
-    }
-
-];
-
-
-function loadProblem() {
-    // 1. その大問が解放されているかチェック
-    // ※引数は 'daimon1_all', 'daimon5_all' などファイルに合わせて変えてください
-    const isUnlocked = AuthManager.isUnlocked('daimon5_all'); 
-
-    let qIndex;
-    if (!isUnlocked) {
-        // 未購入なら「最初の1問」に固定
-        qIndex = 0;
-        // お試し通知を出す（オプション）
-        const probText = document.getElementById('prob-text');
-        if(!document.getElementById('trial-msg')){
-            const msg = document.createElement('div');
-            msg.id = 'trial-msg';
-            msg.style = "color:orange; font-size:0.8em; margin-bottom:5px;";
-            msg.innerText = "⚠️ お試しモード：最初の1問のみ学習可能です";
-            probText.parentNode.insertBefore(msg, probText);
-        }
-    } else {
-        // 購入済みならランダム
-        qIndex = Math.floor(Math.random() * database.length);
-        if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
-    }
-
-    const q = database[qIndex];
-    // --- 以下、既存の描画・表示処理 ---
-
-    try {
-        // 問題の選定
-        const q = database[Math.floor(Math.random() * database.length)];
-        
-        // テキスト等の更新
-        document.getElementById('prob-text').innerHTML = q.text;
-        document.getElementById('ans').innerHTML = "正解：" + q.ans;
-        document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
-        document.getElementById('ans-area').style.display = 'none';
-        
-        // ボードの初期化
-        if(board) JXG.JSXGraph.freeBoard(board);
-        board = JXG.JSXGraph.initBoard('jxgbox', {
-            boundingbox: [-5, 5, 5, -5], 
-            keepaspectratio: true, // 歪まないようにtrueに変更
-            axis: false, 
-            showCopyright: false,
-            pan: { enabled: false } 
-        });
-
-        // 3Dビューの作成
-        let view = board.create('view3d', 
-            [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], 
-            {
-                azimuth: 0.8,
-                elevation: 0.5,
-                xPlaneOpts: {visible: false},
-                yPlaneOpts: {visible: false}
+            const box = document.getElementById('jxgbox');
+            if (currentProblem.draw) {
+                box.style.display = 'block';
+                const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
+                currentProblem.draw(brd, false);
+            } else {
+                box.style.display = 'none';
             }
-        );
-        
-        // 【重要】3Dエンジンの準備を待つために、描画処理をわずかに遅らせる
-        setTimeout(() => {
-            q.draw(view);
-            board.fullUpdate(); // 再描画を強制
-        }, 50); // 50ミリ秒のウェイト
+        }
 
-        if(window.MathJax) MathJax.typesetPromise();
-    } catch (e) {
-        console.error("描画エラー:", e);
-        document.getElementById('prob-text').innerHTML = "エラーが発生しました。リロードしてください。";
-    }
-}
+        function showAnswer() {
+            document.getElementById('answer-area').style.display = 'block';
+            document.getElementById('show-ans-btn').style.display = 'none';
+        }
 
-function showAnswer() {
-    document.getElementById('ans-area').style.display = 'block';
-}
-
-// ページ読み込み完了後に実行
-window.onload = loadProblem;
-</script>
+        window.onload = loadQuestion;
+    </script>
 </body>
 </html>
