@@ -288,11 +288,8 @@
 <script>
     let board = null;
 
-    window.onload = function() {
-        if (typeof MasterDatabase === 'undefined') {
-            document.getElementById('question-text').innerHTML = "<b style='color:red;'>エラー: problems_db.jsが読み込めません。</b>";
-            return;
-        }
+        window.onload = function() {
+        // すでに上にデータがあるので、エラーチェックなしで直接読み込む
         loadQuestion();
     };
 
