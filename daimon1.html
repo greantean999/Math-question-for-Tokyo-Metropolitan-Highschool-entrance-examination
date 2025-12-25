@@ -31,39 +31,38 @@
     <div class="grid" id="menu-grid"></div>
 
     <script>
-        // 修正ポイント：DBのカテゴリ名(catId)とリンク先を一致させる
-        const questions = [
-            { n: "1", title: "正負・文字式", key: "d1_q1" },
-            { n: "2", title: "平方根", key: "d1_q2" },
-            { n: "3", title: "一次方程式", key: "d1_q3" },
-            { n: "4", title: "連立方程式", key: "d1_q4" },
-            { n: "5", title: "二次方程式", key: "d1_q5" },
-            { n: "6", title: "関数(基本)", key: "d1_q6" },
-            { n: "7", title: "角度・図形", key: "d1_q7" },
-            { n: "8", title: "確率・統計", key: "d1_q8" },
-            { n: "9", title: "作図", key: "d1_q9" }
-        ];
+    const questions = [
+        { n: "1", title: "正負・文字式", key: "d1_q1" },
+        { n: "2", title: "平方根", key: "d1_q2" },
+        { n: "3", title: "一次方程式", key: "d1_q3" },
+        { n: "4", title: "連立方程式", key: "d1_q4" },
+        { n: "5", title: "二次方程式", key: "d1_q5" },
+        { n: "6", title: "関数(基本)", key: "d1_q6" },
+        { n: "7", title: "角度・図形", key: "d1_q7" },
+        { n: "8", title: "確率・統計", key: "d1_q8" },
+        { n: "9", title: "作図", key: "d1_q9" }
+    ];
 
-        const grid = document.getElementById('menu-grid');
-        questions.forEach(q => {
-            const btn = document.createElement('button');
-            btn.className = 'q-btn';
-            
-            // 演習ページ practice.html に引数を渡して移動
-            btn.onclick = () => {
-                location.href = `practice.html?cat=${q.key}`;
-            };
-            
-            // 権限確認
-            const isUnlocked = AuthManager.isUnlocked(q.key);
-            btn.classList.add(isUnlocked ? 'unlocked' : 'locked');
-            
-            btn.innerHTML = `
-                <span>(${q.n}) ${q.title}</span>
-                <span class="status">${isUnlocked ? "✅ 解放済み" : "🔓 お試し版"}</span>
-            `;
-            grid.appendChild(btn);
-        });
-    </script>
+    const grid = document.getElementById('menu-grid');
+    questions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'q-btn';
+        
+        // practice.html へカテゴリIDを渡すだけ！
+        btn.onclick = () => {
+            location.href = `practice.html?cat=${q.key}`;
+        };
+        
+        const isUnlocked = AuthManager.isUnlocked(q.key);
+        btn.classList.add(isUnlocked ? 'unlocked' : 'locked');
+        
+        btn.innerHTML = `
+            <span>(${q.n}) ${q.title}</span>
+            <span class="status">${isUnlocked ? "✅ 解放済み" : "🔓 お試し版"}</span>
+        `;
+        grid.appendChild(btn);
+    });
+</script>
+
 </body>
 </html>
