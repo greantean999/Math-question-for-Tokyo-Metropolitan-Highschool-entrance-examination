@@ -26,26 +26,35 @@
         <h1>都立数学 爆速合格パック</h1>
         <p>志望校合格への最短ルートを、今すぐ始めよう。</p>
 
-        <div id="auth-section" style="background:#eee8d5; padding:20px; border-radius:12px; margin:20px 0; border: 2px solid #93a1a1;">
-            <h3 style="margin-top:0; color:#073642;">🔑 ライセンス認証</h3>
-            <p style="font-size: 0.8rem; margin-bottom: 10px;">団体利用の方は団体名を入力してください。</p>
-            
-            <input type="text" id="org-input" placeholder="団体名 (アルファベット例: TOKYO_JUKU)" 
-                   style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px; box-sizing: border-box;">
-            
-            <input type="password" id="key-input" placeholder="ライセンスキーを入力" 
-                   style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px; box-sizing: border-box;">
-            
-            <button onclick="login()" style="width:100%; background:#268bd2; color:white; padding:15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; font-size:1rem;">
-                認証してすべての機能を開放
-            </button>
-        </div>
-        <div class="menu-grid">
-            <button onclick="location.href='practice.html'" class="menu-btn">各分野の演習</button>
-            <button onclick="location.href='final_test.html'" class="menu-btn" style="background:#d33682;">実戦模試を受ける</button>
-            <button onclick="location.href='store.html'" class="menu-btn" style="background:#859900;">ストア・見積もり</button>
-        </div>
+        <div id="auth-section" style="background:#eee8d5; padding:20px; border-radius:12px; margin:20px 0; border: 2px solid #268bd2; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <h3 style="margin-top:0; color:#073642; display: flex; align-items: center;">
+        <span style="margin-right:8px;">🔓</span> ライセンス有効化
+    </h3>
+    
+    <div style="background: rgba(255,255,255,0.7); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; line-height: 1.5; color: #586e75; border-left: 4px solid #268bd2;">
+        <strong>【個人でご利用の方】</strong><br>
+        「団体名」は<strong>空欄のまま</strong>、お持ちの個人用キーを入力してください。<br>
+        <hr style="border:0; border-top:1px solid #ccc; margin:8px 0;">
+        <strong>【学校・塾など団体利用の方】</strong><br>
+        管理者から指定された<strong>「団体名（アルファベット）」</strong>と「ライセンスキー」を両方入力してください。
     </div>
+    
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="text" id="org-input" placeholder="団体名（個人の場合は空欄でOK）" 
+               style="width:100%; padding:12px; border:1px solid #93a1a1; border-radius:5px; font-size:1rem; box-sizing: border-box;">
+        
+        <input type="password" id="key-input" placeholder="ライセンスキーを入力" 
+               style="width:100%; padding:12px; border:1px solid #93a1a1; border-radius:5px; font-size:1rem; box-sizing: border-box;">
+        
+        <button onclick="login()" style="width:100%; background:#268bd2; color:white; padding:15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; font-size:1.1rem; transition: background 0.3s;">
+            認証して全機能を開放
+        </button>
+    </div>
+    
+    <p style="text-align: center; font-size: 0.8rem; margin-top: 10px;">
+        キーをお持ちでない方は <a href="store.html" style="color:#268bd2; text-decoration:none; font-weight:bold;">ストアページ</a> へ
+    </p>
+</div>
 
     <script src="problems_db.js"></script>
     <script>
