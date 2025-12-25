@@ -52,22 +52,23 @@
         };
 
         const menuItems = [
-            { id: "full_access", name: "【総仕上げ】実戦模試・偏差値診断", link: "final_test.html" },
-            { id: "d1_all", name: "大問1 フルセット演習", link: "daimon1_1.html" },
-            { id: "d1_q1", name: "大問1(1) 計算", link: "daimon1_1.html" },
-            { id: "d1_q2", name: "大問1(2) 平方根", link: "daimon1_2.html" },
-            { id: "d1_q3", name: "大問1(3) 方程式", link: "daimon1_3.html" },
-            { id: "d1_q4", name: "大問1(4) 連立方程式", link: "daimon1_4.html" },
-            { id: "d1_q5", name: "大問1(5) 二次方程式", link: "daimon1_5.html" },
-            { id: "d1_q6", name: "大問1(6) 関数基礎", link: "daimon1_6.html" },
-            { id: "d1_q7", name: "大問1(7) 角度", link: "daimon1_7.html" },
-            { id: "d1_q8", name: "大問1(8) 確率/統計", link: "daimon1_8.html" },
-            { id: "d1_q9", name: "大問1(9) 作図", link: "daimon1_9.html" },
-            { id: "d2_only", name: "大問2 規則性・証明", link: "daimon2.html" },
-            { id: "d3_only", name: "大問3 一次関数", link: "daimon3.html" },
-            { id: "d4_only", name: "大問4 平面図形", link: "daimon4.html" },
-            { id: "d5_only", name: "大問5 空間図形", link: "daimon5.html" }
-        ];
+    { id: "full_access", name: "【総仕上げ】実戦模試・偏差値診断", link: "final_test.html" },
+    { id: "d1_all", name: "大問1 フルセット演習", link: "practice.html?cat=d1_q1" }, // 全体演習のロジックに合わせて調整
+    { id: "d1_q1", name: "大問1(1) 計算", link: "practice.html?cat=d1_q1" },
+    { id: "d1_q2", name: "大問1(2) 平方根", link: "practice.html?cat=d1_q2" },
+    { id: "d1_q3", name: "大問1(3) 方程式", link: "practice.html?cat=d1_q3" },
+    { id: "d1_q4", name: "大問1(4) 連立方程式", link: "practice.html?cat=d1_q4" },
+    { id: "d1_q5", name: "大問1(5) 二次方程式", link: "practice.html?cat=d1_q5" },
+    { id: "d1_q6", name: "大問1(6) 関数基礎", link: "practice.html?cat=d1_q6" },
+    { id: "d1_q7", name: "大問1(7) 角度", link: "practice.html?cat=d1_q7" },
+    { id: "d1_q8", name: "大問1(8) 確率/統計", link: "practice.html?cat=d1_q8" },
+    { id: "d1_q9", name: "大問1(9) 作図", link: "practice.html?cat=d1_q9" },
+    { id: "d2_only", name: "大問2 規則性・証明", link: "practice.html?cat=d2" },
+    { id: "d3_only", name: "大問3 一次関数", link: "practice.html?cat=d3" },
+    { id: "d4_only", name: "大問4 平面図形", link: "practice.html?cat=d4" },
+    { id: "d5_only", name: "大問5 空間図形", link: "practice.html?cat=d5" }
+];
+
 
         function renderMenu() {
             const menuArea = document.getElementById('menu-area');
