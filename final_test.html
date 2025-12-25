@@ -1,148 +1,167 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <script src="auth.js"></script>
     <meta charset="UTF-8">
-    <title>【限定特典】都立数学 総仕上げ模試</title>
-    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都立数学 実戦模試 & 偏差値診断</title>
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: sans-serif; max-width: 650px; margin: auto; padding: 20px; background: #eee8d5; }
-        .test-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .progress-bar { width: 100%; height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #859900; width: 0%; transition: 0.3s; }
-        .prob-header { font-weight: bold; color: #586e75; border-bottom: 2px solid #859900; margin-bottom: 15px; }
-        .prob-content { min-height: 120px; font-size: 1.2rem; margin-bottom: 20px; }
-        #jxgbox { width: 100%; height: 300px; display: none; margin-bottom: 20px; border: 1px solid #ccc; }
-        .action-area { display: flex; flex-direction: column; gap: 10px; }
-        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-ans { background: #268bd2; color: white; }
-        .btn-next { background: #859900; color: white; display: none; }
-        .result-box { display: none; text-align: center; }
-        .score { font-size: 3rem; color: #d33682; font-weight: bold; }
-        .miss-list { text-align: left; background: #fdf6e3; padding: 15px; border-radius: 10px; margin-top: 20px; }
+        :root { --base: #fdf6e3; --text: #657b83; --accent: #d33682; --blue: #268bd2; }
+        body { font-family: sans-serif; background-color: var(--base); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 20px; }
+        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 20px 0; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; }
+        .btn-correct { background-color: #859900; color: white; }
+        .btn-wrong { background-color: #dc322f; color: white; }
+        .badge { background: var(--text); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
+        /* 結果画面用スタイル */
+        .result-card { text-align: center; display: none; }
+        .deviation-circle { width: 120px; height: 120px; line-height: 120px; border-radius: 50%; background: var(--accent); color: white; font-size: 2.5rem; margin: 20px auto; }
+        .advice-box { background: #eee8d5; padding: 15px; border-radius: 10px; text-align: left; margin: 20px 0; }
+        .recommend-link { display: block; background: var(--blue); color: white; text-decoration: none; padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="test-container">
+<div class="container">
     <div id="test-ui">
-        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
-        <div id="prob-header" class="prob-header">問題 1 / 13</div>
-        <div id="prob-content" class="prob-content"></div>
-        <div id="jxgbox" class="jxgbox"></div>
+        <div class="header">
+            <span id="q-number" style="font-weight: bold;">第 1 問 / 13</span>
+            <span id="q-badge" class="badge">計算</span>
+        </div>
         
-        <div class="action-area">
-            <button id="show-ans-btn" class="btn btn-ans" onclick="revealAnswer()">自分の答え合わせをする</button>
-            <div id="ans-check" style="display:none; text-align:center;">
-                <p id="ans-display" style="font-size:1.5rem; color:#d33682; font-weight:bold;"></p>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn" style="flex:1; background:#cb4b16; color:white;" onclick="recordResult(false)">間違えた...</button>
-                    <button class="btn" style="flex:1; background:#859900; color:white;" onclick="recordResult(true)">正解！</button>
-                </div>
-            </div>
+        <div id="question-text" style="font-size: 1.2rem; min-height: 80px;">問題読み込み中...</div>
+        
+        <div id="jxgbox" class="jxgbox"></div>
+
+        <div class="btn-group">
+            <button class="btn-correct" onclick="processAnswer(true)">正解</button>
+            <button class="btn-wrong" onclick="processAnswer(false)">不正解</button>
         </div>
     </div>
 
-    <div id="result-ui" class="result-box">
-        <h2>試験終了！</h2>
-        <div class="score" id="final-score">0 / 13</div>
-        <div id="judge-msg" style="font-size:1.2rem; margin:10px 0;"></div>
-        <div class="miss-list" id="weak-points">
-            <strong>復習が必要なジャンル:</strong>
-            <ul id="weak-list"></ul>
+    <div id="result-ui" class="result-card">
+        <h2 style="margin:0;">診断結果</h2>
+        <div class="deviation-circle" id="res-dv">--</div>
+        <p style="font-size: 1.2rem;">得点: <span id="res-score" style="font-weight:bold; color:var(--accent);">0</span> / 100点</p>
+        
+        <div class="advice-box">
+            <strong>【弱点分析】</strong>
+            <p id="res-weakness" style="font-size: 0.9rem;"></p>
+            <div id="recommend-area"></div>
         </div>
-        <button class="btn btn-ans" style="margin-top:20px;" onclick="location.reload()">もう一度受ける</button>
-        <button class="btn" style="margin-top:10px; background:#586e75; color:white;" onclick="location.href='index.html'">メニューに戻る</button>
+
+        <button onclick="location.reload()" style="background:#586e75; color:white; width:100%;">もう一度挑戦する</button>
+        <button onclick="location.href='store.html'" style="background:none; color:var(--blue); margin-top:10px; border:1px solid var(--blue);">ストアへ戻る</button>
     </div>
 </div>
 
+<script src="problems_db.js"></script>
 <script>
-// 各大問からランダムに1問抽出するための関数
-const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    let currentIdx = 0;
+    let score = 0;
+    let testData = [];
+    let wrongCategories = new Set();
 
-// ここに今まで作った各ページのdatabaseから1問ずつ集約します
-// (実際の実装ではここに各データベースの中身をコピペします)
-const testSuite = [
-    { title: "大問1(1) 正負・文字式", ...database1_1[0] }, // 仮置き。実際はランダム抽出
-    { title: "大問1(2) 平方根", ...database1_2[0] },
-    // ... 大問1(9)まで続く
-    { title: "大問2 規則性/証明", ...database2[0] },
-    { title: "大問3 関数グラフ", ...database3[0] },
-    { title: "大問4 平面図形", ...database4[0] },
-    { title: "大問5 空間図形", ...database5[0] }
-];
+    // 1. 各大問から1問ずつ抽出してシャッフル
+    function initTest() {
+        const categories = [
+            { id: 'd1_q1', name: '計算', w: 5, pack: 1 },
+            { id: 'd1_q2', name: '平方根', w: 5, pack: 2 },
+            { id: 'd1_q3', name: '一次方程式', w: 5, pack: 3 },
+            { id: 'd1_q4', name: '連立方程式', w: 5, pack: 4 },
+            { id: 'd1_q5', name: '二次方程式', w: 5, pack: 5 },
+            { id: 'd1_q6', name: '関数基礎', w: 5, pack: 6 },
+            { id: 'd1_q7', name: '図形角度', w: 5, pack: 7 },
+            { id: 'd1_q8', name: '確率・統計', w: 6, pack: 8 },
+            { id: 'd1_q9', name: '作図', w: 6, pack: 9 },
+            { id: 'd2', name: '規則性', w: 12, pack: 11 },
+            { id: 'd3', name: '一次関数', w: 12, pack: 12 },
+            { id: 'd4', name: '平面図形', w: 12, pack: 13 },
+            { id: 'd5', name: '空間図形', w: 12, pack: 14 }
+        ];
 
-// ※実際にはここに全てのdatabase変数を定義する必要があります
-
-let currentIndex = 0;
-let correctCount = 0;
-let weaknesses = [];
-
-function loadProblem() {
-    const prob = testSuite[currentIndex];
-    document.getElementById('prob-header').innerText = `問題 ${currentIndex + 1} / 13 [${prob.title}]`;
-    document.getElementById('prob-content').innerHTML = prob.text || prob.q; // databaseによってプロパティ名が違うので調整
-    
-    // 図形がある場合
-    const boardElem = document.getElementById('jxgbox');
-    if (prob.draw) {
-        boardElem.style.display = 'block';
-        const board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis:false, showCopyright:false});
-        prob.draw(board);
-    } else {
-        boardElem.style.display = 'none';
+        testData = categories.map(cat => {
+            const db = MasterDatabase[cat.id];
+            const prob = db[Math.floor(Math.random() * db.length)];
+            return { ...prob, ...cat };
+        });
+        showQuestion();
     }
 
-    document.getElementById('progress-fill').style.width = `${(currentIndex / 13) * 100}%`;
-    if(window.MathJax) MathJax.typesetPromise();
-}
+    // 2. 問題表示
+    function showQuestion() {
+        const q = testData[currentIdx];
+        document.getElementById('q-number').innerText = `第 ${currentIdx + 1} 問 / 13`;
+        document.getElementById('q-badge').innerText = q.name;
+        document.getElementById('question-text').innerHTML = q.q;
 
-function revealAnswer() {
-    document.getElementById('show-ans-btn').style.display = 'none';
-    document.getElementById('ans-check').style.display = 'block';
-    const prob = testSuite[currentIndex];
-    document.getElementById('ans-display').innerHTML = "正解: " + (prob.ans || prob.a);
-}
+        if (window.MathJax) MathJax.typeset();
 
-function recordResult(isCorrect) {
-    if (isCorrect) {
-        correctCount++;
-    } else {
-        weaknesses.push(testSuite[currentIndex].title);
+        // 描画リセット
+        document.getElementById('jxgbox').style.display = q.draw ? 'block' : 'none';
+        if (q.draw) {
+            const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
+            q.draw(brd, false);
+        }
     }
 
-    currentIndex++;
-    if (currentIndex < 13) {
-        document.getElementById('show-ans-btn').style.display = 'block';
-        document.getElementById('ans-check').style.display = 'none';
-        loadProblem();
-    } else {
-        showFinalResult();
+    // 3. 回答処理
+    function processAnswer(isCorrect) {
+        const q = testData[currentIdx];
+        if (isCorrect) {
+            score += q.w;
+        } else {
+            wrongCategories.add({name: q.name, pack: q.pack});
+        }
+
+        if (currentIdx < testData.length - 1) {
+            currentIdx++;
+            showQuestion();
+        } else {
+            finishTest();
+        }
     }
-}
 
-function showFinalResult() {
-    document.getElementById('test-ui').style.display = 'none';
-    document.getElementById('result-ui').style.display = 'block';
-    document.getElementById('final-score').innerText = `${correctCount} / 13`;
-    
-    let msg = "";
-    if(correctCount === 13) msg = "完璧です！合格間違いなし！";
-    else if(correctCount >= 10) msg = "素晴らしい！あと一歩で満点です。";
-    else if(correctCount >= 7) msg = "合格圏内ですが、ケアレスミスに注意。";
-    else msg = "基礎をもう一度復習しましょう。";
-    document.getElementById('judge-msg').innerText = msg;
+    // 4. 終了・偏差値計算
+    function finishTest() {
+        document.getElementById('test-ui').style.display = 'none';
+        document.getElementById('result-ui').style.display = 'block';
 
-    const list = document.getElementById('weak-list');
-    weaknesses.forEach(w => {
-        const li = document.createElement('li');
-        li.innerText = w;
-        list.appendChild(li);
-    });
-}
+        // 簡易偏差値計算 (平均60, 標準偏差15想定)
+        const dv = Math.round(((score - 60) / 15) * 10 + 50);
+        const finalDv = Math.max(30, Math.min(75, dv));
+
+        document.getElementById('res-score').innerText = score;
+        document.getElementById('res-dv').innerText = finalDv;
+
+        // 弱点分析とレコメンド
+        const weaknessText = document.getElementById('res-weakness');
+        const recommendArea = document.getElementById('recommend-area');
+
+        if (wrongCategories.size === 0) {
+            weaknessText.innerText = "弱点なし！完璧な実力です。";
+        } else {
+            let catNames = Array.from(wrongCategories).map(c => c.name);
+            weaknessText.innerText = catNames.join('、') + " の正解率を上げる必要があります。";
+            
+            // おすすめパックの表示（最初の2つだけ提示）
+            Array.from(wrongCategories).slice(0, 2).forEach(c => {
+                const link = document.createElement('a');
+                link.href = `store.html?pack=${c.pack}`;
+                link.className = 'recommend-link';
+                link.innerText = `パック(${c.pack}) ${c.name}特訓コースを見る`;
+                recommendArea.appendChild(link);
+            });
+        }
+    }
+
+    initTest();
 </script>
+
 </body>
 </html>
