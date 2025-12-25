@@ -202,46 +202,114 @@ Object.assign(MasterDatabase, {
     ],
 
     // 大問3：一次関数・グラフ
-    d3: [
-        { q: String.raw`点 $A(2, 6)$ と点 $B(4, 10)$ を通る直線の式。`, a: String.raw`$y = 2x + 2$`, e: String.raw`傾きは $(10-6)/(4-2) = 2$。`, draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [[2,6],[4,10]], {strokeColor:'blue'}); } },
-        { q: String.raw`直線 $y = x + 4$ と $y = -2x + 10$ の交点。`, a: String.raw`$(2, 6)$`, e: String.raw`連立方程式を解く。`, draw: (brd) => { brd.create('line', [1,4], {strokeColor:'red'}); brd.create('line', [-2,10], {strokeColor:'blue'}); } },
-        { q: String.raw`$y = 2x + 4$ のグラフにおいて、$x$ 軸との交点。`, a: String.raw`$(-2, 0)$`, e: String.raw`$y=0$ を代入。`, draw: (brd) => { brd.create('line', [2,4], {strokeColor:'green'}); } },
-        { q: String.raw`傾きが $-3$ で点 $(1, 2)$ を通る直線の式。`, a: String.raw`$y = -3x + 5$`, e: String.raw`$2 = -3(1) + b \Rightarrow b=5$` },
-        { q: String.raw`$y = 3x - 1$ に平行で、切片が $5$ の直線。`, a: String.raw`$y = 3x + 5$`, e: String.raw`平行なら傾きが同じ。` },
-        { q: String.raw`2点 $(0, -2)$ と $(3, 4)$ を通る直線の式。`, a: String.raw`$y = 2x - 2$`, e: String.raw`切片は $-2$。傾きは $(4 - (-2))/3 = 2$。` },
-        { q: String.raw`$y = -x + 6$ と $x$ 軸、 $y$ 軸で囲まれた三角形の面積。`, a: String.raw`$18$`, e: String.raw`底辺6、高さ6。 $6 \times 6 \div 2 = 18$。` },
-        { q: String.raw`$y = 2x + k$ が点 $(3, 4)$ を通るとき、 $k$ の値。`, a: String.raw`$k = -2$`, e: String.raw`$4 = 2(3) + k \Rightarrow k = -2$` },
-        { q: String.raw`一次関数 $f(x) = 4x - 3$ において、 $f(2)$ の値。`, a: String.raw`$5$`, e: String.raw`$4(2) - 3 = 5$` },
-        { q: String.raw`$y$ が $x$ の一次関数で、 $x=2$ のとき $y=5$、 $x=4$ のとき $y=9$。`, a: String.raw`$y = 2x + 1$`, e: String.raw`傾き2、切片1。` }
-    ]
-});
-// 【第4ブロック】大問4（平面図形）、大問5（空間図形）各10問
-Object.assign(MasterDatabase, {
-    // 大問4：平面図形（相似・円・面積比）
-    d4: [
-        { q: String.raw`$\triangle ABC$ で $DE // BC$。$AD=3, DB=6, DE=2$ のとき、$BC$ の長さを求めなさい。`, a: String.raw`$6$`, e: String.raw`$\triangle ADE \sim \triangle ABC$。相似比 $3:(3+6)=1:3$ より $BC=2 \times 3=6$。`, draw: (brd) => { brd.create('polygon', [[0,0],[6,0],[2,4]]); brd.create('line', [[0.6,1.3],[3.3,1.3]], {straightFirst:false, straightLast:false}); } },
-        { q: String.raw`相似比が $2:3$ である2つの図形の面積比を求めなさい。`, a: String.raw`$4:9$`, e: String.raw`面積比は相似比の2乗。$2^2:3^2 = 4:9$。` },
-        { q: String.raw`右の図で $\angle x$ の大きさを求めなさい。`, a: String.raw`$50^\circ$`, e: String.raw`同じ弧に対する円周角は等しい。`, draw: (brd) => { brd.create('circle', [[0,0], 2.5]); brd.create('polygon', [[-1.5,2], [1.5,2], [2,-1.5], [-2,-1.5]], {fillColor:'none'}); brd.create('text', [-1.2, 1.5, "50°"]); brd.create('text', [1.2, 1.5, "x"]); } },
-        { q: String.raw`1辺 $8$cm の正三角形の面積を求めなさい。`, a: String.raw`$16\sqrt{3}$ cm$^2$`, e: String.raw`高さ $4\sqrt{3}$ より $8 \times 4\sqrt{3} \div 2 = 16\sqrt{3}$。` },
-        { q: String.raw`直角三角形で、斜辺が $13$、他の一辺が $12$ のとき、残りの一辺の長さ。`, a: String.raw`$5$`, e: String.raw`$13^2 - 12^2 = 169 - 144 = 25 = 5^2$。` },
-        { q: String.raw`円周上に4点 $A,B,C,D$ があり、弦 $AB, CD$ の交点を $P$ とする。$\triangle PAC \sim \triangle PDB$ を証明する時に使う条件は？`, a: "2組の角がそれぞれ等しい", e: String.raw`円周角の定理より2角が等しくなります。` },
-        { q: String.raw`半径 $10$cm、中心角 $72^\circ$ のおうぎ形の面積。`, a: String.raw`$20\pi$ cm$^2$`, e: String.raw`$100\pi \times (72/360) = 20\pi$。` },
-        { q: String.raw`$\triangle ABC$ で、辺 $AB$ の中点を $D$、$AC$ の中点を $E$ とするとき、$BC=10$ ならば $DE$ の長さは？`, a: String.raw`$5$`, e: String.raw`中点連結定理より $BC$ の半分。` },
-        { q: String.raw`1辺 $6$cm の正方形の対角線の長さ。`, a: String.raw`$6\sqrt{2}$ cm`, e: String.raw`$1:1:\sqrt{2}$ の比を利用。` },
-        { q: String.raw`ひし形の面積が $24$cm$^2$、一方の対角線が $6$cm のとき、他方の対角線の長さ。`, a: String.raw`$8$ cm`, e: String.raw`$6 \times x \div 2 = 24 \Rightarrow 3x = 24$。` }
-    ],
+d3: [
+    { 
+        q: String.raw`点 $A(2, 6)$ と点 $B(4, 10)$ を通る直線の式を求めなさい。`, 
+        a: String.raw`$y = 2x + 2$`, 
+        e: String.raw`傾きは $\frac{10-6}{4-2} = 2$。$y = 2x + b$ に $(2, 6)$ を代入して $b=2$。`, 
+        draw: (brd) => { 
+            brd.setBoundingBox([-1, 12, 6, -2]);
+            brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); 
+            brd.create('line', [[2,6],[4,10]], {strokeColor:'blue', fixed:true}); 
+            brd.create('point', [2,6], {name:'A', size:3}); brd.create('point', [4,10], {name:'B', size:3});
+        } 
+    },
+    { 
+        q: String.raw`直線 $y = x + 4$ と $y = -2x + 10$ の交点の座標を求めなさい。`, 
+        a: String.raw`$(2, 6)$`, 
+        e: String.raw`$x + 4 = -2x + 10$ を解くと $3x = 6 \Rightarrow x = 2$。$y = 2 + 4 = 6$。`, 
+        draw: (brd) => { 
+            brd.setBoundingBox([-1, 12, 8, -2]);
+            brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]);
+            brd.create('line', [1,4], {strokeColor:'red'}); 
+            brd.create('line', [-2,10], {strokeColor:'blue'}); 
+            brd.create('point', [2,6], {name:'交点', color:'green'});
+        } 
+    },
+    { 
+        q: String.raw`$y = 2x + 4$ のグラフにおいて、$x$ 軸との交点の座標を求めなさい。`, 
+        a: String.raw`$(-2, 0)$`, 
+        e: String.raw`$y=0$ を代入すると $0 = 2x + 4 \Rightarrow 2x = -4 \Rightarrow x = -2$。`, 
+        draw: (brd) => { 
+            brd.setBoundingBox([-5, 8, 3, -2]);
+            brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]);
+            brd.create('line', [2,4], {strokeColor:'green'}); 
+            brd.create('point', [-2,0], {name:'(-2,0)', color:'red'});
+        } 
+    },
+    { q: String.raw`傾きが $-3$ で点 $(1, 2)$ を通る直線の式。`, a: String.raw`$y = -3x + 5$`, e: String.raw`$2 = -3(1) + b \Rightarrow b=5$` },
+    { q: String.raw`$y = 3x - 1$ に平行で、切片が $5$ の直線。`, a: String.raw`$y = 3x + 5$`, e: String.raw`平行なら傾きが同じ。` },
+    { q: String.raw`2点 $(0, -2)$ と $(3, 4)$ を通る直線の式。`, a: String.raw`$y = 2x - 2$`, e: String.raw`切片は $-2$。傾きは $(4 - (-2))/3 = 2$。` },
+    { q: String.raw`$y = -x + 6$ と $x$ 軸、 $y$ 軸で囲まれた三角形の面積。`, a: String.raw`$18$`, e: String.raw`底辺6、高さ6。 $6 \times 6 \div 2 = 18$。` },
+    { q: String.raw`$y = 2x + k$ が点 $(3, 4)$ を通るとき、 $k$ の値。`, a: String.raw`$k = -2$`, e: String.raw`$4 = 2(3) + k \Rightarrow k = -2$` },
+    { q: String.raw`一次関数 $f(x) = 4x - 3$ において、 $f(2)$ の値。`, a: String.raw`$5$`, e: String.raw`$4(2) - 3 = 5$` },
+    { q: String.raw`$y$ が $x$ の一次関数で、 $x=2$ のとき $y=5$、 $x=4$ のとき $y=9$。`, a: String.raw`$y = 2x + 1$`, e: String.raw`傾き2、切片1。` }
+],
 
-    // 大問5：空間図形（体積・表面積・三平方）
-    d5: [
-        { q: String.raw`底面の半径 $3$cm、高さ $4$cm の円錐の体積を求めなさい。`, a: String.raw`$12\pi$ cm$^3$`, e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, draw: (brd) => { brd.create('ellipse', [[0,-2], 3, 0.8]); brd.create('line', [[-3,-2],[0,2]], {straightFirst:false, straightLast:false}); brd.create('line', [[3,-2],[0,2]], {straightFirst:false, straightLast:false}); } },
-        { q: String.raw`底面の半径 $3$cm、母線の長さ $5$cm の円錐の高さ。`, a: String.raw`$4$ cm`, e: String.raw`三平方の定理 $\sqrt{5^2 - 3^2} = 4$。` },
-        { q: String.raw`1辺 $3$cm の立方体の表面積を求めなさい。`, a: String.raw`$54$ cm$^2$`, e: String.raw`$(3 \times 3) \times 6 = 54$。` },
-        { q: String.raw`半径 $6$cm の球の表面積。`, a: String.raw`$144\pi$ cm$^2$`, e: String.raw`$4\pi \times 6^2 = 144\pi$。` },
-        { q: String.raw`半径 $2$cm の球の体積。`, a: String.raw`$\frac{32}{3}\pi$ cm$^3$`, e: String.raw`$\frac{4}{3}\pi \times 2^3 = \frac{32}{3}\pi$。` },
-        { q: String.raw`底面が $4 \times 5$ の長方形で、高さが $6$ の四角柱の体積。`, a: String.raw`$120$`, e: String.raw`$4 \times 5 \times 6 = 120$。` },
-        { q: String.raw`1辺 $2$cm の正四面体のすべての辺の長さの和。`, a: String.raw`$12$ cm`, e: String.raw`正四面体の辺は6本。$2 \times 6 = 12$。` },
-        { q: String.raw`円柱の底面の直径が $4$cm、高さが $5$cm のときの体積。`, a: String.raw`$20\pi$ cm$^3$`, e: String.raw`半径2なので $\pi \times 2^2 \times 5 = 20\pi$。` },
-        { q: String.raw`立方体の対角線の長さが $\sqrt{12}$cm のとき、その1辺の長さ。`, a: String.raw`$2$ cm`, e: String.raw`$a\sqrt{3} = \sqrt{12} = 2\sqrt{3} \Rightarrow a=2$。` },
-        { q: String.raw`直方体の $3$ 辺が $1, 2, 3$ のとき、対角線の長さ。`, a: String.raw`$\sqrt{14}$`, e: String.raw`$\sqrt{1^2+2^2+3^2} = \sqrt{1+4+9} = \sqrt{14}$。` }
-    ]
+});
+// 大問4：平面図形
+d4: [
+    { 
+        q: String.raw`$\triangle ABC$ で $DE // BC$。$AD=3, DB=6, DE=2$ のとき、$BC$ の長さを求めなさい。`, 
+        a: String.raw`$6$`, 
+        e: String.raw`$\triangle ADE \sim \triangle ABC$。相似比 $3:(3+6)=1:3$。$DE:BC = 1:3 \Rightarrow BC=6$。`, 
+        draw: (brd) => { 
+            brd.setBoundingBox([-1, 5, 7, -1]);
+            const pA = brd.create('point', [2,4], {name:'A'});
+            const pB = brd.create('point', [0,0], {name:'B'});
+            const pC = brd.create('point', [6,0], {name:'C'});
+            brd.create('polygon', [pA, pB, pC], {fillColor:'none'});
+            brd.create('segment', [[2/3, 4/3], [2+8/3, 4/3]], {name:'DE', withLabel:true, strokeColor:'red'});
+        } 
+    },
+    { q: String.raw`相似比が $2:3$ である2つの図形の面積比を求めなさい。`, a: String.raw`$4:9$`, e: String.raw`面積比は相似比の2乗。$2^2:3^2 = 4:9$。` },
+    { 
+        q: String.raw`右の図で $\angle x$ の大きさを求めなさい。（円周角）`, 
+        a: String.raw`$50^\circ$`, 
+        e: String.raw`同じ弧に対する円周角は等しいため、示された角度と同じになります。`, 
+        draw: (brd) => { 
+            brd.setBoundingBox([-3, 3, 3, -3]);
+            brd.create('circle', [[0,0], 2.5], {strokeColor:'#ccc'});
+            const pA = brd.create('point', [-1.5, 2], {name:'A'});
+            const pB = brd.create('point', [1.5, 2], {name:'B'});
+            const pC = brd.create('point', [2, -1.5], {name:'C'});
+            const pD = brd.create('point', [-2, -1.5], {name:'D'});
+            brd.create('polyline', [pA, pD, pB, pC, pA], {strokeColor:'blue'});
+            brd.create('text', [-1.3, 1.2, "50°"]); brd.create('text', [1.1, 1.2, "x"]);
+        } 
+    },
+    { q: String.raw`1辺 $8$cm の正三角形の面積。`, a: String.raw`$16\sqrt{3}$`, e: String.raw`高さ $4\sqrt{3}$ より $8 \times 4\sqrt{3} \div 2 = 16\sqrt{3}$。` },
+    { q: String.raw`斜辺が $13$、他の一辺が $12$ の直角三角形の残りの辺。`, a: String.raw`$5$`, e: String.raw`$\sqrt{13^2 - 12^2} = \sqrt{25} = 5$。` },
+    { q: String.raw`円周上に4点 $A,B,C,D$ があり、弦 $AB, CD$ の交点を $P$ とする。$\triangle PAC \sim \triangle PDB$ の相似条件は？`, a: "2組の角がそれぞれ等しい", e: String.raw`円周角の定理により、2つの角が等しくなります。` },
+    { q: String.raw`半径 $10$cm、中心角 $72^\circ$ のおうぎ形の面積。`, a: String.raw`$20\pi$`, e: String.raw`$100\pi \times \frac{72}{360} = 20\pi$。` },
+    { q: String.raw`$\triangle ABC$ で辺 $AB, AC$ の中点を $D, E$ とする。$BC=10$ ならば $DE$ の長さは？`, a: String.raw`$5$`, e: String.raw`中点連結定理より $10 \div 2 = 5$。` },
+    { q: String.raw`1辺 $6$cm の正方形の対角線の長さ。`, a: String.raw`$6\sqrt{2}$`, e: String.raw`$1:1:\sqrt{2}$ の比を利用。` },
+    { q: String.raw`ひし形の面積が $24$、一方の対角線が $6$ のとき他方の対角線。`, a: String.raw`$8$`, e: String.raw`$(6 \times x) \div 2 = 24$ より $x=8$。` }
+],
+
+// 大問5：空間図形
+d5: [
+    { 
+        q: String.raw`底面の半径 $3$cm、高さ $4$cm の円錐の体積を求めなさい。`, 
+        a: String.raw`$12\pi$ cm$^3$`, 
+        e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
+        draw: (brd) => { 
+            brd.setBoundingBox([-5, 5, 5, -5]);
+            brd.create('ellipse', [[0,-2], 3, 0.8], {strokeColor:'black'}); 
+            brd.create('segment', [[-3,-2],[0,3]], {strokeColor:'black'}); 
+            brd.create('segment', [[3,-2],[0,3]], {strokeColor:'black'});
+            brd.create('segment', [[0,-2],[0,3]], {dash:2, strokeColor:'gray'}); // 高さ
+        } 
+    },
+    { q: String.raw`底面の半径 $3$cm、母線の長さ $5$cm の円錐の高さ。`, a: String.raw`$4$ cm`, e: String.raw`三平方の定理より $\sqrt{5^2-3^2}=4$。` },
+    { q: String.raw`1辺 $3$cm の立方体の表面積。`, a: String.raw`$54$ cm$^2$`, e: String.raw`$3 \times 3 \times 6 = 54$。` },
+    { q: String.raw`半径 $6$cm の球の表面積。`, a: String.raw`$144\pi$ cm$^2$`, e: String.raw`$4\pi \times 6^2 = 144\pi$。` },
+    { q: String.raw`半径 $2$cm の球の体積。`, a: String.raw`$\frac{32}{3}\pi$ cm$^3$`, e: String.raw`$\frac{4}{3}\pi \times 2^3 = \frac{32}{3}\pi$。` },
+    { q: String.raw`底面 $4 \times 5$、高さ $6$ の四角柱の体積。`, a: String.raw`$120$`, e: String.raw`$4 \times 5 \times 6 = 120$。` },
+    { q: String.raw`1辺 $2$cm の正四面体のすべての辺の長さの和。`, a: String.raw`$12$ cm`, e: String.raw`辺は全部で6本あるので $2 \times 6 = 12$。` },
+    { q: String.raw`円柱の底面の直径 $4$cm、高さ $5$cm の体積。`, a: String.raw`$20\pi$ cm$^3$`, e: String.raw`半径2なので $\pi \times 2^2 \times 5 = 20\pi$。` },
+    { q: String.raw`立方体の対角線の長さが $\sqrt{12}$ のとき、その1辺の長さ。`, a: String.raw`$2$`, e: String.raw`$a\sqrt{3} = \sqrt{12} \Rightarrow a\sqrt{3} = 2\sqrt{3} \Rightarrow a=2$。` },
+    { q: String.raw`直方体の $3$ 辺が $1, 2, 3$ のとき、対角線の長さ。`, a: String.raw`$\sqrt{14}$`, e: String.raw`$\sqrt{1^2+2^2+3^2} = \sqrt{14}$。` }
+]
+
 });
