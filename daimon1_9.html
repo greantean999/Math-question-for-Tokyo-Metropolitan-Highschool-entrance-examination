@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <script src="auth.js"></script>
+    <meta charset="UTF-8">
+    <title>都立数学特訓 - 大問1(9) 作図</title>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #fdf6e3; }
+        .back-link { text-decoration: none; color: #268bd2; font-weight: bold; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .prob-text { font-size: 1.1rem; margin: 20px 0; min-height: 50px; color: #073642; text-align: left; line-height: 1.6; }
+        #jxgbox { width: 100%; height: 320px; margin: auto; border-radius: 10px; background: white; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #268bd2; color: white; cursor: pointer; font-weight: bold; margin: 10px 0; }
+        .ans-box { display: none; margin-top: 20px; padding: 20px; background: #eee8d5; border-radius: 10px; border: 2px solid #268bd2; }
+    </style>
+</head>
+<body>
+
+<a href="daimon1.html" class="back-link">← 大問1メニューへ</a>
+
+<div class="card">
+    <div id="prob-text" class="prob-text">読み込み中...</div>
+    <div id="jxgbox" class="jxgbox"></div>
+    <button class="action-btn" onclick="showAnswer()">作図手順・正解を表示</button>
+    <button class="action-btn" style="background:#859900;" onclick="nextProblem()">次の問題</button>
+
+    <div id="ans-area" class="ans-box">
+        <div id="ans-text" style="font-weight: bold; color: #d33682; margin-bottom: 10px;"></div>
+        <div id="exp-text" style="text-align: left; font-size: 0.9rem; line-height: 1.5;"></div>
+    </div>
+</div>
+
+<script>
+    let board;
+    const database = [
+        { 
+            q: String.raw`下の図の $\triangle ABC$ において、辺 $BC$ 上にあり、2辺 $AB, AC$ から等しい距離にある点 $P$ を作図しなさい。`, 
+            a: "角の二等分線を利用", 
+            e: String.raw`1. $\angle A$ の二等分線を作図する。<br>2. その二等分線と辺 $BC$ が交わった点が点 $P$ となる。<br><br><strong>ポイント：</strong>「2辺から等しい距離」と言われたら「角の二等分線」を使います。`,
+            draw: (brd, showAns) => {
+                let a = brd.create('point', [2, 3], {name:'A', fixed:true});
+                let b = brd.create('point', [0, 0], {name:'B', fixed:true});
+                let c = brd.create('point', [5, 0], {name:'C', fixed:true});
+                brd.create('polygon', [a, b, c], {fillColor:'none'});
+                
+                if(showAns) {
+                    // 角の二等分線の補助線
+                    brd.create('bisector', [b, a, c], {dash:2, strokeColor:'orange', strokeWidth:1});
+                    brd.create('point', [2.2, 0], {name:'P', color:'red', size:4});
+                }
+            }
+        },
+        { 
+            q: String.raw`下の図において、点 $A$ を通り、直線 $l$ に接する円のうち、中心が直線 $m$ 上にある円の中心 $O$ を作図しなさい。`, 
+            a: "垂線を利用", 
+            e: String.raw`1. 点 $A$ を通り、直線 $l$ に垂直な直線（垂線）を作図する。<br>2. その垂線と直線 $m$ が交わった点が中心 $O$ となる。<br><br><strong>ポイント：</strong>「直線に接する」＝「中心から接点への半径はその直線と垂直」です。`,
+            draw: (brd, showAns) => {
+                brd.create('line', [[-1, 0], [5, 0]], {name:'l', withLabel:true});
+                brd.create('line', [[-1, 2], [5, 3]], {name:'m', withLabel:true, strokeColor:'blue'});
+                let a = brd.create('point', [2, 0], {name:'A', color:'black'});
+                
+                if(showAns) {
+                    brd.create('line', [[2, 0], [2, 4]], {dash:2, strokeColor:'orange'});
+                    brd.create('point', [2, 2.5], {name:'O', color:'red', size:4});
+                    brd.create('circle', [[2, 2.5], 2.5], {strokeColor:'red', fillOpacity:0.05});
+                }
+            }
+        },
+        { 
+            q: String.raw`下の図の線分 $AB$ を斜辺とする直角二等辺三角形 $ABC$ の頂点 $C$ を作図しなさい。`, 
+            a: "垂直二等分線を利用", 
+            e: String.raw`1. 線分 $AB$ の垂直二等分線を作図する。<br>2. 線分 $AB$ の中点を中心として、半径 $MA$（$M$は中点）の半円を描く（または角の45度を作る）。<br>3. 垂直二等分線との交点が点 $C$ となる。`,
+            draw: (brd, showAns) => {
+                let b1 = brd.create('point', [1, 1], {name:'A', fixed:true});
+                let b2 = brd.create('point', [4, 1], {name:'B', fixed:true});
+                brd.create('segment', [b1, b2]);
+                
+                if(showAns) {
+                    brd.create('line', [b1, b2], {type:'bisector', dash:2, strokeColor:'orange'});
+                    brd.create('point', [2.5, 2.5], {name:'C', color:'red', size:4});
+                    brd.create('polygon', [b1, b2, [2.5, 2.5]], {fillColor:'none', strokeColor:'red'});
+                }
+            }
+        }
+    ];
+
+    let currentProb = null;
+
+    function nextProblem() {
+        const isUnlocked = AuthManager.isUnlocked('daimon1_q9');
+        let qIndex = isUnlocked ? Math.floor(Math.random() * database.length) : 0;
+        currentProb = database[qIndex];
+        
+        document.getElementById('prob-text').innerHTML = currentProb.q;
+        document.getElementById('ans-area').style.display = 'none';
+
+        initBoard(false);
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    function initBoard(showAns) {
+        if(board) JXG.JSXGraph.freeBoard(board);
+        board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-1, 5, 6, -1], axis:false, showCopyright:false});
+        currentProb.draw(board, showAns);
+    }
+
+    function showAnswer() {
+        document.getElementById('ans-text').innerHTML = "【解法のヒント】" + currentProb.a;
+        document.getElementById('exp-text').innerHTML = currentProb.e;
+        document.getElementById('ans-area').style.display = 'block';
+        initBoard(true); // 正解（補助線）ありで再描画
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    window.onload = nextProblem;
+</script>
+</body>
+</html>
