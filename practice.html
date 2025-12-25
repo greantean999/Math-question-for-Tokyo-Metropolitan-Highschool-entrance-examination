@@ -4,14 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>都立数学 - 分野別演習</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script src="problems_db.js"></script>
+
     <style>
+        /* 実行まで画面を隠す（プログラミング言語漏れ防止） */
+        #app-container { visibility: hidden; }
         body { font-family: sans-serif; background: #fdf6e3; color: #657b83; padding: 20px; max-width: 600px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 15px 0; display: none; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 15px 0; background-color: #fff; border: 1px solid #eee; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         .btn-next { background: #268bd2; color: white; }
         .btn-home { background: #eee; color: #333; text-decoration: none; display: block; text-align: center; margin-top: 20px; padding: 10px; border-radius: 8px; }
         .answer-area { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; }
@@ -19,72 +25,51 @@
 </head>
 <body>
 
-    <div class="card">
-        <div id="category-name" style="font-weight: bold; color: #d33682; margin-bottom: 10px;">分野</div>
-        <div id="question-text" style="font-size: 1.2rem; min-height: 60px;">問題を読み込み中...</div>
-        
-        <div id="jxgbox" class="jxgbox"></div>
+    <div id="app-container">
+        <div class="card">
+            <div id="category-name" style="font-weight: bold; color: #d33682; margin-bottom: 10px;">演習問題</div>
+            <div id="question-text" style="font-size: 1.2rem; min-height: 60px;">問題をロード中...</div>
+            
+            <div id="jxgbox" class="jxgbox"></div>
 
-        <button id="show-ans-btn" class="btn" style="background:#859900; color:white;" onclick="showAnswer()">答え合わせ</button>
+            <button id="show-ans-btn" class="btn" style="background:#859900; color:white;" onclick="showAnswer()">答え合わせ</button>
 
-        <div id="answer-area" class="answer-area">
-            <div style="color: #dc322f; font-weight: bold;">【正解】</div>
-            <div id="answer-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
-            <div style="color: #268bd2; font-weight: bold;">【解説】</div>
-            <div id="explanation-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px;"></div>
-            <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
+            <div id="answer-area" class="answer-area">
+                <div style="color: #dc322f; font-weight: bold;">【正解】</div>
+                <div id="answer-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
+                <div style="color: #268bd2; font-weight: bold;">【解説】</div>
+                <div id="explanation-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
+                <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
+            </div>
         </div>
+        <a href="index.html" class="btn-home">メニューに戻る</a>
     </div>
 
-    <a href="index.html" class="btn-home">メニューに戻る</a>
-
-    <script src="problems_db.js"></script>
     <script>
-        // URLからカテゴリを取得 (例: practice.html?cat=d1_q1)
+        // 2. 権限チェック (最初に実行)
+        (function(){
+            const status = localStorage.getItem('math_app_status');
+            const params = new URLSearchParams(window.location.search);
+            const catId = params.get('cat') || 'd1_q1';
+            
+            // full_access ではない、かつ、個別の権限 (d3_only 等) もない場合は追い出す
+            // 大問1はd1_all、大問3はd3_only等でチェック
+            const shortCat = catId.split('_')[0]; // "d1" or "d3" etc
+            const specificKey = (shortCat === "d1") ? "d1_all" : shortCat + "_only";
+
+            if (status !== "full_access" && status !== specificKey && status !== catId) {
+                alert("この分野のアクセス権限がありません。");
+                location.href = "index.html";
+            }
+        })();
+
+        // 3. 問題読み込みロジック
         const params = new URLSearchParams(window.location.search);
         const catId = params.get('cat') || 'd1_q1';
-        
         let currentProblem = null;
+        let board = null;
 
         function loadQuestion() {
             // 表示リセット
             document.getElementById('answer-area').style.display = 'none';
-            document.getElementById('show-ans-btn').style.display = 'block';
-            
-            // DBから問題選出
-            const problems = MasterDatabase[catId];
-            if (!problems) {
-                document.getElementById('question-text').innerText = "問題データが見つかりません。";
-                return;
-            }
-            
-            currentProblem = problems[Math.floor(Math.random() * problems.length)];
-            
-            // テキスト反映
-            document.getElementById('question-text').innerHTML = currentProblem.q;
-            document.getElementById('answer-text').innerHTML = currentProblem.a;
-            document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
-
-            // MathJax描画
-            if (window.MathJax) MathJax.typesetPromise();
-
-            // 図形描画
-            const box = document.getElementById('jxgbox');
-            if (currentProblem.draw) {
-                box.style.display = 'block';
-                const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
-                currentProblem.draw(brd, false);
-            } else {
-                box.style.display = 'none';
-            }
-        }
-
-        function showAnswer() {
-            document.getElementById('answer-area').style.display = 'block';
-            document.getElementById('show-ans-btn').style.display = 'none';
-        }
-
-        window.onload = loadQuestion;
-    </script>
-</body>
-</html>
+            document.getElementById('show-ans-btn').style.display = 'block
