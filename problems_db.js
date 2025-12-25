@@ -173,8 +173,8 @@ const MasterDatabase = {
         { q: String.raw`辺 $AB$ 上にあり、辺 $AC, BC$ から等距離にある点。`, a: "（角の二等分線の交点）", e: "∠Cの二等分線とABの交点。", draw: (brd) => { brd.create('polygon', [[0,3],[-2,0],[3,0]]); } },
         { q: String.raw`円の外の点 $P$ から円への接線。`, a: "（接線）", e: "OPの中点を中心としPを通る円を描き、元の円との交点を結ぶ。", draw: (brd) => { brd.create('circle', [[0,0], 1.5]); brd.create('point', [4,0], {name:'P'}); } },
         { q: String.raw`$\triangle ABC$ で、辺 $BC$ 上にあり $\triangle ABP = \triangle ACP$ となる点 $P$。`, a: "（中点）", e: "辺BCの中点を作図する。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[3,0]]); } }
-    ]
-});
+    ],
+
     // 大問2：規則性・文字式の利用 【10題】
     d2: [
         { q: String.raw`$n$ 段目のタイルの個数を $n$ で表せ（1, 4, 9...）`, a: String.raw`$n^2$`, e: String.raw`$1^2, 2^2, 3^2 \dots$ と続く2乗の規則性です。` },
