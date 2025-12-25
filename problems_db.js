@@ -27,7 +27,17 @@ const MasterDatabase = {
     // 大問1(2)
     d1_q2: [
         { q: String.raw`$(\sqrt{3} + 1)^2$`, a: String.raw`$4 + 2\sqrt{3}$`, e: String.raw`$3 + 2\sqrt{3} + 1 = 4 + 2\sqrt{3}$` },
-        // ...10問コピペ
+        { q: String.raw`$(\sqrt{3} + 1)^2$`, a: String.raw`$4 + 2\sqrt{3}$`, e: String.raw`$(\sqrt{3})^2 + 2 \times \sqrt{3} \times 1 + 1^2 = 3 + 2\sqrt{3} + 1 = 4 + 2\sqrt{3}$` },
+        { q: String.raw`$(\sqrt{5} + 2)(\sqrt{5} - 2)$`, a: String.raw`$1$`, e: String.raw`$(\sqrt{5})^2 - 2^2 = 5 - 4 = 1$` },
+        { q: String.raw`$\sqrt{50} - \sqrt{18}$`, a: String.raw`$2\sqrt{2}$`, e: String.raw`$5\sqrt{2} - 3\sqrt{2} = 2\sqrt{2}$` },
+        { q: String.raw`$\frac{12}{\sqrt{6}} - \sqrt{24}$`, a: String.raw`$0$`, e: String.raw`有理化：$\frac{12\sqrt{6}}{6} = 2\sqrt{6}$。<br>簡略化：$\sqrt{24} = 2\sqrt{6}$。<br>$2\sqrt{6} - 2\sqrt{6} = 0$` },
+        { q: String.raw`$(\sqrt{7} + 1)(\sqrt{7} + 3)$`, a: String.raw`$10 + 4\sqrt{7}$`, e: String.raw`$7 + 3\sqrt{7} + \sqrt{7} + 3 = 10 + 4\sqrt{7}$` },
+        { q: String.raw`$\sqrt{3}( \sqrt{12} + \sqrt{27} )$`, a: String.raw`$15$`, e: String.raw`$\sqrt{3}( 2\sqrt{3} + 3\sqrt{3} ) = \sqrt{3} \times 5\sqrt{3} = 5 \times 3 = 15$` },
+        { q: String.raw`$a = \sqrt{2}+1$ のとき、$a^2 - 2a$ の値を求めなさい。`, a: String.raw`$1$`, e: String.raw`$a^2 - 2a = a(a - 2)$ と因数分解してから代入。<br>$(\sqrt{2}+1)(\sqrt{2}-1) = 2 - 1 = 1$` },
+        { q: String.raw`$\sqrt{48} \div \sqrt{2} \times \sqrt{6}$`, a: String.raw`$12$`, e: String.raw`$\sqrt{24} \times \sqrt{6} = \sqrt{144} = 12$。または $\sqrt{\frac{48 \times 6}{2}} = \sqrt{144} = 12$` },
+        { q: String.raw`$(2\sqrt{2})^2 - \sqrt{2} \times \sqrt{8}$`, a: String.raw`$4$`, e: String.raw`$8 - \sqrt{16} = 8 - 4 = 4$` },
+        { q: String.raw`$(\sqrt{6} + \sqrt{2})(\sqrt{6} - \sqrt{2})$`, a: String.raw`$4$`, e: String.raw`$(\sqrt{6})^2 - (\sqrt{2})^2 = 6 - 2 = 4$` }
+    ];
     ],
     // 大問1(3)
     d1_q3: [
