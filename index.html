@@ -44,7 +44,30 @@
         大問5：空間図形 <span id="status-d5" class="status-badge">お試し版</span>
     </button>
     
-    <a href="store.html" class="store-link">🛒 ストアでライセンスを有効化する</a>
+        <a href="store.html" class="store-link">🛒 ストアでライセンスを有効化する</a>
+
+    <div id="final-test-section" style="margin-top: 20px; text-align: center;">
+        <button id="final-test-btn" class="menu-btn" 
+                style="background: linear-gradient(135deg, #d33682, #268bd2); color: white; border: none; height: auto; padding: 25px; display: block;"
+                onclick="checkFinalTestAuth()">
+            <div style="text-align: center; width: 100%;">
+                🏆 最終確認テスト・模擬試験<br>
+                <span style="font-size:0.7rem; opacity:0.9; font-weight: normal;">（全問オールインワン購入者限定）</span>
+            </div>
+        </button>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        function checkFinalTestAuth() {
+            if (AuthManager.isUnlocked('all_in_one')) {
+                location.href = 'final_test.html';
+            } else {
+                alert('最終確認テストは「全問オールインワンパッケージ」の購入特典です。\nストアで解放してください！');
+                location.href = 'store.html';
+            }
+        }
+        // ...以下、既存のupdateMenu関数など...
 
     <script src="auth.js"></script>
     <script>
