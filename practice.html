@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
+    <script src="auth.js"></script>
     <script src="problems_db.js"></script>
 
     <style>
-        /* 実行まで画面を隠す（プログラミング言語漏れ防止） */
         #app-container { visibility: hidden; }
         body { font-family: sans-serif; background: #fdf6e3; color: #657b83; padding: 20px; max-width: 600px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
@@ -46,30 +46,70 @@
     </div>
 
     <script>
-        // 2. 権限チェック (最初に実行)
-        (function(){
-            const status = localStorage.getItem('math_app_status');
-            const params = new URLSearchParams(window.location.search);
-            const catId = params.get('cat') || 'd1_q1';
-            
-            // full_access ではない、かつ、個別の権限 (d3_only 等) もない場合は追い出す
-            // 大問1はd1_all、大問3はd3_only等でチェック
-            const shortCat = catId.split('_')[0]; // "d1" or "d3" etc
-            const specificKey = (shortCat === "d1") ? "d1_all" : shortCat + "_only";
-
-            if (status !== "full_access" && status !== specificKey && status !== catId) {
-                alert("この分野のアクセス権限がありません。");
-                location.href = "index.html";
-            }
-        })();
-
-        // 3. 問題読み込みロジック
         const params = new URLSearchParams(window.location.search);
         const catId = params.get('cat') || 'd1_q1';
         let currentProblem = null;
         let board = null;
 
         function loadQuestion() {
+            // 1. 認証チェック (AuthManagerを使用)
+            if (typeof AuthManager !== 'undefined' && !AuthManager.isUnlocked(catId)) {
+                alert("この分野のアクセス権限がありません。");
+                location.href = "index.html";
+                return;
+            }
+
+            // 2. データ存在チェック
+            if (typeof MasterDatabase === 'undefined' || !MasterDatabase[catId]) {
+                document.getElementById('question-text').innerText = "問題データが見つかりません。(" + catId + ")";
+                document.getElementById('app-container').style.visibility = 'visible';
+                return;
+            }
+
             // 表示リセット
             document.getElementById('answer-area').style.display = 'none';
-            document.getElementById('show-ans-btn').style.display = 'block
+            document.getElementById('show-ans-btn').style.display = 'block';
+            
+            // 図形の初期化
+            if (board) { JXG.JSXGraph.freeBoard(board); }
+
+            const problems = MasterDatabase[catId];
+            currentProblem = problems[Math.floor(Math.random() * problems.length)];
+            
+            // テキスト反映
+            document.getElementById('question-text').innerHTML = currentProblem.q;
+            document.getElementById('answer-text').innerHTML = currentProblem.a;
+            document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
+
+            // MathJax描画
+            if (window.MathJax) MathJax.typesetPromise();
+
+            // 図形描画判定
+            const box = document.getElementById('jxgbox');
+            if (currentProblem.draw) {
+                box.style.display = 'block';
+                board = JXG.JSXGraph.initBoard('jxgbox', {
+                    boundingbox: [-5, 5, 5, -5], 
+                    axis: true, 
+                    showCopyright: false,
+                    showNavigation: false
+                });
+                currentProblem.draw(board);
+            } else {
+                box.style.display = 'none';
+            }
+            
+            // 全て完了したら表示
+            document.getElementById('app-container').style.visibility = 'visible';
+        }
+
+        function showAnswer() {
+            document.getElementById('answer-area').style.display = 'block';
+            document.getElementById('show-ans-btn').style.display = 'none';
+        }
+
+        // ページ読み込み時に実行
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
