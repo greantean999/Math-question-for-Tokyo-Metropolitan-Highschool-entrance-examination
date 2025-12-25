@@ -4,60 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>都立数学特訓 - 演習</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="problems_db.js"></script>
-    <script>
-        // 【重要】ファイルごとにここを書き換えてください
-        const PAGE_CONFIG = {
-            catId: "d1_q5", // 開く問題カテゴリ (d1_q1, d1_q2, d2, d3...)
-            allowedKeys: ["full_access", "d1_all", "d1_q5"] // 閲覧可能な権限
-        };
 
-        // 閲覧権限チェック
-        (function() {
-            const status = localStorage.getItem('math_app_status');
-            if (!PAGE_CONFIG.allowedKeys.includes(status)) {
-                alert("このページへのアクセス権限がありません。メニューに戻ります。");
-                location.href = "index.html";
-            }
-        })();
-    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script src="problems_db.js"></script>
+
     <style>
+        /* 3. コード漏れを防ぐため、初期状態ではコンテンツを非表示にする */
+        #main-content { visibility: hidden; }
         body { font-family: sans-serif; background: #fdf6e3; color: #657b83; padding: 20px; max-width: 600px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 15px 0; display: none; }
+        #jxgbox { width: 100%; height: 320px; border-radius: 10px; margin: 15px 0; background: #fff; border: 1px solid #eee; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
-        .btn-next { background: #268bd2; color: white; }
         .btn-ans { background: #859900; color: white; }
+        .btn-next { background: #268bd2; color: white; }
         .answer-area { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; }
         .nav-link { display: block; text-align: center; color: #268bd2; text-decoration: none; margin-top: 20px; font-weight: bold; }
     </style>
-</head>
-<body>
-
-    <div class="card">
-        <div id="q-text" style="font-size: 1.2rem; min-height: 80px;">読み込み中...</div>
-        <div id="jxgbox" class="jxgbox"></div>
-
-        <button id="show-ans-btn" class="btn btn-ans" onclick="showAnswer()">答え合わせ</button>
-
-        <div id="answer-area" class="answer-area">
-            <div style="color: #dc322f; font-weight: bold;">【正解】</div>
-            <div id="ans-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
-            <div style="color: #268bd2; font-weight: bold;">【解説】</div>
-            <div id="exp-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
-            <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
-        </div>
-    </div>
-
-    <a href="index.html" class="nav-link">← メニューに戻る</a>
 
     <script>
+        // 設定：ここを各ファイルで書き換え
+        const PAGE_CONFIG = {
+            catId: "d1_q5", // 各ファイルのIDに合わせて変更
+            allowedKeys: ["full_access", "d1_all", "d1_q5"] // 権限
+        };
+
+        // 4. 権限チェックと表示制御
+        window.addEventListener('DOMContentLoaded', () => {
+            const status = localStorage.getItem('math_app_status');
+            if (!PAGE_CONFIG.allowedKeys.includes(status)) {
+                alert("アクセス権限がありません。");
+                location.href = "index.html";
+                return;
+            }
+            // 権限があれば表示
+            document.getElementById('main-content').style.visibility = 'visible';
+            loadQuestion();
+        });
+
         let currentProblem = null;
+        let board = null;
 
         function loadQuestion() {
+            // 前の図形をクリア
+            if (board) { JXG.JSXGraph.freeBoard(board); }
+            
             document.getElementById('answer-area').style.display = 'none';
             document.getElementById('show-ans-btn').style.display = 'block';
             
@@ -68,13 +61,23 @@
             document.getElementById('ans-text').innerHTML = currentProblem.a;
             document.getElementById('exp-text').innerHTML = currentProblem.e || "解説はありません。";
 
-            if (window.MathJax) MathJax.typesetPromise();
+            // 数式描画（MathJax）
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise();
+            }
 
+            // 図形描画（JSXGraph）
             const box = document.getElementById('jxgbox');
             if (currentProblem.draw) {
                 box.style.display = 'block';
-                const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
-                currentProblem.draw(brd, false);
+                // ボードの初期化
+                board = JXG.JSXGraph.initBoard('jxgbox', {
+                    boundingbox: [-5, 5, 5, -5], 
+                    axis: false, 
+                    showCopyright: false,
+                    showNavigation: false
+                });
+                currentProblem.draw(board, false);
             } else {
                 box.style.display = 'none';
             }
@@ -84,8 +87,28 @@
             document.getElementById('answer-area').style.display = 'block';
             document.getElementById('show-ans-btn').style.display = 'none';
         }
-
-        window.onload = loadQuestion;
     </script>
+</head>
+<body>
+
+    <div id="main-content">
+        <div class="card">
+            <div id="q-text" style="font-size: 1.2rem; min-height: 80px;">問題作成中...</div>
+            
+            <div id="jxgbox" class="jxgbox"></div>
+
+            <button id="show-ans-btn" class="btn btn-ans" onclick="showAnswer()">答え合わせ</button>
+
+            <div id="answer-area" class="answer-area">
+                <div style="color: #dc322f; font-weight: bold;">【正解】</div>
+                <div id="ans-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
+                <div style="color: #268bd2; font-weight: bold;">【解説】</div>
+                <div id="exp-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
+                <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
+            </div>
+        </div>
+        <a href="index.html" class="nav-link">← メニューに戻る</a>
+    </div>
+
 </body>
 </html>
