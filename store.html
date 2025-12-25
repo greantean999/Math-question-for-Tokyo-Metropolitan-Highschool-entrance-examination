@@ -22,25 +22,31 @@
     <div class="card">
         <h2>ライセンスキー入力</h2>
         <p style="font-size: 0.8em; color: #666;">購入したキーを入力して全機能を解放します。</p>
-        <input type="text" id="key-input" placeholder="例：ALL-IN-ONE">
+        <input type="text" id="key-input" placeholder="ライセンスキーを入力">
         <button onclick="applyKey()" class="action-btn">有効化する</button>
         <div id="status-msg" style="margin-top: 10px; font-weight: bold; text-align: center;"></div>
     </div>
 
     <div class="card" style="border-top-color: #859900;">
         <h3>塾・学校での団体利用</h3>
-        <p>生徒数10名以上で一律10%OFFになります。</p>
-        <label>生徒数：</label>
-        <input type="number" id="std-count" value="1" min="1" oninput="calc()">
-        <div class="price-display" id="total-price">合計：500円</div>
-        <p style="font-size:0.7em;">※マスターキー：TOKYO-MATH-MASTER</p>
-        <button class="action-btn" style="background:#859900;" onclick="alert('お問い合わせフォームへ移動します')">団体購入の相談をする</button>
+        <p>10名様以上の同時申し込みで、<strong>全額から10%OFF</strong>いたします。</p>
+        <label>予定生徒数：</label>
+        <input type="number" id="std-count" value="10" min="1" oninput="calc()">
+        <div class="price-display" id="total-price">合計：31,500円</div>
+        <p style="font-size:0.7em;">※オールインワン版（3,500円）を団体購入した際のシミュレーションです。</p>
+        <button class="action-btn" style="background:#859900;" onclick="alert('お問い合わせフォーム(仮)へ移動します')">団体購入を相談する</button>
     </div>
 
     <div class="card" style="border-top-color: #666;">
-        <h3>対象パッケージ</h3>
+        <h3>対象パッケージ（全15種）</h3>
         <div class="pkg-list">
-            ・大問1 全問パック<br>・大問2 規則性<br>・大問3 一次関数<br>・大問4 平面図形<br>・大問5 空間図形<br>・全問オールインワン
+            ・大問1：小問集合 (1)〜(9) 各500円<br>
+            ・大問1：フルパック 1,000円<br>
+            ・大問2：規則性 500円<br>
+            ・大問3：一次関数 500円<br>
+            ・大問4：平面図形 500円<br>
+            ・大問5：空間図形 500円<br>
+            ・<strong>全問オールインワン 3,500円</strong>
         </div>
     </div>
 
@@ -49,29 +55,25 @@
             const val = document.getElementById('key-input').value;
             const msg = document.getElementById('status-msg');
             
-            if (!window.AuthManager) {
-                msg.style.color = "red";
-                msg.innerText = "エラー：auth.jsが読み込まれていません";
-                return;
-            }
-
             if (AuthManager.activateKey(val)) {
                 msg.style.color = "#34C759";
-                msg.innerText = "✅ 認証成功！メニューに戻ります...";
+                msg.innerText = "✅ 認証成功！コンテンツを解放しました。";
                 setTimeout(() => { location.href = "index.html"; }, 1500);
             } else {
                 msg.style.color = "#FF3B30";
-                msg.innerText = "❌ 無効なキーです";
+                msg.innerText = "❌ 無効なキーです。";
             }
         }
 
         function calc() {
             const count = document.getElementById('std-count').value;
-            let unit = 500; 
+            let unit = 3500; // オールインワンの定価
             let total = count * unit;
-            if (count >= 10) total *= 0.9;
+            if (count >= 10) total *= 0.9; // 10名以上で10%引き
             document.getElementById('total-price').innerText = `合計：${Math.floor(total).toLocaleString()}円`;
         }
+        // 初期計算を実行
+        calc();
     </script>
 </body>
 </html>
