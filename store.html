@@ -27,93 +27,71 @@
         <div id="status-msg" style="margin-top: 10px; font-weight: bold; text-align: center;"></div>
     </div>
 
-    <div class="card" style="border-top-color: #859900;">
-        <h3>塾・学校での団体利用</h3>
-        <p>10名様以上の同時申し込みで、<strong>全額から10%OFF</strong>いたします。</p>
-        <label>予定生徒数：</label>
-        <input type="number" id="std-count" value="10" min="1" oninput="calc()">
-        <div class="price-display" id="total-price">合計：18,000円</div>
-        <p style="font-size:0.7em;">※大問1セット（2,000円）を団体購入した際のシミュレーションです。</p>
-        <button class="action-btn" style="background:#859900;" onclick="alert('お問い合わせフォームへ移動します')">団体購入を相談する</button>
-    </div>
-
-    <div class="card" style="border-top-color: #666;">
-        <h3>対象パッケージ</h3>
-        <div style="background: #eee8d5; padding: 20px; border-radius: 12px; margin-top: 20px;">
-    <h3 style="margin-top:0;">法人・団体様用 見積シミュレーター</h3>
+    <div style="background: #eee8d5; padding: 25px; border-radius: 12px; margin-top: 20px; border: 1px solid #93a1a1;">
+    <h3 style="margin-top:0; color: #073642;">ご利用料金シミュレーター</h3>
     
-    <label>1. パックを選択してください：</label><br>
-    <select id="pack-select" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px;">
-        <option value="300">パック(1)〜(9)：大問1 個別 (各300円)</option>
-        <option value="2000">パック(10)：大問1 フルセット (2,000円)</option>
-        <option value="500">パック(11)〜(14)：大問2〜5 個別 (各500円)</option>
-        <option value="3500">パック(15)：全問オールインワン (3,500円)</option>
+    <label><strong>1. 利用プラン・パックの選択</strong></label><br>
+    <select id="pack-select" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+        <optgroup label="【個人利用】（即時利用可能）">
+            <option value="500">個人：大問別 1カテゴリ (¥500)</option>
+            <option value="3500">個人：全問フルパック (¥3,500)</option>
+        </optgroup>
+        <optgroup label="【団体・法人利用】（要ライセンス発行）">
+            <option value="300">団体：大問1 各パック (1名 ¥300)</option>
+            <option value="2000">団体：大問1 フルセット (1名 ¥2,000)</option>
+            <option value="3500">団体：全問オールインワン (1名 ¥3,500)</option>
+        </optgroup>
     </select>
 
-    <label>2. 利用生徒数を入力：</label><br>
-    <input type="number" id="student-count" value="10" min="1" 
-           style="width: 100px; padding: 10px; margin: 10px 0; border-radius: 5px;"> 名
+    <label><strong>2. 利用人数を入力</strong></label><br>
+    <input type="number" id="student-count" value="1" min="1" 
+           style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;">
+    <p style="font-size: 0.8rem; color: #657b83;">※団体利用（10名〜）は自動的に団体割引が適用されます。</p>
 
-    <hr style="border: 0; border-top: 1px solid #93a1a1;">
+    <hr style="border: 0; border-top: 1px solid #93a1a1; margin: 20px 0;">
 
-    <div style="text-align: right; font-weight: bold;">
-        <p>1名あたりの単価: <span id="unit-price">¥300</span></p>
-        <p style="font-size: 1.2rem; color: #d33682;">
-            推定合計金額: <span id="total-price">¥3,000</span>
+    <div style="text-align: right; font-weight: bold; background: white; padding: 15px; border-radius: 8px;">
+        <p id="discount-msg" style="color: #d33682; font-size: 0.9rem; margin: 0;"></p>
+        <p style="margin: 5px 0;">1名あたりの単価: <span id="unit-price">¥0</span></p>
+        <p style="font-size: 1.4rem; color: #268bd2; margin: 0;">
+            合計推定金額: <span id="total-price">¥0</span>
         </p>
     </div>
     
-    <button onclick="requestQuote()" style="width: 100%; background: #268bd2; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer;">
-        この内容で利用を申し込む（窓口へ）
+    <button onclick="requestQuote()" style="width: 100%; background: #859900; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 1.1rem;">
+        この内容で利用・見積もりを相談する
     </button>
 </div>
 
 <script>
-    const packSelect = document.getElementById('pack-select');
-    const studentInput = document.getElementById('student-count');
-    const unitDisplay = document.getElementById('unit-price');
-    const totalDisplay = document.getElementById('total-price');
-
     function calculate() {
-        const unit = parseInt(packSelect.value);
-        const count = parseInt(studentInput.value) || 0;
-        const total = unit * count;
-
-        unitDisplay.innerText = `¥${unit.toLocaleString()}`;
-        totalDisplay.innerText = `¥${total.toLocaleString()}`;
-    }
-
-    packSelect.onchange = calculate;
-    studentInput.oninput = calculate;
-
-    function requestQuote() {
-        const packName = packSelect.options[packSelect.selectedIndex].text;
-        const count = studentInput.value;
-        const total = totalDisplay.innerText;
+        const packSelect = document.getElementById('pack-select');
+        const studentInput = document.getElementById('student-count');
         
-        alert(`【お申し込み内容の確認】\n内容：${packName}\n人数：${count}名\n合計：${total}\n\nこの内容で事務局へメールを作成します。`);
-        // 実際にはここでmailto:などを飛ばすとスマートです
-    }
-</script>
-        <div class="pkg-list">
-    <p style="color:#d33682; font-weight:bold; margin-bottom:10px;">★全(1)〜(9) 合計100問以上の圧倒的問題数！</p>
-    ・大問1：(1)〜(9) 各300円<br>
-    ・<strong>大問1：フルパック 2,000円</strong> (700円お得！)<br><br>
-    ・<strong style="font-size:1.1rem; color:#268bd2;">全問オールインワン 3,500円</strong><br>
-    　<span style="border-bottom: 2px solid #d33682;">【購入特典】大問1〜5 弱点診断付き・模擬試験モード</span>
-    </div>
+        let unit = parseInt(packSelect.value);
+        let count = parseInt(studentInput.value) || 0;
+        let discount = 1.0;
+        let msg = "";
 
-    <script>
-        // ... applyKey関数などはそのまま ...
-
-        function calc() {
-            const count = document.getElementById('std-count').value;
-            let unit = 2000; // 大問1セットの価格を基準に計算
-            let total = count * unit;
-            if (count >= 10) total *= 0.9;
-            document.getElementById('total-price').innerText = `合計：${Math.floor(total).toLocaleString()}円`;
+        // 割引ロジック: 10名以上で10%OFF、30名以上で20%OFF
+        if (count >= 30) {
+            discount = 0.8;
+            msg = "【団体割引】30名以上特典 20% OFF 適用！";
+        } else if (count >= 10) {
+            discount = 0.9;
+            msg = "【団体割引】10名以上特典 10% OFF 適用！";
         }
-        calc();
-    </script>
+
+        const total = Math.floor(unit * count * discount);
+
+        document.getElementById('discount-msg').innerText = msg;
+        document.getElementById('unit-price').innerText = `¥${unit.toLocaleString()}`;
+        document.getElementById('total-price').innerText = `¥${total.toLocaleString()}`;
+    }
+    // イベント登録
+    document.getElementById('pack-select').onchange = calculate;
+    document.getElementById('student-count').oninput = calculate;
+    calculate(); // 初期計算
+</script>
 </body>
 </html>
