@@ -32,47 +32,31 @@
         <p>10名様以上の同時申し込みで、<strong>全額から10%OFF</strong>いたします。</p>
         <label>予定生徒数：</label>
         <input type="number" id="std-count" value="10" min="1" oninput="calc()">
-        <div class="price-display" id="total-price">合計：31,500円</div>
-        <p style="font-size:0.7em;">※オールインワン版（3,500円）を団体購入した際のシミュレーションです。</p>
-        <button class="action-btn" style="background:#859900;" onclick="alert('お問い合わせフォーム(仮)へ移動します')">団体購入を相談する</button>
+        <div class="price-display" id="total-price">合計：18,000円</div>
+        <p style="font-size:0.7em;">※大問1セット（2,000円）を団体購入した際のシミュレーションです。</p>
+        <button class="action-btn" style="background:#859900;" onclick="alert('お問い合わせフォームへ移動します')">団体購入を相談する</button>
     </div>
 
     <div class="card" style="border-top-color: #666;">
-        <h3>対象パッケージ（全15種）</h3>
+        <h3>対象パッケージ</h3>
         <div class="pkg-list">
-            ・大問1：小問集合 (1)〜(9) 各500円<br>
-            ・大問1：フルパック 1,000円<br>
-            ・大問2：規則性 500円<br>
-            ・大問3：一次関数 500円<br>
-            ・大問4：平面図形 500円<br>
-            ・大問5：空間図形 500円<br>
+            ・大問1：小問(1)〜(9) 各300円<br>
+            ・<strong>大問1：フルパック 2,000円</strong> (700円お得！)<br>
+            ・大問2〜5：各500円<br>
             ・<strong>全問オールインワン 3,500円</strong>
         </div>
     </div>
 
     <script>
-        function applyKey() {
-            const val = document.getElementById('key-input').value;
-            const msg = document.getElementById('status-msg');
-            
-            if (AuthManager.activateKey(val)) {
-                msg.style.color = "#34C759";
-                msg.innerText = "✅ 認証成功！コンテンツを解放しました。";
-                setTimeout(() => { location.href = "index.html"; }, 1500);
-            } else {
-                msg.style.color = "#FF3B30";
-                msg.innerText = "❌ 無効なキーです。";
-            }
-        }
+        // ... applyKey関数などはそのまま ...
 
         function calc() {
             const count = document.getElementById('std-count').value;
-            let unit = 3500; // オールインワンの定価
+            let unit = 2000; // 大問1セットの価格を基準に計算
             let total = count * unit;
-            if (count >= 10) total *= 0.9; // 10名以上で10%引き
+            if (count >= 10) total *= 0.9;
             document.getElementById('total-price').innerText = `合計：${Math.floor(total).toLocaleString()}円`;
         }
-        // 初期計算を実行
         calc();
     </script>
 </body>
