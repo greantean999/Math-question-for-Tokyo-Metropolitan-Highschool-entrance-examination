@@ -22,7 +22,7 @@ const MasterDatabase = {
         { q: "$7 - 2^3 \\div 4$", a: "$5$", e: "$7 - 2 = 5$" },
         { q: "$a+2b - \\frac{a-b}{3}$", a: "$\\frac{2a+7b}{3}$", e: "$\\frac{3a+6b-a+b}{3}$" },
         { q: "$(-6)^2 \\div 4 + (-3)$", a: "$6$", e: "$9 - 3 = 6$" }
-    ]
+    ],
 
     // 大問1(2) 平方根 【15題】
     d1_q2: [
@@ -237,5 +237,4 @@ const MasterDatabase = {
         { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
         { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: String.raw`$7$`, e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
         { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
-    ]
-};
+    ]};
