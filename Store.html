@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>特訓ストア - ライセンス有効化</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #fdf6e3; line-height: 1.5; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 6px solid #268bd2; }
+        .pkg-list { font-size: 0.9em; color: #555; background: #eee; padding: 10px; border-radius: 8px; height: 150px; overflow-y: scroll; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #268bd2; color: white; cursor: pointer; font-weight: bold; }
+        input[type="text"], input[type="number"] { width: calc(100% - 24px); padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+        .price-display { font-size: 1.2em; font-weight: bold; color: #859900; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>教材ストア</h1>
+
+    <div class="card">
+        <h3>🔑 ライセンスキーを入力</h3>
+        <p>購入したキーを入力してください。</p>
+        <input type="text" id="license-key" placeholder="例：D1-SET">
+        <button class="action-btn" onclick="checkKey()">有効化する</button>
+    </div>
+
+    <div class="card" style="border-top-color: #859900;">
+        <h3>塾・学校での団体利用</h3>
+        <p>生徒数10名以上で一律10%OFFになります。</p>
+        <label>生徒数：</label>
+        <input type="number" id="std-count" value="1" min="1" oninput="calc()">
+        <div class="price-display" id="total-price">合計：500円</div>
+        <p style="font-size:0.8em;">※オールインワン版（500円）での計算例です。</p>
+        <button class="action-btn" style="background:#859900;" onclick="alert('お問い合わせフォームへ移動します')">団体購入の相談をする</button>
+    </div>
+
+    <div class="card" style="border-top-color: #666;">
+        <h3>対象パッケージ（全15種）</h3>
+        <div class="pkg-list">
+            1. 大問1(1) 計算<br>2. 大問1(2) 文字式<br>3. 大問1(3) 平方根<br>4. 大問1(4) 一次方程式<br>5. 大問1(5) 連立方程式<br>6. 大問1(6) 二次方程式<br>7. 大問1(7) 関数<br>8. 大問1(8) 確率/統計<br>9. 大問1(9) 作図<br>10. 大問1 フルパック<br>11. 大問2 式の説明<br>12. 大問3 二次関数<br>13. 大問4 平面図形<br>14. 大問5 空間図形<br>15. 1〜5 オールインワンパッケージ
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        function checkKey() {
+            const key = document.getElementById('license-key').value;
+            if (AuthManager.activateKey(key)) {
+                alert("認証成功！コンテンツを解放しました。");
+                window.location.href = 'index.html';
+            } else {
+                alert("無効なキーです。正しいキーを入力してください。");
+            }
+        }
+
+        function calc() {
+            const count = document.getElementById('std-count').value;
+            let unit = 500; // オールインワンの定価
+            let total = count * unit;
+            if (count >= 10) total *= 0.9;
+            document.getElementById('total-price').innerText = `合計：${Math.floor(total).toLocaleString()}円`;
+        }
+    </script>
+</body>
+</html>
