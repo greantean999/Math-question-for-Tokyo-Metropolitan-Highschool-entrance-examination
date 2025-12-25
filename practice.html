@@ -19,261 +19,229 @@
     <script src="auth.js"></script>
     <script>
         const MasterDatabase = {
-    // 大問1(1) 正負の数・文字式 【20題】
-    "d1_q1": [
-        { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
-        { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
-        { q: "$8a + b - (a - 7b)$", a: "$7a + 8b$", e: "$8a + b - a + 7b = 7a + 8b$" },
-        { q: "$(-2)^3 \\times 3 - 4 \\div (-2)$", a: "$-22$", e: "$-24 + 2 = -22$" },
-        { q: "$\\frac{3x - y}{2} - \\frac{x - 4y}{4}$", a: "$\\frac{5x + 2y}{4}$", e: "$\\frac{6x-2y-x+4y}{4}$" },
-        { q: "$18ab^2 \\div 6b \\times (-2a)$", a: "$-6a^2b$", e: "$3ab \\times (-2a) = -6a^2b$" },
-        { q: "$5 + 2 \\times (3 - 8)$", a: "$-5$", e: "$5 - 10 = -5$" },
-        { q: "$6x^2 \\div (-3x)^2 \\times 3x$", a: "$2x$", e: "$6x^2 \\div 9x^2 \\times 3x = 2x$" },
-        { q: "$9 - (-3)^2 \\div 3$", a: "$6$", e: "$9 - 3 = 6$" },
-        { q: "$7 + (-4) - (-9)$", a: "$12$", e: "$7 - 4 + 9 = 12$" },
-        { q: "$4(a-b) - 3(2a-b)$", a: "$-2a-b$", e: "$4a-4b-6a+3b$" },
-        { q: "$(-3)^2 + 5 \\times (-2)$", a: "$-1$", e: "$9 - 10 = -1$" },
-        { q: "$12ab \\div (-4a) \\times 3b$", a: "$-9b^2$", e: "$-3b \\times 3b = -9b^2$" },
-        { q: "$2(3x+y) + (x-2y)$", a: "$7x$", e: "$6x+2y+x-2y$" },
-        { q: "$(-1)^4 \\times 7 - 8$", a: "$-1$", e: "$1 \\times 7 - 8 = -1$" },
-        { q: "$\\frac{1}{3}(6x-9) - 2x$", a: "$-3$", e: "$2x-3-2x = -3$" },
-        { q: "$15x^2y \\div 5xy \\times (-2y)$", a: "$-6y^2$", e: "$3x \\times (-2y)$" },
-        { q: "$7 - 2^3 \\div 4$", a: "$5$", e: "$7 - 2 = 5$" },
-        { q: "$a+2b - \\frac{a-b}{3}$", a: "$\\frac{2a+7b}{3}$", e: "$\\frac{3a+6b-a+b}{3}$" },
-        { q: "$(-6)^2 \\div 4 + (-3)$", a: "$6$", e: "$9 - 3 = 6$" }
-    ], 
-
-    // 大問1(2) 平方根 【15題】
-    "d1_q2": [
-        { q: String.raw`$(\sqrt{3} + 1)^2$`, a: String.raw`$4 + 2\sqrt{3}$`, e: String.raw`$3 + 2\sqrt{3} + 1$` },
-        { q: String.raw`$(\sqrt{5} + 2)(\sqrt{5} - 2)$`, a: String.raw`$1$`, e: String.raw`$5 - 4 = 1$` },
-        { q: String.raw`$\sqrt{50} - \sqrt{18}$`, a: String.raw`$2\sqrt{2}$`, e: String.raw`$5\sqrt{2} - 3\sqrt{2} = 2\sqrt{2}$` },
-        { q: String.raw`$\frac{12}{\sqrt{6}} - \sqrt{24}$`, a: String.raw`$0$`, e: String.raw`$2\sqrt{6} - 2\sqrt{6} = 0$` },
-        { q: String.raw`$\sqrt{3} + \frac{6}{\sqrt{3}}$`, a: String.raw`$3\sqrt{3}$`, e: String.raw`$\sqrt{3} + 2\sqrt{3} = 3\sqrt{3}$` },
-        { q: String.raw`$(\sqrt{7}-1)(\sqrt{7}+3)$`, a: String.raw`$4+2\sqrt{7}$`, e: String.raw`$7+3\sqrt{7}-\sqrt{7}-3 = 4+2\sqrt{7}$` },
-        { q: String.raw`$\sqrt{32} \div \sqrt{2} - \sqrt{9}$`, a: String.raw`$1$`, e: String.raw`$\sqrt{16} - 3 = 4-3=1$` },
-        { q: String.raw`$\sqrt{2}(\sqrt{8} + \sqrt{18})$`, a: String.raw`$10$`, e: String.raw`$\sqrt{2}(2\sqrt{2}+3\sqrt{2}) = \sqrt{2} \times 5\sqrt{2} = 10$` },
-        { q: String.raw`$(\sqrt{6}+\sqrt{2})(\sqrt{6}-\sqrt{2})$`, a: String.raw`$4$`, e: String.raw`$6-2=4$` },
-        { q: String.raw`$\frac{\sqrt{75}}{\sqrt{3}} - \sqrt{4}$`, a: String.raw`$3$`, e: String.raw`$\sqrt{25}-2 = 5-2=3$` },
-        { q: String.raw`$(\sqrt{3}-2)^2 + \sqrt{12}$`, a: String.raw`$7-2\sqrt{3}$`, e: String.raw`$3-4\sqrt{3}+4+2\sqrt{3} = 7-2\sqrt{3}$` },
-        { q: String.raw`$\sqrt{48} - \frac{9}{\sqrt{3}}$`, a: String.raw`$\sqrt{3}$`, e: String.raw`$4\sqrt{3}-3\sqrt{3} = \sqrt{3}$` },
-        { q: String.raw`$(\sqrt{5}+1)^2 - \sqrt{20}$`, a: String.raw`$6$`, e: String.raw`$5+2\sqrt{5}+1-2\sqrt{5} = 6$` },
-        { q: String.raw`$\sqrt{27} + \sqrt{12} - \sqrt{75}$`, a: String.raw`$0$`, e: String.raw`$3\sqrt{3}+2\sqrt{3}-5\sqrt{3} = 0$` },
-        { q: String.raw`$\frac{10}{\sqrt{5}} + \sqrt{5}$`, a: String.raw`$3\sqrt{5}$`, e: String.raw`$2\sqrt{5}+\sqrt{5} = 3\sqrt{5}$` }
-    ],
-
-    // 大問1(3) 一次方程式 【15題】
-    "d1_q3": [
-        { q: String.raw`$9x - 4 = 5(x + 4)$`, a: String.raw`$x = 6$`, e: String.raw`$9x-4=5x+20 \to 4x=24$` },
-        { q: String.raw`$\frac{x-1}{2} - \frac{x+2}{3} = 1$`, a: String.raw`$x = 13$`, e: String.raw`$3(x-1)-2(x+2)=6 \to 3x-3-2x-4=6 \to x=13$` },
-        { q: String.raw`$0.3x - 0.1 = 0.5x + 0.7$`, a: String.raw`$x = -4$`, e: String.raw`$3x-1=5x+7 \to -2x=8$` },
-        { q: String.raw`$4x - 7 = x + 8$`, a: String.raw`$x = 5$`, e: String.raw`$3x=15 \to x=5$` },
-        { q: String.raw`$3(x-2) = 2x + 5$`, a: String.raw`$x = 11$`, e: String.raw`$3x-6=2x+5$` },
-        { q: String.raw`$\frac{2}{3}x - 1 = \frac{1}{2}x$`, a: String.raw`$x = 6$`, e: String.raw`$4x-6=3x \to x=6$` },
-        { q: String.raw`$5x + 2 = 3(x-4)$`, a: String.raw`$x = -7$`, e: String.raw`$5x+2=3x-12 \to 2x=-14$` },
-        { q: String.raw`$x - 8 = 4x + 10$`, a: String.raw`$x = -6$`, e: String.raw`$-3x=18$` },
-        { q: String.raw`$0.2x + 1.5 = 0.5x$`, a: String.raw`$x = 5$`, e: String.raw`$2x+15=5x \to 3x=15$` },
-        { q: String.raw`$7x - (2x-5) = 15$`, a: String.raw`$x = 2$`, e: String.raw`$5x+5=15 \to 5x=10$` },
-        { q: String.raw`$\frac{x+3}{4} = 2$`, a: String.raw`$x = 5$`, e: String.raw`$x+3=8$` },
-        { q: String.raw`$8 - x = 3x$`, a: String.raw`$x = 2$`, e: String.raw`$8=4x$` },
-        { q: String.raw`$2(x+1) = x-5$`, a: String.raw`$x = -7$`, e: String.raw`$2x+2=x-5$` },
-        { q: String.raw`$0.04x = 0.12$`, a: String.raw`$x = 3$`, e: String.raw`$4x=12$` },
-        { q: String.raw`$12x - 3 = 7x + 12$`, a: String.raw`$x = 3$`, e: String.raw`$5x=15$` }
-    ],
-
-    // 大問1(4) 連立方程式 【15題】
-    "d1_q4": [
-        { q: String.raw`$\begin{cases} x + 2y = 7 \\ 2x - y = 4 \end{cases}$`, a: String.raw`$x = 3, y = 2$`, e: String.raw`下の式を2倍して足す。` },
-        { q: String.raw`$\begin{cases} y = 2x - 1 \\ 3x + 2y = 12 \end{cases}$`, a: String.raw`$x = 2, y = 3$`, e: String.raw`上の式を下の$y$に代入。` },
-        { q: String.raw`$\begin{cases} 3x + 2y = 13 \\ x - 2y = 7 \end{cases}$`, a: String.raw`$x = 5, y = -1$`, e: String.raw`そのまま足すと $4x=20$` },
-        { q: String.raw`$\begin{cases} 2x + 3y = 8 \\ 2x + y = 4 \end{cases}$`, a: String.raw`$x = 1, y = 2$`, e: String.raw`引くと $2y=4$` },
-        { q: String.raw`$\begin{cases} x = 3y \\ 2x - 5y = 1 \end{cases}$`, a: String.raw`$x = 3, y = 1$`, e: String.raw`代入して $6y-5y=1$` },
-        { q: String.raw`$\begin{cases} 4x - y = 9 \\ 2x + y = 3 \end{cases}$`, a: String.raw`$x = 2, y = -1$`, e: String.raw`足すと $6x=12$` },
-        { q: String.raw`$\begin{cases} x - y = 4 \\ 3x + 2y = 7 \end{cases}$`, a: String.raw`$x = 3, y = -1$`, e: String.raw`上の式を2倍して足す。` },
-        { q: String.raw`$\begin{cases} y = x + 2 \\ 2x + y = 8 \end{cases}$`, a: String.raw`$x = 2, y = 4$`, e: String.raw`代入して $3x+2=8$` },
-        { q: String.raw`$\begin{cases} 5x + 2y = 1 \\ 3x + y = 1 \end{cases}$`, a: String.raw`$x = 1, y = -2$`, e: String.raw`下の式を2倍して引く。` },
-        { q: String.raw`$\begin{cases} x + y = 5 \\ x - y = 1 \end{cases}$`, a: String.raw`$x = 3, y = 2$`, e: String.raw`和と差の基本形。` },
-        { q: String.raw`$\begin{cases} 3x - 4y = 10 \\ x = 2y + 4 \end{cases}$`, a: String.raw`$x = 2, y = -1$`, e: String.raw`代入して $3(2y+4)-4y=10 \to 2y=-2$` },
-        { q: String.raw`$\begin{cases} 0.2x + 0.3y = 1.3 \\ x - y = -1 \end{cases}$`, a: String.raw`$x = 2, y = 3$`, e: String.raw`上の式を10倍して $2x+3y=13$` },
-        { q: String.raw`$\begin{cases} \frac{x}{2} + \frac{y}{3} = 4 \\ x + y = 10 \end{cases}$`, a: String.raw`$x = 4, y = 6$`, e: String.raw`上の式を6倍して $3x+2y=24$` },
-        { q: String.raw`$\begin{cases} 7x + 3y = -1 \\ 2x + y = 0 \end{cases}$`, a: String.raw`$x = -1, y = 2$`, e: String.raw`下の式から $y=-2x$ を代入。` },
-        { q: String.raw`$\begin{cases} 2x - 3y = 12 \\ 4x + 5y = 2 \end{cases}$`, a: String.raw`$x = 3, y = -2$`, e: String.raw`上の式を2倍して引く。` }
-    ],
-
-    // 大問1(5) 二次方程式 【15題】
-    "d1_q5": [
-        { q: String.raw`$x^2 + 5x + 6 = 0$`, a: String.raw`$x = -2, -3$`, e: String.raw`$(x+2)(x+3)=0$` },
-        { q: String.raw`$x^2 - 7x + 10 = 0$`, a: String.raw`$x = 2, 5$`, e: String.raw`$(x-2)(x-5)=0$` },
-        { q: String.raw`$x^2 + 2x - 15 = 0$`, a: String.raw`$x = 3, -5$`, e: String.raw`$(x-3)(x+5)=0$` },
-        { q: String.raw`$x^2 - 6x + 9 = 0$`, a: String.raw`$x = 3$`, e: String.raw`$(x-3)^2=0$ (重解)` },
-        { q: String.raw`$x^2 + 4x = 0$`, a: String.raw`$x = 0, -4$`, e: String.raw`$x(x+4)=0$` },
-        { q: String.raw`$x^2 - 16 = 0$`, a: String.raw`$x = \pm 4$`, e: String.raw`$(x-4)(x+4)=0$` },
-        { q: String.raw`$x^2 + 3x + 1 = 0$`, a: String.raw`$x = \frac{-3 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式 $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$` },
-        { q: String.raw`$x^2 - 5x + 2 = 0$`, a: String.raw`$x = \frac{5 \pm \sqrt{17}}{2}$`, e: String.raw`解の公式を利用。` },
-        { q: String.raw`$2x^2 + 5x + 1 = 0$`, a: String.raw`$x = \frac{-5 \pm \sqrt{17}}{4}$`, e: String.raw`解の公式を利用。` },
-        { q: String.raw`$x^2 - 2x - 1 = 0$`, a: String.raw`$x = 1 \pm \sqrt{2}$`, e: String.raw`解の公式より $x = \frac{2 \pm \sqrt{8}}{2} = 1 \pm \sqrt{2}$` },
-        { q: String.raw`$3x^2 - 7x + 2 = 0$`, a: String.raw`$x = 2, \frac{1}{3}$`, e: String.raw`$(x-2)(3x-1)=0$ または解の公式。` },
-        { q: String.raw`$(x-3)^2 = 5$`, a: String.raw`$x = 3 \pm \sqrt{5}$`, e: String.raw`平方根の考え方を利用。` },
-        { q: String.raw`$x^2 + 10x + 25 = 0$`, a: String.raw`$x = -5$`, e: String.raw`$(x+5)^2=0$` },
-        { q: String.raw`$x^2 + x - 1 = 0$`, a: String.raw`$x = \frac{-1 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式を利用。` },
-        { q: String.raw`$x^2 - 8x + 12 = 0$`, a: String.raw`$x = 2, 6$`, e: String.raw`$(x-2)(x-6)=0$` }
-    ],
-
-    // 大問1(6) 関数基礎（変化の割合・変域） 【15題】
-    "d1_q6": [
-        { q: String.raw`$y = 2x^2$ で $x$ が $1$ から $3$ まで増加するときの変化の割合。`, a: String.raw`$8$`, e: String.raw`$2(1+3)=8$` },
-        { q: String.raw`$y = -x^2$ で $x$ が $-4$ から $-2$ まで増加するときの変化の割合。`, a: String.raw`$6$`, e: String.raw`$-1(-4-2)=6$` },
-        { q: String.raw`$y = 3x^2$ で $x$ の変域が $-1 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=0$ で最小値 $0$, $x=2$ で最大値 $12$。` },
-        { q: String.raw`$y = ax^2$ において、$x$ が $2$ から $4$ まで増加するときの変化の割合が $12$ であるとき、$a$ の値。`, a: String.raw`$2$`, e: String.raw`$a(2+4)=12 \to 6a=12$` },
-        { q: String.raw`$y = \frac{1}{2}x^2$ で $x$ の変域が $-4 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 8$`, e: String.raw`$x=-4$ のとき最大値 $8$。` },
-        { q: String.raw`関数 $y = -2x^2$ について、$x$ の値が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-10$`, e: String.raw`$-2(1+4)=-10$` },
-        { q: String.raw`$y = ax^2$ で $x$ の変域が $-2 \leqq x \leqq 1$ のとき $y$ の変域が $0 \leqq y \leqq 8$。 $a$ の値。`, a: String.raw`$2$`, e: String.raw`$x=-2$ のとき $y=8$ となるので $4a=8$` },
-        { q: String.raw`$y = \frac{1}{4}x^2$ で $x$ が $2$ から $6$ まで増加するときの変化の割合。`, a: String.raw`$2$`, e: String.raw`$\frac{1}{4}(2+6)=2$` },
-        { q: String.raw`$y = -3x^2$ で $x$ の変域が $-1 \leqq x \leqq 3$ のときの $y$ の変域。`, a: String.raw`$-27 \leqq y \leqq 0$`, e: String.raw`$x=3$ で最小値 $-27$。` },
-        { q: String.raw`変化の割合が常に $3$ で、点 $(1, 5)$ を通る直線の式。`, a: String.raw`$y = 3x + 2$`, e: String.raw`$y-5=3(x-1)$` },
-        { q: String.raw`$y = x^2$ と $y = 2x+3$ の交点の $x$ 座標。`, a: String.raw`$x = 3, -1$`, e: String.raw`$x^2-2x-3=0$ を解く。` },
-        { q: String.raw`$y = \frac{4}{x}$ で $x$ が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-1$`, e: String.raw`$(1-4)/(4-1) = -3/3 = -1$` },
-        { q: String.raw`$y = -2x^2$ で $y$ の変域が $-18 \leqq y \leqq 0$ となる $x$ の変域。`, a: String.raw`$-3 \leqq x \leqq 3$`, e: String.raw`$-2x^2 = -18 \to x^2=9$` },
-        { q: String.raw`$y = ax^2$ と $y = -3x-1$ について、$x$ が $1$ から $3$ まで変化する時の変化の割合が一致する時の $a$。`, a: String.raw`$-0.75$`, e: String.raw`$a(1+3)=-3 \to 4a=-3$` },
-        { q: String.raw`関数 $y = \frac{1}{3}x^2$ について、$x$ の変域が $-3 \leqq x \leqq 6$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=6$ のとき $y=12$。` }
-    ],
-
-    // 大問1(7) 角度・図形性質 【15題】
-    "d1_q7": [
-        { q: String.raw`正九角形の $1$ つの内角の大きさ。`, a: String.raw`$140^\circ$`, e: String.raw`外角は $360 \div 9 = 40^\circ$。内角は $180 - 40 = 140^\circ$。` },
-        { q: String.raw`半径 $6$cm, 中心角 $120^\circ$ のおうぎ形の弧の長さ。`, a: String.raw`$4\pi \text{cm}$`, e: String.raw`$12\pi \times \frac{120}{360} = 4\pi$` },
-        { q: String.raw`円周角の定理：中心角が $80^\circ$ のとき、その弧に対する円周角。`, a: String.raw`$40^\circ$`, e: String.raw`円周角は中心角の半分。` },
-        { q: String.raw`$n$ 角形の内角の和が $1260^\circ$ であるとき、$n$ の値。`, a: String.raw`$9$`, e: String.raw`$180(n-2)=1260 \to n-2=7 \to n=9$` },
-        { q: String.raw`対角線の本数が $20$ 本である多角形は何角形か。`, a: "八角形", e: String.raw`$\frac{n(n-3)}{2}=20 \to n^2-3n-40=0 \to (n-8)(n+5)=0$` },
-        { q: String.raw`三角形の $2$ つの内角が $45^\circ, 65^\circ$ のとき、残りの外角の大きさ。`, a: String.raw`$110^\circ$`, e: String.raw`$45 + 65 = 110$ (三角形の外角の性質)` },
-        { q: String.raw`円に内接する四角形で、向かい合う角の和。`, a: String.raw`$180^\circ$`, e: String.raw`円に内接する四角形の性質。` },
-        { q: String.raw`中心角 $72^\circ$ のおうぎ形は、円全体の何分の $1$ か。`, a: String.raw`$\frac{1}{5}$`, e: String.raw`$72/360 = 1/5$` },
-        { q: String.raw`正六角形の $1$ つの外角。`, a: String.raw`$60^\circ$`, e: String.raw`$360 \div 6 = 60$` },
-        { q: String.raw`直角二等辺三角形の鋭角の大きさ。`, a: String.raw`$45^\circ$`, e: String.raw`$(180-90) \div 2 = 45$` },
-        { q: String.raw`半径 $10$cm、弧の長さ $4\pi$cm のおうぎ形の面積。`, a: String.raw`$20\pi \text{cm}^2$`, e: String.raw`$S = \frac{1}{2}lr = \frac{1}{2} \times 4\pi \times 10 = 20\pi$` },
-        { q: String.raw`ひし形の面積。対角線が $8$cm と $6$cm。`, a: String.raw`$24 \text{cm}^2$`, e: String.raw`$(8 \times 6) \div 2 = 24$` },
-        { q: String.raw`平行四辺形 $ABCD$ で $\angle A=110^\circ$ のとき $\angle B$。`, a: String.raw`$70^\circ$`, e: String.raw`隣り合う角の和は $180^\circ$。` },
-        { q: String.raw`円周上に $3$ 点 $A,B,C$。$\angle ABC$ が直径 $AC$ を持つとき、$\angle ABC$ は。`, a: String.raw`$90^\circ$`, e: String.raw`半円の弧に対する円周角は $90^\circ$。` }
-    ],
-
-    // 大問1(8) 確率・統計・標本調査 【15題】
-    "d1_q8": [
-        { q: String.raw`$2$ 枚の硬貨を同時に投げるとき、少なくとも $1$ 枚が表になる確率。`, a: String.raw`$\frac{3}{4}$`, e: String.raw`「すべて裏」の $1/4$ を $1$ から引く。` },
-        { q: String.raw`赤玉 $3$ 個、白玉 $2$ 個が入った袋から同時に $2$ 個取り出すとき、両方赤である確率。`, a: String.raw`$\frac{3}{10}$`, e: String.raw`全部で ${}_5\mathrm{C}_2=10$ 通り。赤 $2$ 個は ${}_3\mathrm{C}_2=3$ 通り。` },
-        { q: String.raw`$1$ から $6$ までのカードから $2$ 枚引いて作る $2$ 桁の整数が $3$ の倍数になる確率。`, a: String.raw`$\frac{4}{15}$`, e: String.raw`全 $30$ 通り中、和が $3,6,9$ になる組を探す。` },
-        { q: String.raw`サイコロを $2$ 回振り、出た目の積が奇数になる確率。`, a: String.raw`$\frac{1}{4}$`, e: String.raw`$1$ 回目も $2$ 回目も奇数である確率 $(1/2 \times 1/2)$。` },
-        { q: String.raw`ある箱の中に白球が多数入っている。黒球を $50$ 個入れて混ぜた後、$40$ 個取り出すと黒球が $2$ 個あった。白球は約何個か。`, a: "約 950 個", e: String.raw`$50 : x = 2 : 40 \to 2x = 2000 \to x=1000$。黒を引いて $950$。` },
-        { q: String.raw`トランプ $52$ 枚から $1$ 枚引くとき、絵札（J,Q,K）が出る確率。`, a: String.raw`$\frac{3}{13}$`, e: String.raw`$12/52 = 3/13$` },
-        { q: String.raw`$A,B,C$ の $3$ 人でリレーの走る順番を決める方法は何通りか。`, a: "6 通り", e: String.raw`$3 \times 2 \times 1 = 6$` },
-        { q: String.raw`くじが $10$ 本あり、$3$ 本が当たり。同時に $2$ 本引いて少なくとも $1$ 本当たる確率。`, a: String.raw`$\frac{8}{15}$`, e: String.raw`余事象（$2$ 本ともハズレ）は ${}_7\mathrm{C}_2 / {}_{10}\mathrm{C}_2 = 21/45 = 7/15$。$1 - 7/15 = 8/15$。` },
-        { q: String.raw`サイコロを振り、$1$ または $6$ の目が出る確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`$2/6 = 1/3$` },
-        { q: String.raw`袋に $1,2,3,4$ の数字が書かれた玉。元に戻さず $2$ 回引くとき、和が $5$ になる確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`全 $12$ 通り。和が $5$ は $(1,4),(4,1),(2,3),(3,2)$ の $4$ 通り。` },
-        { q: String.raw`中央値（メジアン）の意味。`, a: "資料を大きさ順に並べた時の中央の値", e: "データが偶数個の場合は中央の2つの平均。" },
-        { q: String.raw`相対度数の合計は必ずいくつになるか。`, a: String.raw`$1$`, e: "各階級の割合の合計なので必ず $1$。" },
-        { q: String.raw`最頻値（モード）とは何か。`, a: "最も頻繁に現れる値", e: "度数が最大の階級の階級値など。" },
-        { q: String.raw`$5$ 回のテストの平均が $72$ 点。$6$ 回目に何点取れば平均 $75$ 点になるか。`, a: "90 点", e: String.raw`$75 \times 6 - 72 \times 5 = 450 - 360 = 90$` },
-        { q: String.raw`$2$ つのサイコロを振り、目の差が $4$ になる確率。`, a: String.raw`$\frac{1}{9}$`, e: String.raw`$(1,5),(2,6),(5,1),(6,2)$ の $4$ 通り。$4/36 = 1/9$` }
-    ],
-
-    // 大問1(9) 作図 【15題】
-    "d1_q9": [
-        { q: String.raw`線分 $AB$ の垂直二等分線を作図せよ。`, a: "（垂直二等分線）", e: "2点A,Bから等しい半径の弧を描き、その交点を結ぶ。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]], {name:'AB', withLabel:true}); } },
-        { q: String.raw`$\angle ABC$ の二等分線を作図せよ。`, a: "（角の二等分線）", e: "頂点Bから弧を描き、辺との交点からさらに等しい半径の弧を描く。", draw: (brd) => { brd.create('polyline', [[0,3],[0,0],[4,0]], {strokeColor:'black'}); } },
-        { q: String.raw`点 $P$ を通り直線 $l$ に垂直な直線を作図せよ。`, a: "（垂線）", e: "Pからlに弧を描き、交点からさらに弧を描いて交点を作る。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]], {name:'l', withLabel:true}); brd.create('point', [0,1], {name:'P'}); } },
-        { q: String.raw`円の接線を作図せよ（円上の点 $A$ を通るもの）。`, a: "（接線）", e: "中心Oと点Aを結び、点Aを通る垂線を引く。", draw: (brd) => { brd.create('circle', [[0,0], 2]); brd.create('point', [2,0], {name:'A'}); } },
-        { q: String.raw`$3$ 点 $A,B,C$ から等しい距離にある点 $P$ を作図せよ。`, a: "（外心）", e: "2つの辺の垂直二等分線の交点を求める。", draw: (brd) => { brd.create('point', [0,2], {name:'A'}); brd.create('point', [-2,-1], {name:'B'}); brd.create('point', [3,-1], {name:'C'}); } },
-        { q: String.raw`辺 $BC$ を底辺とした時の、$\triangle ABC$ の高さを示す線分。`, a: "（垂線）", e: "点Aから辺BCへの垂線。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[4,0]]); } },
-        { q: String.raw`長方形 $ABCD$ を、対角線 $AC$ を軸に折り返した時の頂点 $B$ の移動先 $B'$。`, a: "（作図）", e: "ACを対称軸とした線対称な点。", draw: (brd) => { brd.create('polygon', [[0,2],[4,2],[4,0],[0,0]]); } },
-        { q: String.raw`円の中心 $O$ を作図で求めよ。`, a: "（中心）", e: "任意の2つの弦の垂直二等分線の交点。", draw: (brd) => { brd.create('circle', [[1,1], 2.5], {strokeDashArray:[2,2]}); } },
-        { q: String.raw`点 $P$ を通り直線 $l$ に平行な直線。`, a: "（平行線）", e: "ひし形を作るように作図するか、垂線を2回引く。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]]); brd.create('point', [1,1], {name:'P'}); } },
-        { q: String.raw`$60^\circ$ の角度を作図せよ。`, a: "（正三角形の角）", e: "正三角形の作図と同じ手順で行う。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
-        { q: String.raw`$30^\circ$ の角度を作図せよ。`, a: "（60度の二等分）", e: "まず60度を作り、それを二等分する。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
-        { q: String.raw`線分 $AB$ を $1:3$ に分ける点。`, a: "（垂直二等分線の利用）", e: "垂直二等分線を2回引き、4等分する。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]]); } },
-        { q: String.raw`辺 $AB$ 上にあり、辺 $AC, BC$ から等距離にある点。`, a: "（角の二等分線の交点）", e: "∠Cの二等分線とABの交点。", draw: (brd) => { brd.create('polygon', [[0,3],[-2,0],[3,0]]); } },
-        { q: String.raw`円の外の点 $P$ から円への接線。`, a: "（接線）", e: "OPの中点を中心としPを通る円を描き、元の円との交点を結ぶ。", draw: (brd) => { brd.create('circle', [[0,0], 1.5]); brd.create('point', [4,0], {name:'P'}); } },
-        { q: String.raw`$\triangle ABC$ で、辺 $BC$ 上にあり $\triangle ABP = \triangle ACP$ となる点 $P$。`, a: "（中点）", e: "辺BCの中点を作図する。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[3,0]]); } }
-    ],
-
-    // 大問2：規則性・文字式の利用 【10題】
-    "d2": [
-        { q: String.raw`$n$ 段目のタイルの個数を $n$ で表せ（1, 4, 9...）`, a: String.raw`$n^2$`, e: String.raw`$1^2, 2^2, 3^2 \dots$ と続く2乗の規則性です。` },
-        { q: String.raw`連続する3つの整数の和が3の倍数になることを証明せよ。`, a: String.raw`$n+(n+1)+(n+2) = 3n+3 = 3(n+1)$`, e: String.raw`$3 \times (\text{整数})$ の形になるため3の倍数といえます。` },
-        { q: String.raw`底面の半径 $r$, 高さ $h$ の円柱の体積 $V$ を $h$ について解け。`, a: String.raw`$h = \frac{V}{\pi r^2}$`, e: String.raw`$V = \pi r^2 h$ より。` },
-        { q: String.raw`奇数と奇数の和が偶数になることを証明せよ。`, a: String.raw`$(2m+1)+(2n+1) = 2(m+n+1)$`, e: String.raw`$2 \times (\text{整数})$ は偶数です。` },
-        { q: String.raw`2けたの正の整数で、十の位の数と一の位の数を入れかえた数との和。`, a: String.raw`"$11$ の倍数", e: String.raw`$(10a+b)+(10b+a) = 11a+11b = 11(a+b)$` },
-        { q: String.raw`$n$ 角形の対角線の本数を $n$ を用いて表せ。`, a: String.raw`$\frac{n(n-3)}{2}$`, e: String.raw`1つの頂点から $(n-3)$ 本引けます。` },
-        { q: String.raw`1辺 $a$ cmの正方形の周の長さ $L$ を $a$ について解け。`, a: String.raw`$a = \frac{L}{4}$`, e: String.raw`$L = 4a$ より。` },
-        { q: String.raw`連続する2つの奇数の積に1を足した数は、何の倍数か。`, a: "4 の倍数", e: String.raw`$(2n-1)(2n+1)+1 = 4n^2-1+1 = 4n^2$` },
-        { q: String.raw`半径 $r$ の円の周の長さを $l$ とするとき、$r$ について解け。`, a: String.raw`$r = \frac{l}{2\pi}$`, e: String.raw`$l = 2\pi r$ より。` }
-    ],
-
-    // 大問3：一次関数 【10題】
-    "d3": [
-        { 
-            q: String.raw`2点 $A(2, 6), B(4, 10)$ を通る直線の式。`, a: String.raw`$y = 2x + 2$`, e: String.raw`傾き $2$, 切片 $2$。`,
-            draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [[2,6],[4,10]], {strokeColor:'blue'}); }
-        },
-        { q: String.raw`直線 $y = -x + 8$ と $x$ 軸、 $y$ 軸で囲まれた三角形の面積。`, a: "32", e: String.raw`$8 \times 8 \div 2 = 32$。` },
-        { q: String.raw`$y = 2x + 3$ に平行で、点 $(1, 2)$ を通る直線の式。`, a: String.raw`$y = 2x$`, e: String.raw`$y - 2 = 2(x - 1)$` },
-        { q: String.raw`2直線 $y = x + 2$ と $y = -2x + 8$ の交点の座標。`, a: String.raw`$(2, 4)$`, e: String.raw`連立方程式として解く。` },
-        { q: String.raw`点 $(3, -1)$ を通り、傾きが $-2$ の直線の式。`, a: String.raw`$y = -2x + 5$`, e: String.raw`$-1 = -2(3) + b \to b = 5$` },
-        { q: String.raw`$x$ 切片が $4$, $y$ 切片が $3$ の直線の式。`, a: String.raw`$y = -\frac{3}{4}x + 3$`, e: String.raw`$(4, 0)$ と $(0, 3)$ を通る。` },
-        { q: String.raw`関数 $y = 3x - 5$ で、$x$ の変域が $1 \leqq x \leqq 4$ のときの $y$ の変域。`, a: String.raw`$-2 \leqq y \leqq 7$`, e: String.raw`$x=1$ で $y=-2$, $x=4$ で $y=7$。` },
-        { q: String.raw`2点 $(-1, 4), (2, -2)$ を通る直線の式。`, a: String.raw`$y = -2x + 2$`, e: String.raw`傾き $(-2-4)/(2-(-1)) = -2$。` },
-        { q: String.raw`直線 $y = \frac{1}{2}x + 1$ 上にあり、$x$ 座標が $4$ である点の $y$ 座標。`, a: "3", e: String.raw`$y = \frac{1}{2}(4) + 1 = 3$` },
-        { q: String.raw`3点 $(0, 2), (2, 6), (a, 10)$ が一直線上にあるとき、 $a$ の値。`, a: "4", e: String.raw`前の2点から $y = 2x + 2$。これに代入して $10 = 2a + 2$。` }
-    ],
-
-    // 大問4：平面図形（相似・円周角・三平方） 【10題】
-    "d4": [
-        { 
-            q: String.raw`$\triangle ABC$ で $DE // BC, AD:DB = 1:2$ のとき、$DE:BC$ を求めよ。`, a: String.raw`$1:3$`, e: String.raw`相似比は $AD:AB = 1:(1+2) = 1:3$。`, 
-            draw: (brd) => { brd.create('polygon', [[2,4],[0,0],[6,0]], {name:'ABC'}); brd.create('segment', [[0.66,1.33],[4.66,1.33]], {strokeColor:'red'}); } 
-        },
-        { q: String.raw`半径 $5\text{cm}$ の円で、中心からの距離が $3\text{cm}$ である弦の長さ。`, a: "8cm", e: String.raw`三平方の定理より $\sqrt{5^2-3^2} = 4$。弦はその2倍の $8$。` },
-        { q: String.raw`1辺 $6\text{cm}$ の正三角形の高さ。`, a: String.raw`$3\sqrt{3}\text{cm}$`, e: String.raw`辺の比 $1:2:\sqrt{3}$ を利用。` },
-        { q: String.raw`相似比が $2:3$ の2つの図形の面積比。`, a: String.raw`$4:9$`, e: String.raw`面積比は相似比の2乗になる。` },
-        { q: String.raw`円周角の定理より、半円の弧に対する円周角の大きさ。`, a: String.raw`$90^\circ$`, e: String.raw`中心角が $180^\circ$ なのでその半分。` },
-        { q: String.raw`2つの同心円があり、半径が $3\text{cm}$ と $5\text{cm}$ のとき、ドーナツ部分の面積。`, a: String.raw`$16\pi\text{cm}^2$`, e: String.raw`$25\pi - 9\pi = 16\pi$` },
-        { q: String.raw`$\triangle ABC$ が直角二等辺三角形で、斜辺が $10\text{cm}$ のとき、他の辺の長さ。`, a: String.raw`$5\sqrt{2}\text{cm}$`, e: String.raw`$x : 10 = 1 : \sqrt{2} \to \sqrt{2}x = 10$` },
-        { q: String.raw`対角線の長さが $8\text{cm}, 10\text{cm}$ のひし形の面積。`, a: String.raw`$40\text{cm}^2$`, e: String.raw`$(8 \times 10) \div 2 = 40$` },
-        { q: String.raw`円に内接する四角形 $ABCD$ で、$\angle A = 85^\circ$ のとき $\angle C$ の大きさ。`, a: String.raw`$95^\circ$`, e: String.raw`対角の和は $180^\circ$。` },
-        { q: String.raw`辺の長さが $3, 4, 5$ の三角形はどのような三角形か。`, a: "直角三角形", e: String.raw`$3^2 + 4^2 = 5^2$ が成り立つ（三平方の逆）。` }
-    ],
-
-    // 大問5：空間図形（体積・表面積・三平方） 【10題】
-    "d5": [
-        { 
-            q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, a: String.raw`$12\pi\text{cm}^3$`, e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
-            draw: (brd) => { brd.create('ellipse', [[0,-2], 3, 0.8]); brd.create('polyline', [[-3,-2],[0,3],[3,-2]]); } 
-        },
-        { q: String.raw`1辺 $6\text{cm}$ の立方体の対角線の長さ。`, a: String.raw`$6\sqrt{3}\text{cm}$`, e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。` },
-        { q: String.raw`半径 $3\text{cm}$ の球の表面積。`, a: String.raw`$36\pi\text{cm}^2$`, e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。` },
-        { q: String.raw`半径 $3\text{cm}$ の球の体積。`, a: String.raw`$36\pi\text{cm}^3$`, e: String.raw`公式 $\frac{4}{3}\pi r^3$ より $\frac{4}{3} \times \pi \times 27 = 36\pi$。` },
-        { q: String.raw`底面が 1辺 $4\text{cm}$ の正方形で、高さが $6\text{cm}$ の正四角錐の体積。`, a: String.raw`$32\text{cm}^3$`, e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。` },
-        { q: String.raw`底面の半径 $2\text{cm}$, 高さ $5\text{cm}$ の円柱の側面積。`, a: String.raw`$20\pi\text{cm}^2$`, e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。` },
-        { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
-        { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
-        { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
-        { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
-    ]
-};
-</script>
+            "d1_q1": [
+                { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
+                { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
+                { q: "$8a + b - (a - 7b)$", a: "$7a + 8b$", e: "$8a + b - a + 7b = 7a + 8b$" },
+                { q: "$(-2)^3 \\times 3 - 4 \\div (-2)$", a: "$-22$", e: "$-24 + 2 = -22$" },
+                { q: "$\\frac{3x - y}{2} - \\frac{x - 4y}{4}$", a: "$\\frac{5x + 2y}{4}$", e: "$\\frac{6x-2y-x+4y}{4}$" },
+                { q: "$18ab^2 \\div 6b \\times (-2a)$", a: "$-6a^2b$", e: "$3ab \\times (-2a) = -6a^2b$" },
+                { q: "$5 + 2 \\times (3 - 8)$", a: "$-5$", e: "$5 - 10 = -5$" },
+                { q: "$6x^2 \\div (-3x)^2 \\times 3x$", a: "$2x$", e: "$6x^2 \\div 9x^2 \\times 3x = 2x$" },
+                { q: "$9 - (-3)^2 \\div 3$", a: "$6$", e: "$9 - 3 = 6$" },
+                { q: "$7 + (-4) - (-9)$", a: "$12$", e: "$7 - 4 + 9 = 12$" },
+                { q: "$4(a-b) - 3(2a-b)$", a: "$-2a-b$", e: "$4a-4b-6a+3b$" },
+                { q: "$(-3)^2 + 5 \\times (-2)$", a: "$-1$", e: "$9 - 10 = -1$" },
+                { q: "$12ab \\div (-4a) \\times 3b$", a: "$-9b^2$", e: "$-3b \\times 3b = -9b^2$" },
+                { q: "$2(3x+y) + (x-2y)$", a: "$7x$", e: "$6x+2y+x-2y$" },
+                { q: "$(-1)^4 \\times 7 - 8$", a: "$-1$", e: "$1 \\times 7 - 8 = -1$" },
+                { q: "$\\frac{1}{3}(6x-9) - 2x$", a: "$-3$", e: "$2x-3-2x = -3$" },
+                { q: "$15x^2y \\div 5xy \\times (-2y)$", a: "$-6y^2$", e: "$3x \\times (-2y)$" },
+                { q: "$7 - 2^3 \\div 4$", a: "$5$", e: "$7 - 2 = 5$" },
+                { q: "$a+2b - \\frac{a-b}{3}$", a: "$\\frac{2a+7b}{3}$", e: "$\\frac{3a+6b-a+b}{3}$" },
+                { q: "$(-6)^2 \\div 4 + (-3)$", a: "$6$", e: "$9 - 3 = 6$" }
+            ],
+            "d1_q2": [
+                { q: String.raw`$(\sqrt{3} + 1)^2$`, a: String.raw`$4 + 2\sqrt{3}$`, e: String.raw`$3 + 2\sqrt{3} + 1$` },
+                { q: String.raw`$(\sqrt{5} + 2)(\sqrt{5} - 2)$`, a: String.raw`$1$`, e: String.raw`$5 - 4 = 1$` },
+                { q: String.raw`$\sqrt{50} - \sqrt{18}$`, a: String.raw`$2\sqrt{2}$`, e: String.raw`$5\sqrt{2} - 3\sqrt{2} = 2\sqrt{2}$` },
+                { q: String.raw`$\frac{12}{\sqrt{6}} - \sqrt{24}$`, a: String.raw`$0$`, e: String.raw`$2\sqrt{6} - 2\sqrt{6} = 0$` },
+                { q: String.raw`$\sqrt{3} + \frac{6}{\sqrt{3}}$`, a: String.raw`$3\sqrt{3}$`, e: String.raw`$\sqrt{3} + 2\sqrt{3} = 3\sqrt{3}$` },
+                { q: String.raw`$(\sqrt{7}-1)(\sqrt{7}+3)$`, a: String.raw`$4+2\sqrt{7}$`, e: String.raw`$7+3\sqrt{7}-\sqrt{7}-3 = 4+2\sqrt{7}$` },
+                { q: String.raw`$\sqrt{32} \div \sqrt{2} - \sqrt{9}$`, a: String.raw`$1$`, e: String.raw`$\sqrt{16} - 3 = 4-3=1$` },
+                { q: String.raw`$\sqrt{2}(\sqrt{8} + \sqrt{18})$`, a: String.raw`$10$`, e: String.raw`$\sqrt{2}(2\sqrt{2}+3\sqrt{2}) = \sqrt{2} \times 5\sqrt{2} = 10$` },
+                { q: String.raw`$(\sqrt{6}+\sqrt{2})(\sqrt{6}-\sqrt{2})$`, a: String.raw`$4$`, e: String.raw`$6-2=4$` },
+                { q: String.raw`$\frac{\sqrt{75}}{\sqrt{3}} - \sqrt{4}$`, a: String.raw`$3$`, e: String.raw`$\sqrt{25}-2 = 5-2=3$` },
+                { q: String.raw`$(\sqrt{3}-2)^2 + \sqrt{12}$`, a: String.raw`$7-2\sqrt{3}$`, e: String.raw`$3-4\sqrt{3}+4+2\sqrt{3} = 7-2\sqrt{3}$` },
+                { q: String.raw`$\sqrt{48} - \frac{9}{\sqrt{3}}$`, a: String.raw`$\sqrt{3}$`, e: String.raw`$4\sqrt{3}-3\sqrt{3} = \sqrt{3}$` },
+                { q: String.raw`$(\sqrt{5}+1)^2 - \sqrt{20}$`, a: String.raw`$6$`, e: String.raw`$5+2\sqrt{5}+1-2\sqrt{5} = 6$` },
+                { q: String.raw`$\sqrt{27} + \sqrt{12} - \sqrt{75}$`, a: String.raw`$0$`, e: String.raw`$3\sqrt{3}+2\sqrt{3}-5\sqrt{3} = 0$` },
+                { q: String.raw`$\frac{10}{\sqrt{5}} + \sqrt{5}$`, a: String.raw`$3\sqrt{5}$`, e: String.raw`$2\sqrt{5}+\sqrt{5} = 3\sqrt{5}$` }
+            ],
+            "d1_q3": [
+                { q: String.raw`$9x - 4 = 5(x + 4)$`, a: String.raw`$x = 6$`, e: String.raw`$9x-4=5x+20 \to 4x=24$` },
+                { q: String.raw`$\frac{x-1}{2} - \frac{x+2}{3} = 1$`, a: String.raw`$x = 13$`, e: String.raw`$3(x-1)-2(x+2)=6 \to 3x-3-2x-4=6 \to x=13$` },
+                { q: String.raw`$0.3x - 0.1 = 0.5x + 0.7$`, a: String.raw`$x = -4$`, e: String.raw`$3x-1=5x+7 \to -2x=8$` },
+                { q: String.raw`$4x - 7 = x + 8$`, a: String.raw`$x = 5$`, e: String.raw`$3x=15 \to x=5$` },
+                { q: String.raw`$3(x-2) = 2x + 5$`, a: String.raw`$x = 11$`, e: String.raw`$3x-6=2x+5$` },
+                { q: String.raw`$\frac{2}{3}x - 1 = \frac{1}{2}x$`, a: String.raw`$x = 6$`, e: String.raw`$4x-6=3x \to x=6$` },
+                { q: String.raw`$5x + 2 = 3(x-4)$`, a: String.raw`$x = -7$`, e: String.raw`$5x+2=3x-12 \to 2x=-14$` },
+                { q: String.raw`$x - 8 = 4x + 10$`, a: String.raw`$x = -6$`, e: String.raw`$-3x=18$` },
+                { q: String.raw`$0.2x + 1.5 = 0.5x$`, a: String.raw`$x = 5$`, e: String.raw`$2x+15=5x \to 3x=15$` },
+                { q: String.raw`$7x - (2x-5) = 15$`, a: String.raw`$x = 2$`, e: String.raw`$5x+5=15 \to 5x=10$` },
+                { q: String.raw`$\frac{x+3}{4} = 2$`, a: String.raw`$x = 5$`, e: String.raw`$x+3=8$` },
+                { q: String.raw`$8 - x = 3x$`, a: String.raw`$x = 2$`, e: String.raw`$8=4x$` },
+                { q: String.raw`$2(x+1) = x-5$`, a: String.raw`$x = -7$`, e: String.raw`$2x+2=x-5$` },
+                { q: String.raw`$0.04x = 0.12$`, a: String.raw`$x = 3$`, e: String.raw`$4x=12$` },
+                { q: String.raw`$12x - 3 = 7x + 12$`, a: String.raw`$x = 3$`, e: String.raw`$5x=15$` }
+            ],
+            "d1_q4": [
+                { q: String.raw`$\begin{cases} x + 2y = 7 \\ 2x - y = 4 \end{cases}$`, a: String.raw`$x = 3, y = 2$`, e: String.raw`下の式を2倍して足す。` },
+                { q: String.raw`$\begin{cases} y = 2x - 1 \\ 3x + 2y = 12 \end{cases}$`, a: String.raw`$x = 2, y = 3$`, e: String.raw`上の式を下の$y$に代入。` },
+                { q: String.raw`$\begin{cases} 3x + 2y = 13 \\ x - 2y = 7 \end{cases}$`, a: String.raw`$x = 5, y = -1$`, e: String.raw`そのまま足すと $4x=20$` },
+                { q: String.raw`$\begin{cases} 2x + 3y = 8 \\ 2x + y = 4 \end{cases}$`, a: String.raw`$x = 1, y = 2$`, e: String.raw`引くと $2y=4$` },
+                { q: String.raw`$\begin{cases} x = 3y \\ 2x - 5y = 1 \end{cases}$`, a: String.raw`$x = 3, y = 1$`, e: String.raw`代入して $6y-5y=1$` },
+                { q: String.raw`$\begin{cases} 4x - y = 9 \\ 2x + y = 3 \end{cases}$`, a: String.raw`$x = 2, y = -1$`, e: String.raw`足すと $6x=12$` },
+                { q: String.raw`$\begin{cases} x - y = 4 \\ 3x + 2y = 7 \end{cases}$`, a: String.raw`$x = 3, y = -1$`, e: String.raw`上の式を2倍して足す。` },
+                { q: String.raw`$\begin{cases} y = x + 2 \\ 2x + y = 8 \end{cases}$`, a: String.raw`$x = 2, y = 4$`, e: String.raw`代入して $3x+2=8$` },
+                { q: String.raw`$\begin{cases} 5x + 2y = 1 \\ 3x + y = 1 \end{cases}$`, a: String.raw`$x = 1, y = -2$`, e: String.raw`下の式を2倍して引く。` },
+                { q: String.raw`$\begin{cases} x + y = 5 \\ x - y = 1 \end{cases}$`, a: String.raw`$x = 3, y = 2$`, e: String.raw`和と差の基本形。` },
+                { q: String.raw`$\begin{cases} 3x - 4y = 10 \\ x = 2y + 4 \end{cases}$`, a: String.raw`$x = 2, y = -1$`, e: String.raw`代入して $3(2y+4)-4y=10 \to 2y=-2$` },
+                { q: String.raw`$\begin{cases} 0.2x + 0.3y = 1.3 \\ x - y = -1 \end{cases}$`, a: String.raw`$x = 2, y = 3$`, e: String.raw`上の式を10倍して $2x+3y=13$` },
+                { q: String.raw`$\begin{cases} \frac{x}{2} + \frac{y}{3} = 4 \\ x + y = 10 \end{cases}$`, a: String.raw`$x = 4, y = 6$`, e: String.raw`上の式を6倍して $3x+2y=24$` },
+                { q: String.raw`$\begin{cases} 7x + 3y = -1 \\ 2x + y = 0 \end{cases}$`, a: String.raw`$x = -1, y = 2$`, e: String.raw`下の式から $y=-2x$ を代入。` },
+                { q: String.raw`$\begin{cases} 2x - 3y = 12 \\ 4x + 5y = 2 \end{cases}$`, a: String.raw`$x = 3, y = -2$`, e: String.raw`上の式を2倍して引く。` }
+            ],
+            "d1_q5": [
+                { q: String.raw`$x^2 + 5x + 6 = 0$`, a: String.raw`$x = -2, -3$`, e: String.raw`$(x+2)(x+3)=0$` },
+                { q: String.raw`$x^2 - 7x + 10 = 0$`, a: String.raw`$x = 2, 5$`, e: String.raw`$(x-2)(x-5)=0$` },
+                { q: String.raw`$x^2 + 2x - 15 = 0$`, a: String.raw`$x = 3, -5$`, e: String.raw`$(x-3)(x+5)=0$` },
+                { q: String.raw`$x^2 - 6x + 9 = 0$`, a: String.raw`$x = 3$`, e: String.raw`$(x-3)^2=0$ (重解)` },
+                { q: String.raw`$x^2 + 4x = 0$`, a: String.raw`$x = 0, -4$`, e: String.raw`$x(x+4)=0$` },
+                { q: String.raw`$x^2 - 16 = 0$`, a: String.raw`$x = \pm 4$`, e: String.raw`$(x-4)(x+4)=0$` },
+                { q: String.raw`$x^2 + 3x + 1 = 0$`, a: String.raw`$x = \frac{-3 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式 $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$` },
+                { q: String.raw`$x^2 - 5x + 2 = 0$`, a: String.raw`$x = \frac{5 \pm \sqrt{17}}{2}$`, e: String.raw`解の公式を利用。` },
+                { q: String.raw`$2x^2 + 5x + 1 = 0$`, a: String.raw`$x = \frac{-5 \pm \sqrt{17}}{4}$`, e: String.raw`解の公式を利用。` },
+                { q: String.raw`$x^2 - 2x - 1 = 0$`, a: String.raw`$x = 1 \pm \sqrt{2}$`, e: String.raw`解の公式より $x = \frac{2 \pm \sqrt{8}}{2} = 1 \pm \sqrt{2}$` },
+                { q: String.raw`$3x^2 - 7x + 2 = 0$`, a: String.raw`$x = 2, \frac{1}{3}$`, e: String.raw`$(x-2)(3x-1)=0$ または解の公式。` },
+                { q: String.raw`$(x-3)^2 = 5$`, a: String.raw`$x = 3 \pm \sqrt{5}$`, e: String.raw`平方根の考え方を利用。` },
+                { q: String.raw`$x^2 + 10x + 25 = 0$`, a: String.raw`$x = -5$`, e: String.raw`$(x+5)^2=0$` },
+                { q: String.raw`$x^2 + x - 1 = 0$`, a: String.raw`$x = \frac{-1 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式を利用。` },
+                { q: String.raw`$x^2 - 8x + 12 = 0$`, a: String.raw`$x = 2, 6$`, e: String.raw`$(x-2)(x-6)=0$` }
+            ],
+            "d1_q6": [
+                { q: String.raw`$y = 2x^2$ で $x$ が $1$ から $3$ まで増加するときの変化の割合。`, a: String.raw`$8$`, e: String.raw`$2(1+3)=8$` },
+                { q: String.raw`$y = -x^2$ で $x$ が $-4$ から $-2$ まで増加するときの変化の割合。`, a: String.raw`$6$`, e: String.raw`$-1(-4-2)=6$` },
+                { q: String.raw`$y = 3x^2$ で $x$ の変域が $-1 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=0$ で最小値 $0$, $x=2$ で最大値 $12$。` },
+                { q: String.raw`$y = ax^2$ において、$x$ が $2$ から $4$ まで増加するときの変化の割合が $12$ であるとき、$a$ の値。`, a: String.raw`$2$`, e: String.raw`$a(2+4)=12 \to 6a=12$` },
+                { q: String.raw`$y = \frac{1}{2}x^2$ で $x$ の変域が $-4 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 8$`, e: String.raw`$x=-4$ のとき最大値 $8$。` },
+                { q: String.raw`関数 $y = -2x^2$ について、$x$ の値が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-10$`, e: String.raw`$-2(1+4)=-10$` },
+                { q: String.raw`$y = ax^2$ で $x$ の変域が $-2 \leqq x \leqq 1$ のとき $y$ の変域が $0 \leqq y \leqq 8$。 $a$ の値。`, a: String.raw`$2$`, e: String.raw`$x=-2$ のとき $y=8$ となるので $4a=8$` },
+                { q: String.raw`$y = \frac{1}{4}x^2$ で $x$ が $2$ から $6$ まで増加するときの変化の割合。`, a: String.raw`$2$`, e: String.raw`$\frac{1}{4}(2+6)=2$` },
+                { q: String.raw`$y = -3x^2$ で $x$ の変域が $-1 \leqq x \leqq 3$ のときの $y$ の変域。`, a: String.raw`$-27 \leqq y \leqq 0$`, e: String.raw`$x=3$ で最小値 $-27$。` },
+                { q: String.raw`変化の割合が常に $3$ で、点 $(1, 5)$ を通る直線の式。`, a: String.raw`$y = 3x + 2$`, e: String.raw`$y-5=3(x-1)$` },
+                { q: String.raw`$y = x^2$ と $y = 2x+3$ の交点の $x$ 座標。`, a: String.raw`$x = 3, -1$`, e: String.raw`$x^2-2x-3=0$ を解く。` },
+                { q: String.raw`$y = \frac{4}{x}$ で $x$ が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-1$`, e: String.raw`$(1-4)/(4-1) = -3/3 = -1$` },
+                { q: String.raw`$y = -2x^2$ で $y$ の変域が $-18 \leqq y \leqq 0$ となる $x$ の変域。`, a: String.raw`$-3 \leqq x \leqq 3$`, e: String.raw`$-2x^2 = -18 \to x^2=9$` },
+                { q: String.raw`$y = ax^2$ と $y = -3x-1$ について、$x$ が $1$ から $3$ まで変化する時の変化の割合が一致する時の $a$。`, a: String.raw`$-0.75$`, e: String.raw`$a(1+3)=-3 \to 4a=-3$` },
+                { q: String.raw`関数 $y = \frac{1}{3}x^2$ について、$x$ の変域が $-3 \leqq x \leqq 6$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=6$ のとき $y=12$。` }
+            ],
+            "d1_q7": [
+                { q: String.raw`正九角形の $1$ つの内角の大きさ。`, a: String.raw`$140^\circ$`, e: String.raw`外角は $360 \div 9 = 40^\circ$。内角は $180 - 40 = 140^\circ$。` },
+                { q: String.raw`半径 $6$cm, 中心角 $120^\circ$ のおうぎ形の弧の長さ。`, a: String.raw`$4\pi \text{cm}$`, e: String.raw`$12\pi \times \frac{120}{360} = 4\pi$` },
+                { q: String.raw`円周角の定理：中心角が $80^\circ$ のとき、その弧に対する円周角。`, a: String.raw`$40^\circ$`, e: String.raw`円周角は中心角の半分。` },
+                { q: String.raw`$n$ 角形の内角の和が $1260^\circ$ であるとき、$n$ の値。`, a: String.raw`$9$`, e: String.raw`$180(n-2)=1260 \to n-2=7 \to n=9$` },
+                { q: String.raw`対角線の本数が $20$ 本である多角形は何角形か。`, a: "八角形", e: String.raw`$\frac{n(n-3)}{2}=20 \to n^2-3n-40=0 \to (n-8)(n+5)=0$` },
+                { q: String.raw`三角形の $2$ つの内角が $45^\circ, 65^\circ$ のとき、残りの外角の大きさ。`, a: String.raw`$110^\circ$`, e: String.raw`$45 + 65 = 110$ (三角形の外角の性質)` },
+                { q: String.raw`円に内接する四角形で、向かい合う角の和。`, a: String.raw`$180^\circ$`, e: String.raw`円に内接する四角形の性質。` },
+                { q: String.raw`中心角 $72^\circ$ のおうぎ形は、円全体の何分の $1$ か。`, a: String.raw`$\frac{1}{5}$`, e: String.raw`$72/360 = 1/5$` },
+                { q: String.raw`正六角形の $1$ つの外角。`, a: String.raw`$60^\circ$`, e: String.raw`$360 \div 6 = 60$` },
+                { q: String.raw`直角二等辺三角形の鋭角の大きさ。`, a: String.raw`$45^\circ$`, e: String.raw`$(180-90) \div 2 = 45$` },
+                { q: String.raw`半径 $10$cm、弧の長さ $4\pi$cm のおうぎ形の面積。`, a: String.raw`$20\pi \text{cm}^2$`, e: String.raw`$S = \frac{1}{2}lr = \frac{1}{2} \times 4\pi \times 10 = 20\pi$` },
+                { q: String.raw`ひし形の面積。対角線が $8$cm と $6$cm。`, a: String.raw`$24 \text{cm}^2$`, e: String.raw`$(8 \times 6) \div 2 = 24$` },
+                { q: String.raw`平行四辺形 $ABCD$ で $\angle A=110^\circ$ のとき $\angle B$。`, a: String.raw`$70^\circ$`, e: String.raw`隣り合う角の和は $180^\circ$。` },
+                { q: String.raw`円周上に $3$ 点 $A,B,C$。$\angle ABC$ が直径 $AC$ を持つとき、$\angle ABC$ は。`, a: String.raw`$90^\circ$`, e: String.raw`半円の弧に対する円周角は $90^\circ$。` }
+            ],
+            "d1_q8": [
+                { q: String.raw`$2$ 枚の硬貨を同時に投げるとき、少なくとも $1$ 枚が表になる確率。`, a: String.raw`$\frac{3}{4}$`, e: String.raw`「すべて裏」の $1/4$ を $1$ から引く。` },
+                { q: String.raw`赤玉 $3$ 個、白玉 $2$ 個が入った袋から同時に $2$ 個取り出すとき、両方赤である確率。`, a: String.raw`$\frac{3}{10}$`, e: String.raw`全部で ${}_5\mathrm{C}_2=10$ 通り。赤 $2$ 個は ${}_3\mathrm{C}_2=3$ 通り。` },
+                { q: String.raw`$1$ から $6$ までのカードから $2$ 枚引いて作る $2$ 桁の整数が $3$ の倍数になる確率。`, a: String.raw`$\frac{4}{15}$`, e: String.raw`全 $30$ 通り中、和が $3,6,9$ になる組を探す。` },
+                { q: String.raw`サイコロを $2$ 回振り、出た目の積が奇数になる確率。`, a: String.raw`$\frac{1}{4}$`, e: String.raw`$1$ 回目も $2$ 回目も奇数である確率 $(1/2 \times 1/2)$。` },
+                { q: String.raw`ある箱の中に白球が多数入っている。黒球を $50$ 個入れて混ぜた後、$40$ 個取り出すと黒球が $2$ 個あった。白球は約何個か。`, a: "約 950 個", e: String.raw`$50 : x = 2 : 40 \to 2x = 2000 \to x=1000$。黒を引いて $950$。` },
+                { q: String.raw`トランプ $52$ 枚から $1$ 枚引くとき、絵札（J,Q,K）が出る確率。`, a: String.raw`$\frac{3}{13}$`, e: String.raw`$12/52 = 3/13$` },
+                { q: String.raw`$A,B,C$ の $3$ 人でリレーの走る順番を決める方法は何通りか。`, a: "6 通り", e: String.raw`$3 \times 2 \times 1 = 6$` },
+                { q: String.raw`くじが $10$ 本あり、$3$ 本が当たり。同時に $2$ 本引いて少なくとも $1$ 本当たる確率。`, a: String.raw`$\frac{8}{15}$`, e: String.raw`余事象（$2$ 本ともハズレ）は ${}_7\mathrm{C}_2 / {}_{10}\mathrm{C}_2 = 21/45 = 7/15$。$1 - 7/15 = 8/15$。` },
+                { q: String.raw`サイコロを振り、$1$ または $6$ の目が出る確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`$2/6 = 1/3$` },
+                { q: String.raw`袋に $1,2,3,4$ の数字が書かれた玉。元に戻さず $2$ 回引くとき、和が $5$ になる確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`全 $12$ 通り. 和が $5$ は $(1,4),(4,1),(2,3),(3,2)$ の $4$ 通り。` },
+                { q: String.raw`中央値（メジアン）の意味。`, a: "資料を大きさ順に並べた時の中央の値", e: "データが偶数個の場合は中央の2つの平均。" },
+                { q: String.raw`相対度数の合計は必ずいくつになるか。`, a: String.raw`$1$`, e: "各階級の割合の合計なので必ず $1$。" },
+                { q: String.raw`最頻値（モード）とは何か。`, a: "最も頻繁に現れる値", e: "度数が最大の階級の階級値など。" },
+                { q: String.raw`$5$ 回のテストの平均が $72$ 点。$6$ 回目に何点取れば平均 $75$ 点になるか。`, a: "90 点", e: String.raw`$75 \times 6 - 72 \times 5 = 450 - 360 = 90$` },
+                { q: String.raw`$2$ つのサイコロを振り、目の差が $4$ になる確率。`, a: String.raw`$\frac{1}{9}$`, e: String.raw`$(1,5),(2,6),(5,1),(6,2)$ の $4$ 通り。$4/36 = 1/9$` }
+            ],
+            "d1_q9": [
+                { q: String.raw`線分 $AB$ の垂直二等分線を作図せよ。`, a: "（垂直二等分線）", e: "2点A,Bから等しい半径の弧を描き、その交点を結ぶ。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]], {name:'AB', withLabel:true}); } },
+                { q: String.raw`$\angle ABC$ の二等分線を作図せよ。`, a: "（角の二等分線）", e: "頂点Bから弧を描き、辺との交点からさらに等しい半径の弧を描く。", draw: (brd) => { brd.create('polyline', [[0,3],[0,0],[4,0]], {strokeColor:'black'}); } },
+                { q: String.raw`点 $P$ を通り直線 $l$ に垂直な直線を作図せよ。`, a: "（垂線）", e: "Pからlに弧を描き、交点からさらに弧を描いて交点を作る。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]], {name:'l', withLabel:true}); brd.create('point', [0,1], {name:'P'}); } },
+                { q: String.raw`円の接線を作図せよ（円上の点 $A$ を通るもの）。`, a: "（接線）", e: "中心Oと点Aを結び、点Aを通る垂線を引く。", draw: (brd) => { brd.create('circle', [[0,0], 2]); brd.create('point', [2,0], {name:'A'}); } },
+                { q: String.raw`$3$ 点 $A,B,C$ から等しい距離にある点 $P$ を作図せよ。`, a: "（外心）", e: "2つの辺の垂直二等分線の交点を求める。", draw: (brd) => { brd.create('point', [0,2], {name:'A'}); brd.create('point', [-2,-1], {name:'B'}); brd.create('point', [3,-1], {name:'C'}); } },
+                { q: String.raw`辺 $BC$ を底辺とした時の、$\triangle ABC$ の高さを示す線分。`, a: "（垂線）", e: "点Aから辺BCへの垂線。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[4,0]]); } },
+                { q: String.raw`長方形 $ABCD$ を、対角線 $AC$ を軸に折り返した時の頂点 $B$ の移動先 $B'$。`, a: "（作図）", e: "ACを対称軸とした線対称な点。", draw: (brd) => { brd.create('polygon', [[0,2],[4,2],[4,0],[0,0]]); } },
+                { q: String.raw`円の中心 $O$ を作図で求めよ。`, a: "（中心）", e: "任意の2つの弦の垂直二等分線の交点。", draw: (brd) => { brd.create('circle', [[1,1], 2.5], {strokeDashArray:[2,2]}); } },
+                { q: String.raw`点 $P$ を通り直線 $l$ に平行な直線。`, a: "（平行線）", e: "ひし形を作るように作図するか、垂線を2回引く。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]]); brd.create('point', [1,1], {name:'P'}); } },
+                { q: String.raw`$60^\circ$ の角度を作図せよ。`, a: "（正三角形の角）", e: "正三角形の作図と同じ手順で行う。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
+                { q: String.raw`$30^\circ$ の角度を作図せよ。`, a: "（60度の二等分）", e: "まず60度を作り、それを二等分する。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
+                { q: String.raw`線分 $AB$ を $1:3$ に分ける点。`, a: "（垂直二等分線の利用）", e: "垂直二等分線を2回引き、4等分する。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]]); } },
+                { q: String.raw`辺 $AB$ 上にあり、辺 $AC, BC$ から等距離にある点。`, a: "（角の二等分線の交点）", e: "∠Cの二等分線とABの交点。", draw: (brd) => { brd.create('polygon', [[0,3],[-2,0],[3,0]]); } },
+                { q: String.raw`円の外の点 $P$ から円への接線。`, a: "（接線）", e: "OPの中点を中心としPを通る円を描き、元の円との交点を結ぶ。", draw: (brd) => { brd.create('circle', [[0,0], 1.5]); brd.create('point', [4,0], {name:'P'}); } },
+                { q: String.raw`$\triangle ABC$ で、辺 $BC$ 上にあり $\triangle ABP = \triangle ACP$ となる点 $P$。`, a: "（中点）", e: "辺BCの中点を作図する。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[3,0]]); } }
+            ],
+            "d2": [
+                { q: String.raw`$n$ 段目のタイルの個数を $n$ で表せ（1, 4, 9...）`, a: String.raw`$n^2$`, e: String.raw`$1^2, 2^2, 3^2 \dots$ と続く2乗の規則性です。` },
+                { q: String.raw`連続する3つの整数の和が3の倍数になることを証明せよ。`, a: String.raw`$n+(n+1)+(n+2) = 3n+3 = 3(n+1)$`, e: String.raw`$3 \times (\text{整数})$ の形になるため3の倍数といえます。` },
+                { q: String.raw`底面の半径 $r$, 高さ $h$ の円柱の体積 $V$ を $h$ について解け。`, a: String.raw`$h = \frac{V}{\pi r^2}$`, e: String.raw`$V = \pi r^2 h$ より。` },
+                { q: String.raw`奇数と奇数の和が偶数になることを証明せよ。`, a: String.raw`$(2m+1)+(2n+1) = 2(m+n+1)$`, e: String.raw`$2 \times (\text{整数})$ は偶数です。` },
+                { q: String.raw`2けたの正の整数で、十の位の数と一の位の数を入れかえた数との和。`, a: String.raw`"$11$ の倍数"`, e: String.raw`$(10a+b)+(10b+a) = 11a+11b = 11(a+b)$` },
+                { q: String.raw`$n$ 角形の対角線の本数を $n$ を用いて表せ。`, a: String.raw`$\frac{n(n-3)}{2}$`, e: String.raw`1つの頂点から $(n-3)$ 本引けます。` },
+                { q: String.raw`1辺 $a$ cmの正方形の周の長さ $L$ を $a$ について解け。`, a: String.raw`$a = \frac{L}{4}$`, e: String.raw`$L = 4a$ より。` },
+                { q: String.raw`連続する2つの奇数の積に1を足した数は、何の倍数か。`, a: "4 の倍数", e: String.raw`$(2n-1)(2n+1)+1 = 4n^2-1+1 = 4n^2$` },
+                { q: String.raw`半径 $r$ の円の周の長さを $l$ とするとき、$r$ について解け。`, a: String.raw`$r = \frac{l}{2\pi}$`, e: String.raw`$l = 2\pi r$ より。` }
+            ],
+            "d3": [
+                { q: String.raw`2点 $A(2, 6), B(4, 10)$ を通る直線の式。`, a: String.raw`$y = 2x + 2$`, e: String.raw`傾き $2$, 切片 $2$。`, draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [[2,6],[4,10]], {strokeColor:'blue'}); } },
+                { q: String.raw`直線 $y = -x + 8$ と $x$ 軸、 $y$ 軸で囲まれた三角形の面積。`, a: "32", e: String.raw`$8 \times 8 \div 2 = 32$。` },
+                { q: String.raw`$y = 2x + 3$ に平行で、点 $(1, 2)$ を通る直線の式。`, a: String.raw`$y = 2x$`, e: String.raw`$y - 2 = 2(x - 1)$` },
+                { q: String.raw`2直線 $y = x + 2$ と $y = -2x + 8$ の交点の座標。`, a: String.raw`$(2, 4)$`, e: String.raw`連立方程式として解く。` },
+                { q: String.raw`点 $(3, -1)$ を通り、傾きが $-2$ の直線の式。`, a: String.raw`$y = -2x + 5$`, e: String.raw`$-1 = -2(3) + b \to b = 5$` },
+                { q: String.raw`$x$ 切片が $4$, $y$ 切片が $3$ の直線の式。`, a: String.raw`$y = -\frac{3}{4}x + 3$`, e: String.raw`$(4, 0)$ と $(0, 3)$ を通る。` },
+                { q: String.raw`関数 $y = 3x - 5$ で、$x$ の変域が $1 \leqq x \leqq 4$ のときの $y$ の変域。`, a: String.raw`$-2 \leqq y \leqq 7$`, e: String.raw`$x=1$ で $y=-2$, $x=4$ で $y=7$。` },
+                { q: String.raw`2点 $(-1, 4), (2, -2)$ を通る直線の式。`, a: String.raw`$y = -2x + 2$`, e: String.raw`傾き $(-2-4)/(2-(-1)) = -2$。` },
+                { q: String.raw`直線 $y = \frac{1}{2}x + 1$ 上にあり、$x$ 座標が $4$ である点の $y$ 座標。`, a: "3", e: String.raw`$y = \frac{1}{2}(4) + 1 = 3$` },
+                { q: String.raw`3点 $(0, 2), (2, 6), (a, 10)$ が一直線上にあるとき、 $a$ の値。`, a: "4", e: String.raw`前の2点から $y = 2x + 2$。これに代入して $10 = 2a + 2$。` }
+            ],
+            "d4": [
+                { q: String.raw`$\triangle ABC$ で $DE // BC, AD:DB = 1:2$ のとき、$DE:BC$ を求めよ。`, a: String.raw`$1:3$`, e: String.raw`相似比は $AD:AB = 1:(1+2) = 1:3$。`, draw: (brd) => { brd.create('polygon', [[2,4],[0,0],[6,0]], {name:'ABC'}); brd.create('segment', [[0.66,1.33],[4.66,1.33]], {strokeColor:'red'}); } },
+                { q: String.raw`半径 $5\text{cm}$ の円で、中心からの距離が $3\text{cm}$ である弦の長さ。`, a: "8cm", e: String.raw`三平方の定理より $\sqrt{5^2-3^2} = 4$。弦はその2倍の $8$。` },
+                { q: String.raw`1辺 $6\text{cm}$ の正三角形の高さ。`, a: String.raw`$3\sqrt{3}\text{cm}$`, e: String.raw`辺の比 $1:2:\sqrt{3}$ を利用。` },
+                { q: String.raw`相似比が $2:3$ の2つの図形の面積比。`, a: String.raw`$4:9$`, e: String.raw`面積比は相似比の2乗になる。` },
+                { q: String.raw`円周角の定理より、半円の弧に対する円周角の大きさ。`, a: String.raw`$90^\circ$`, e: String.raw`中心角が $180^\circ$ なのでその半分。` },
+                { q: String.raw`2つの同心円があり、半径が $3\text{cm}$ と $5\text{cm}$ のとき、ドーナツ部分の面積。`, a: String.raw`$16\pi\text{cm}^2$`, e: String.raw`$25\pi - 9\pi = 16\pi$` },
+                { q: String.raw`$\triangle ABC$ が直角二等辺三角形で、斜辺が $10\text{cm}$ のとき、他の辺の長さ。`, a: String.raw`$5\sqrt{2}\text{cm}$`, e: String.raw`$x : 10 = 1 : \sqrt{2} \to \sqrt{2}x = 10$` },
+                { q: String.raw`対角線の長さが $8\text{cm}, 10\text{cm}$ のひし形の面積。`, a: String.raw`$40\text{cm}^2$`, e: String.raw`$(8 \times 10) \div 2 = 40$` },
+                { q: String.raw`円に内接する四角形 $ABCD$ で、$\angle A = 85^\circ$ のとき $\angle C$ の大きさ。`, a: String.raw`$95^\circ$`, e: String.raw`対角の和は $180^\circ$。` },
+                { q: String.raw`辺の長さが $3, 4, 5$ の三角形はどのような三角形か。`, a: "直角三角形", e: String.raw`$3^2 + 4^2 = 5^2$ が成り立つ（三平方の逆）。` }
+            ],
+            "d5": [
+                { q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, a: String.raw`$12\pi\text{cm}^3$`, e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, draw: (brd) => { brd.create('ellipse', [[0,-2], 3, 0.8]); brd.create('polyline', [[-3,-2],[0,3],[3,-2]]); } },
+                { q: String.raw`1辺 $6\text{cm}$ の立方体の対角線の長さ。`, a: String.raw`$6\sqrt{3}\text{cm}$`, e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。` },
+                { q: String.raw`半径 $3\text{cm}$ の球の表面積。`, a: String.raw`$36\pi\text{cm}^2$`, e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。` },
+                { q: String.raw`半径 $3\text{cm}$ の球の体積。`, a: String.raw`$36\pi\text{cm}^3$`, e: String.raw`公式 $\frac{4}{3}\pi r^3$ より $\frac{4}{3} \times \pi \times 27 = 36\pi$。` },
+                { q: String.raw`底面が 1辺 $4\text{cm}$ の正方形で、高さが $6\text{cm}$ の正四角錐の体積。`, a: String.raw`$32\text{cm}^3$`, e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。` },
+                { q: String.raw`底面の半径 $2\text{cm}$, 高さ $5\text{cm}$ の円柱の側面積。`, a: String.raw`$20\pi\text{cm}^2$`, e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。` },
+                { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
+                { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
+                { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
+                { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
+            ]
+        };
+    </script>
     
     <style>
-        /* 読み込み中の表示を整える（任意） */
-        #problem-container.loading {
-            opacity: 0.5;
-        }
+        #app-container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; font-family: sans-serif; }
+        #question-text { font-size: 1.2em; margin-bottom: 20px; min-height: 50px; }
+        #jxgbox { width: 300px; height: 300px; margin: 10px auto; border: 1px solid #ddd; }
+        #answer-area { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #4CAF50; }
+        button { padding: 10px 20px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 5px; margin: 5px; }
+        button:hover { background: #45a049; }
+        .label { font-weight: bold; color: #333; }
+        .nav-btn { background: #666; }
     </style>
 </head>
 <body>
 
 <div id="app-container">
     <div id="question-text">読み込み中……</div>
-    
     <div id="jxgbox" style="display:none;"></div>
-
     <button id="show-ans-btn" onclick="showAnswer()">答え合わせを表示</button>
 
     <div id="answer-area" style="display:none;">
@@ -281,15 +249,14 @@
         <p><span class="label">【解説】</span> <span id="explanation-text"></span></p>
         <button onclick="location.reload()">次の問題へ</button>
     </div>
-
+    <br>
     <button class="nav-btn" onclick="location.href='index.html'">トップに戻る</button>
 </div>
 
 <script>
     let board = null;
 
-        window.onload = function() {
-        // すでに上にデータがあるので、エラーチェックなしで直接読み込む
+    window.onload = function() {
         loadQuestion();
     };
 
@@ -299,21 +266,18 @@
         const problems = MasterDatabase[catId];
 
         if (!problems) {
-            document.getElementById('question-text').innerText = "カテゴリがありません。";
+            document.getElementById('question-text').innerText = "問題が見つかりません。";
             return;
         }
 
         const currentProblem = problems[Math.floor(Math.random() * problems.length)];
         
-        // テキスト反映
         document.getElementById('question-text').innerHTML = currentProblem.q;
         document.getElementById('answer-text').innerHTML = currentProblem.a;
         document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
 
-        // 数式処理
-        if (window.MathJax) MathJax.typeset();
+        if (window.MathJax) MathJax.typesetPromise();
 
-        // 図形処理
         const box = document.getElementById('jxgbox');
         if (currentProblem.draw) {
             box.style.display = 'block';
