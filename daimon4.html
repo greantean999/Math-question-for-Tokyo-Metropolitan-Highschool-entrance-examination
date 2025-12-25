@@ -161,6 +161,32 @@ const database = [
 ];
 
 function loadProblem() {
+    // 1. その大問が解放されているかチェック
+    // ※引数は 'daimon1_all', 'daimon5_all' などファイルに合わせて変えてください
+    const isUnlocked = AuthManager.isUnlocked('daimon5_all'); 
+
+    let qIndex;
+    if (!isUnlocked) {
+        // 未購入なら「最初の1問」に固定
+        qIndex = 0;
+        // お試し通知を出す（オプション）
+        const probText = document.getElementById('prob-text');
+        if(!document.getElementById('trial-msg')){
+            const msg = document.createElement('div');
+            msg.id = 'trial-msg';
+            msg.style = "color:orange; font-size:0.8em; margin-bottom:5px;";
+            msg.innerText = "⚠️ お試しモード：最初の1問のみ学習可能です";
+            probText.parentNode.insertBefore(msg, probText);
+        }
+    } else {
+        // 購入済みならランダム
+        qIndex = Math.floor(Math.random() * database.length);
+        if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
+    }
+
+    const q = database[qIndex];
+    // --- 以下、既存の描画・表示処理 ---
+
     const q = database[Math.floor(Math.random() * database.length)];
     document.getElementById('prob-text').innerHTML = q.text;
     document.getElementById('ans').innerHTML = "正解：" + q.ans;
