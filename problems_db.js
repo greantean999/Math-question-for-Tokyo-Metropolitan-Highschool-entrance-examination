@@ -1,7 +1,6 @@
 // MasterDatabase の初期化
 const MasterDatabase = {
     // 大問1(1) 正負の数・文字式 【20題】
-    const MasterDatabase = {
     "d1_q1": [
         { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
         { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
