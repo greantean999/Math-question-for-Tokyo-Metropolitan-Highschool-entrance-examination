@@ -6,48 +6,69 @@
     <title>都立数学特訓 - メニュー</title>
     <style>
         body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #fdf6e3; }
+        h1 { color: #073642; text-align: center; }
         .menu-btn { 
-            width: 100%; padding: 20px; margin-bottom: 15px; border-radius: 12px; border: none; 
+            width: 100%; padding: 20px; margin-bottom: 12px; border-radius: 12px; border: none; 
             background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
             font-size: 18px; font-weight: bold; text-align: left; cursor: pointer;
             display: flex; justify-content: space-between; align-items: center;
+            transition: transform 0.1s;
         }
-        .unlocked { border-left: 8px solid #859900; }
+        .menu-btn:active { transform: scale(0.98); }
+        .unlocked { border-left: 8px solid #859900 !important; }
         .locked { border-left: 8px solid #ccc; color: #666; }
-        .status-badge { font-size: 0.7em; padding: 4px 8px; border-radius: 4px; background: #eee; }
-        .store-link { display: block; text-align: center; color: #268bd2; font-weight: bold; text-decoration: none; margin-top: 20px; }
+        .status-badge { font-size: 0.7em; padding: 4px 8px; border-radius: 4px; background: #eee; color: #333; }
+        .store-link { display: block; text-align: center; color: #268bd2; font-weight: bold; text-decoration: none; margin-top: 20px; padding: 10px; }
     </style>
 </head>
 <body>
     <h1>都立数学特訓 2025</h1>
 
-    <button id="btn-d1" class="menu-btn" onclick="location.href='daimon1.html'">
+    <button class="menu-btn" onclick="location.href='daimon1.html'">
         大問1：小問集合 <span id="status-d1" class="status-badge">お試し版</span>
     </button>
-    <button id="btn-d5" class="menu-btn" onclick="location.href='daimon5.html'">
+
+    <button class="menu-btn" onclick="location.href='daimon2.html'">
+        大問2：規則性 <span id="status-d2" class="status-badge">お試し版</span>
+    </button>
+
+    <button class="menu-btn" onclick="location.href='daimon3.html'">
+        大問3：一次関数 <span id="status-d3" class="status-badge">お試し版</span>
+    </button>
+
+    <button class="menu-btn" onclick="location.href='daimon4.html'">
+        大問4：平面図形 <span id="status-d4" class="status-badge">お試し版</span>
+    </button>
+
+    <button class="menu-btn" onclick="location.href='daimon5.html'">
         大問5：空間図形 <span id="status-d5" class="status-badge">お試し版</span>
     </button>
     
-    <a href="store.html" class="store-link">🛒 ストアで全問解放する</a>
+    <a href="store.html" class="store-link">🛒 ストアでライセンスを有効化する</a>
 
     <script src="auth.js"></script>
     <script>
         function updateMenu() {
-            // 各大問の解放状況を確認して表示を更新
             const config = [
                 { id: 'status-d1', key: 'daimon1_all' },
+                { id: 'status-d2', key: 'daimon2_all' },
+                { id: 'status-d3', key: 'daimon3_all' },
+                { id: 'status-d4', key: 'daimon4_all' },
                 { id: 'status-d5', key: 'daimon5_all' }
             ];
 
             config.forEach(item => {
                 const badge = document.getElementById(item.id);
+                const btn = badge.parentElement;
+
                 if (AuthManager.isUnlocked(item.key)) {
                     badge.innerText = "✅ 解放済み";
                     badge.style.background = "#859900";
                     badge.style.color = "white";
-                    badge.parentElement.classList.add('unlocked');
+                    btn.classList.add('unlocked');
+                    btn.classList.remove('locked');
                 } else {
-                    badge.classList.add('locked');
+                    btn.classList.add('locked');
                 }
             });
         }
