@@ -93,28 +93,28 @@ function renderMenu() {
     });
 }
 
-        function login() {
-            const org = document.getElementById('org-input').value.trim();
-            const key = document.getElementById('key-input').value.trim();
-            const status = AuthSystem.verify(key, org);
+function login() {
+    const org = document.getElementById('org-input').value.trim();
+    const key = document.getElementById('key-input').value.trim();
+    const status = AuthSystem.verify(key, org);
             
-            if (status !== "DENIED") {
+    if (status !== "DENIED") {
                 localStorage.setItem('math_app_status', status);
                 localStorage.setItem('math_app_org', org);
                 alert("認証に成功しました！");
                 document.getElementById('auth-section').style.display = 'none';
                 renderMenu(); // メニューを再描画
-            } else {
+    } else {
                 alert("キーが正しくありません。");
             }
         }
 
-        window.onload = function() {
-            const status = localStorage.getItem('math_app_status');
-            if (status && status !== "DENIED") {
-                document.getElementById('auth-section').style.display = 'none';
+    window.onload = function() {
+        const status = localStorage.getItem('math_app_status');
+        if (status && status !== "DENIED") {
+            document.getElementById('auth-section').style.display = 'none';
             }
-            renderMenu();
+        renderMenu();
         }
     </script>
 </body>
