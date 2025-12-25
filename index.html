@@ -22,80 +22,59 @@
     </style>
 </head>
 <body>
-    <h1>都立数学特訓 2025</h1>
+    <div class="container">
+        <h1>都立数学 爆速合格パック</h1>
+        <p>志望校合格への最短ルートを、今すぐ始めよう。</p>
 
-    <button class="menu-btn" onclick="location.href='daimon1.html'">
-        大問1：小問集合 <span id="status-d1" class="status-badge">お試し版</span>
-    </button>
-
-    <button class="menu-btn" onclick="location.href='daimon2.html'">
-        大問2：規則性 <span id="status-d2" class="status-badge">お試し版</span>
-    </button>
-
-    <button class="menu-btn" onclick="location.href='daimon3.html'">
-        大問3：一次関数 <span id="status-d3" class="status-badge">お試し版</span>
-    </button>
-
-    <button class="menu-btn" onclick="location.href='daimon4.html'">
-        大問4：平面図形 <span id="status-d4" class="status-badge">お試し版</span>
-    </button>
-
-    <button class="menu-btn" onclick="location.href='daimon5.html'">
-        大問5：空間図形 <span id="status-d5" class="status-badge">お試し版</span>
-    </button>
-    
-        <a href="store.html" class="store-link">🛒 ストアでライセンスを有効化する</a>
-
-    <div id="final-test-section" style="margin-top: 20px; text-align: center;">
-        <button id="final-test-btn" class="menu-btn" 
-                style="background: linear-gradient(135deg, #d33682, #268bd2); color: white; border: none; height: auto; padding: 25px; display: block;"
-                onclick="checkFinalTestAuth()">
-            <div style="text-align: center; width: 100%;">
-                🏆 最終確認テスト・模擬試験<br>
-                <span style="font-size:0.7rem; opacity:0.9; font-weight: normal;">（全問オールインワン購入者限定）</span>
-            </div>
-        </button>
+        <div id="auth-section" style="background:#eee8d5; padding:20px; border-radius:12px; margin:20px 0; border: 2px solid #93a1a1;">
+            <h3 style="margin-top:0; color:#073642;">🔑 ライセンス認証</h3>
+            <p style="font-size: 0.8rem; margin-bottom: 10px;">団体利用の方は団体名を入力してください。</p>
+            
+            <input type="text" id="org-input" placeholder="団体名 (アルファベット例: TOKYO_JUKU)" 
+                   style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px; box-sizing: border-box;">
+            
+            <input type="password" id="key-input" placeholder="ライセンスキーを入力" 
+                   style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px; box-sizing: border-box;">
+            
+            <button onclick="login()" style="width:100%; background:#268bd2; color:white; padding:15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold; font-size:1rem;">
+                認証してすべての機能を開放
+            </button>
+        </div>
+        <div class="menu-grid">
+            <button onclick="location.href='practice.html'" class="menu-btn">各分野の演習</button>
+            <button onclick="location.href='final_test.html'" class="menu-btn" style="background:#d33682;">実戦模試を受ける</button>
+            <button onclick="location.href='store.html'" class="menu-btn" style="background:#859900;">ストア・見積もり</button>
+        </div>
     </div>
 
-    <script src="auth.js"></script>
+    <script src="problems_db.js"></script>
     <script>
-        function checkFinalTestAuth() {
-            if (AuthManager.isUnlocked('all_in_one')) {
-                location.href = 'final_test.html';
+        function login() {
+            const org = document.getElementById('org-input').value.trim();
+            const key = document.getElementById('key-input').value.trim();
+            
+            // problems_db.jsに定義したAuthSystemを使用
+            const status = AuthSystem.verify(key, org);
+            
+            if (status !== "DENIED") {
+                localStorage.setItem('math_app_status', status);
+                localStorage.setItem('math_app_org', org);
+                alert("認証に成功しました！すべての問題と診断機能が利用可能です。");
+                // 成功したら認証フォームを消す、またはリロード
+                document.getElementById('auth-section').style.display = 'none';
             } else {
-                alert('最終確認テストは「全問オールインワンパッケージ」の購入特典です。\nストアで解放してください！');
-                location.href = 'store.html';
+                alert("キーまたは団体名が正しくありません。購入サイトから発行された情報を確認してください。");
             }
         }
-        // ...以下、既存のupdateMenu関数など...
 
-    <script src="auth.js"></script>
-    <script>
-        function updateMenu() {
-            const config = [
-                { id: 'status-d1', key: 'daimon1_all' },
-                { id: 'status-d2', key: 'daimon2_all' },
-                { id: 'status-d3', key: 'daimon3_all' },
-                { id: 'status-d4', key: 'daimon4_all' },
-                { id: 'status-d5', key: 'daimon5_all' }
-            ];
-
-            config.forEach(item => {
-                const badge = document.getElementById(item.id);
-                const btn = badge.parentElement;
-
-                if (AuthManager.isUnlocked(item.key)) {
-                    badge.innerText = "✅ 解放済み";
-                    badge.style.background = "#859900";
-                    badge.style.color = "white";
-                    btn.classList.add('unlocked');
-                    btn.classList.remove('locked');
-                } else {
-                    btn.classList.add('locked');
-                }
-            });
+        // ページ読み込み時に認証済みかチェック
+        window.onload = function() {
+            if (localStorage.getItem('math_app_status') === "FULL_ACCESS" || 
+                localStorage.getItem('math_app_status') === "ORG_ACCESS") {
+                document.getElementById('auth-section').style.display = 'none';
+            }
         }
-        window.onload = updateMenu;
     </script>
 </body>
+
 </html>
