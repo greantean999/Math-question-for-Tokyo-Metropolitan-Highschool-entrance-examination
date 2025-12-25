@@ -1,3 +1,34 @@
+// 【認証システム】
+const AuthSystem = {
+    // 1. マスターキー（例: admin2025）
+    masterKey: "GEMINI_PASS_2025",
+
+    // 2. 団体キー生成ロジック (簡易ハッシュ)
+    // 団体名から特定の数値を生成してキーを作る
+    generateOrgKey: function(orgName) {
+        let hash = 0;
+        for (let i = 0; i < orgName.length; i++) {
+            hash = ((hash << 5) - hash) + orgName.charCodeAt(i);
+            hash |= 0; // 32bit整数に変換
+        }
+        return "ORG-" + Math.abs(hash).toString(16).toUpperCase();
+    },
+
+    // 3. キー照合
+    verify: function(inputKey, orgName = "") {
+        if (inputKey === this.masterKey) return "FULL_ACCESS";
+        
+        if (orgName) {
+            const expected = this.generateOrgKey(orgName.toUpperCase());
+            if (inputKey === expected) return "ORG_ACCESS";
+        }
+        
+        // 個人用キーの例（簡易的に固定値。本来はDB照合）
+        if (inputKey === "USER-PREMIUM-777") return "FULL_ACCESS";
+        
+        return "DENIED";
+    }
+};
 // problems_db.js
 // 【第0ブロック】大問1(1)〜(3)
 const MasterDatabase = {}; // 最初に一度だけ宣言
