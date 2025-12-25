@@ -1,194 +1,91 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <script src="auth.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>都立数学特訓 - 大問2規則性</title>
-    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <title>都立数学特訓 - 演習</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="problems_db.js"></script>
+    <script>
+        // 【重要】ファイルごとにここを書き換えてください
+        const PAGE_CONFIG = {
+            catId: "d2", // 開く問題カテゴリ (d1_q1, d1_q2, d2, d3...)
+            allowedKeys: ["full_access", "d2"] // 閲覧可能な権限
+        };
+
+        // 閲覧権限チェック
+        (function() {
+            const status = localStorage.getItem('math_app_status');
+            if (!PAGE_CONFIG.allowedKeys.includes(status)) {
+                alert("このページへのアクセス権限がありません。メニューに戻ります。");
+                location.href = "index.html";
+            }
+        })();
+    </script>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f0f4f8; }
-        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .back-link { text-decoration: none; color: #007AFF; font-weight: bold; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .visualizer { background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center; min-height: 200px; display: flex; justify-content: center; align-items: center; border: 1px solid #eee; position: relative; overflow: hidden; }
-        .tile-grid { display: grid; gap: 4px; }
-        .tile { width: 30px; height: 30px; background: #007AFF; border-radius: 4px; }
-        .empty-tile { width: 30px; height: 30px; background: transparent; }
-        .match-container { position: relative; height: 100px; }
-        .match { position: absolute; background: #8B4513; border-radius: 2px; }
-        .match-h { width: 40px; height: 4px; }
-        .match-v { width: 4px; height: 40px; }
-        .calendar-table { border-collapse: collapse; font-size: 12px; }
-        .calendar-table td { border: 1px solid #ddd; width: 25px; height: 25px; text-align: center; }
-        .highlight { background: rgba(255, 149, 0, 0.3); border: 2px solid #FF9500 !important; font-weight: bold; }
-        .control-panel { margin: 20px 0; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 10px; }
-        input[type="range"] { width: 100%; }
-        .prob-box { font-size: 1.1em; line-height: 1.6; min-height: 80px; font-weight: bold; }
-        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #34C759; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        .ans-box { display: none; margin-top: 20px; padding: 15px; background: #fff9e6; border-radius: 10px; border: 2px solid #FF9500; }
+        body { font-family: sans-serif; background: #fdf6e3; color: #657b83; padding: 20px; max-width: 600px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 15px 0; display: none; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn-next { background: #268bd2; color: white; }
+        .btn-ans { background: #859900; color: white; }
+        .answer-area { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; }
+        .nav-link { display: block; text-align: center; color: #268bd2; text-decoration: none; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="nav-header">
-    <a href="index.html" class="back-link">← メニューに戻る</a>
-</div>
+    <div class="card">
+        <div id="q-text" style="font-size: 1.2rem; min-height: 80px;">読み込み中...</div>
+        <div id="jxgbox" class="jxgbox"></div>
 
-<div class="card">
-    <div id="question" class="prob-box">読み込み中...</div>
-    <div class="control-panel">
-        <label>図の段階 / 位置 ($n$): <span id="n-val" style="color:#007AFF;">1</span></label>
-        <input type="range" id="n-slider" min="1" max="15" value="1" oninput="updateVisualizer()">
+        <button id="show-ans-btn" class="btn btn-ans" onclick="showAnswer()">答え合わせ</button>
+
+        <div id="answer-area" class="answer-area">
+            <div style="color: #dc322f; font-weight: bold;">【正解】</div>
+            <div id="ans-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
+            <div style="color: #268bd2; font-weight: bold;">【解説】</div>
+            <div id="exp-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
+            <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
+        </div>
     </div>
-    <div class="visualizer" id="viz"></div>
-    <button class="action-btn" onclick="showAnswer()">答え合わせ</button>
-    <button class="action-btn" style="background:#8E8E93;" onclick="nextProblem()">次の問題</button>
-    <div id="ans-area" class="ans-box">
-        <div id="ans-text" style="font-weight:bold; color:#FF9500; font-size:1.2rem; margin-bottom:10px;"></div>
-        <div id="exp-text" style="font-size: 0.9rem; color:#555; line-height: 1.6;"></div>
-    </div>
-</div>
 
-<script>
-    const database = [
-        { type: "center-square", text: String.raw`中心のタイルから順に外側へ広げていくとき、$n$ 番目のタイルの総数を $n$ を用いて表しなさい。`, ans: String.raw`$2n^2 - 2n + 1$ 枚`, exp: String.raw`1番目: 1枚, 2番目: 5枚, 3番目: 13枚... と増えます。これは $n^2 + (n-1)^2$ と分解できます。` },
-        { type: "stick-tri", text: String.raw`正三角形を横に $n$ 個繋げて並べるとき、必要なマッチ棒の本数を $n$ を用いて表しなさい。`, ans: String.raw`$2n + 1$ 本`, exp: String.raw`1個目は3本、2個目以降は2本ずつ増えるので、$3 + 2(n-1) = 2n + 1$ となります。` },
-        { type: "L-tile", text: String.raw`1辺 $n$ 枚の正方形の角から、1辺 $n-1$ 枚の正方形を切り取ったとき、残ったタイルの枚数を $n$ で表せ。`, ans: String.raw`$2n - 1$ 枚`, exp: String.raw`$n^2 - (n-1)^2$ を計算すると $2n - 1$ になります。これは「縦1列($n$) + 横1列($n-1$)」と同じです。` },
-        { type: "pyramid", text: String.raw`1段目に1個、2段目に2個... と $n$ 段まで積み上げたブロックの総数を $n$ で表せ。`, ans: String.raw`$\frac{n(n+1)}{2}$ 個`, exp: String.raw`1から $n$ までの和の公式そのものです。` },
-        { type: "calendar-v", text: String.raw`カレンダーで縦に並んだ2つの数を囲む。上の数を $n$ とするとき、その2つの数の和を $n$ を用いて表しなさい。`, ans: String.raw`$2n + 7$`, exp: String.raw`上の数を $n$ とすると、下の数は1週間後なので $n+7$ です。和は $n + (n+7) = 2n + 7$ です。` },
-        { type: "calendar-3x3", text: String.raw`カレンダーで 3×3 の合計9つの数字を囲む。真ん中の数を $n$ とするとき、9つの数字の和を $n$ を用いて表しなさい。`, ans: String.raw`$9n$`, exp: String.raw`真ん中 $n$ に対して、全ての数の平均が $n$ になるため、$n \times 9 = 9n$ となります。` },
-        { type: "table-3", text: String.raw`横に連続して並ぶ3つの整数を囲む。真ん中の数を $n$ とするとき、これら3つの整数の和を $n$ を用いて表しなさい。`, ans: String.raw`$3n$`, exp: String.raw`3つの数は $n-1, n, n+1$ です。和は $(n-1) + n + (n+1) = 3n$ です。` },
-        { type: "calendar-diag", text: String.raw`カレンダーで、ある数 $n$ と、その右下の数を囲む。2つの数の和を $n$ を用いて表しなさい。`, ans: String.raw`$2n + 8$`, exp: String.raw`右下の数は $n+8$ です。和は $n + (n+8) = 2n + 8$ です。` },
-        { type: "calendar-cross", text: String.raw`ある数とその上下左右の計5つの数を十字に囲む。真ん中の数を $n$ とするとき、5つの数の和を $n$ を用いて表しなさい。`, ans: String.raw`$5n$`, exp: String.raw`$n + (n-1) + (n+1) + (n-7) + (n+7) = 5n$ となります。` },
-        { type: "stick-square", text: String.raw`正方形を横に $n$ 個繋げて並べるとき、必要なマッチ棒の本数を $n$ を用いて表しなさい。`, ans: String.raw`$3n + 1$ 本`, exp: String.raw`最初は4本、次は3本ずつ増えるので $4 + 3(n-1) = 3n + 1$ です。` }
-    ];
+    <a href="index.html" class="nav-link">← メニューに戻る</a>
 
-    let currentProb = null;
+    <script>
+        let currentProblem = null;
 
-    function nextProblem() {
-        // 1. 解放状況チェック
-        const isUnlocked = AuthManager.isUnlocked('daimon2_all'); 
+        function loadQuestion() {
+            document.getElementById('answer-area').style.display = 'none';
+            document.getElementById('show-ans-btn').style.display = 'block';
+            
+            const problems = MasterDatabase[PAGE_CONFIG.catId];
+            currentProblem = problems[Math.floor(Math.random() * problems.length)];
+            
+            document.getElementById('q-text').innerHTML = currentProblem.q;
+            document.getElementById('ans-text').innerHTML = currentProblem.a;
+            document.getElementById('exp-text').innerHTML = currentProblem.e || "解説はありません。";
 
-        let qIndex;
-        if (!isUnlocked) {
-            qIndex = 0; // お試しは最初の1問
-            const qBox = document.getElementById('question');
-            if(!document.getElementById('trial-msg')){
-                const msg = document.createElement('div');
-                msg.id = 'trial-msg';
-                msg.style = "color:#FF9500; font-size:0.8em; margin-bottom:5px; font-weight:bold;";
-                msg.innerText = "⚠️ お試しモード：最初の1問のみ学習可能です";
-                qBox.parentNode.insertBefore(msg, qBox);
+            if (window.MathJax) MathJax.typesetPromise();
+
+            const box = document.getElementById('jxgbox');
+            if (currentProblem.draw) {
+                box.style.display = 'block';
+                const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
+                currentProblem.draw(brd, false);
+            } else {
+                box.style.display = 'none';
             }
-        } else {
-            qIndex = Math.floor(Math.random() * database.length);
-            if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
         }
 
-        currentProb = database[qIndex];
-        document.getElementById('question').innerHTML = currentProb.text;
-        document.getElementById('ans-area').style.display = 'none';
-        
-        const slider = document.getElementById('n-slider');
-        if (currentProb.type.startsWith('calendar') || currentProb.type.startsWith('table')) {
-            slider.min = 8; slider.max = 20; slider.value = 11;
-        } else {
-            slider.min = 1; slider.max = 6; slider.value = 2;
+        function showAnswer() {
+            document.getElementById('answer-area').style.display = 'block';
+            document.getElementById('show-ans-btn').style.display = 'none';
         }
-        
-        updateVisualizer();
-        if(window.MathJax) MathJax.typesetPromise();
-    }
 
-
-    function updateVisualizer() {
-        const n = parseInt(document.getElementById('n-slider').value);
-        document.getElementById('n-val').innerText = n;
-        const viz = document.getElementById('viz');
-        viz.innerHTML = '';
-
-        if (currentProb.type === "center-square") {
-            const size = n * 2 - 1;
-            const grid = document.createElement('div');
-            grid.className = 'tile-grid';
-            grid.style.gridTemplateColumns = `repeat(${size}, 20px)`;
-            for (let r = 0; r < size; r++) {
-                for (let c = 0; c < size; c++) {
-                    const dist = Math.abs(r - (n-1)) + Math.abs(c - (n-1));
-                    const t = document.createElement('div');
-                    t.className = dist < n ? 'tile' : 'empty-tile';
-                    t.style.width = '20px'; t.style.height = '20px';
-                    grid.appendChild(t);
-                }
-            }
-            viz.appendChild(grid);
-        } else if (currentProb.type.startsWith("stick")) {
-            const container = document.createElement('div');
-            container.className = 'match-container';
-            for (let i = 0; i < n; i++) {
-                addMatch(container, i*40, 0, 'h');
-                addMatch(container, i*40, 40, 'h');
-                addMatch(container, i*40, 0, 'v');
-                if (i === n-1) addMatch(container, (i+1)*40, 0, 'v');
-            }
-            viz.appendChild(container);
-        } else if (currentProb.type.includes("calendar") || currentProb.type.includes("table")) {
-            const table = document.createElement('table');
-            table.className = 'calendar-table';
-            for (let r = 0; r < 5; r++) {
-                const tr = document.createElement('tr');
-                for (let c = 1; c <= 7; c++) {
-                    const val = r * 7 + c;
-                    const td = document.createElement('td');
-                    td.innerText = val;
-                    if (isHighlighted(val, n, currentProb.type)) td.className = 'highlight';
-                    tr.appendChild(td);
-                }
-                table.appendChild(tr);
-            }
-            viz.appendChild(table);
-        } else if (currentProb.type === "pyramid" || currentProb.type === "L-tile") {
-            const container = document.createElement('div');
-            for (let i = 1; i <= n; i++) {
-                const row = document.createElement('div');
-                for (let j = 0; j < (currentProb.type === "pyramid" ? i : n); j++) {
-                    const t = document.createElement('div');
-                    t.className = 'tile'; t.style.display = 'inline-block'; t.style.margin = '2px';
-                    if (currentProb.type === "L-tile" && i > 1 && j > 0) t.style.background = '#eee';
-                    row.appendChild(t);
-                }
-                container.appendChild(row);
-            }
-            viz.appendChild(container);
-        }
-    }
-
-    function isHighlighted(val, n, type) {
-        if (type === "calendar-v") return val === n || val === n + 7;
-        if (type === "calendar-3x3") return Math.abs(Math.floor((val-1)/7) - Math.floor((n-1)/7)) <= 1 && Math.abs((val-1)%7 - (n-1)%7) <= 1;
-        if (type === "table-3") return val === n || val === n-1 || val === n+1;
-        if (type === "calendar-diag") return val === n || val === n + 8;
-        if (type === "calendar-cross") return val === n || val === n-1 || val === n+1 || val === n-7 || val === n+7;
-        return false;
-    }
-
-    function addMatch(parent, x, y, dir) {
-        const m = document.createElement('div');
-        m.className = 'match ' + (dir === 'h' ? 'match-h' : 'match-v');
-        m.style.left = x + 'px'; m.style.top = y + 'px';
-        parent.appendChild(m);
-    }
-
-    function showAnswer() {
-        document.getElementById('ans-text').innerHTML = "正解：" + currentProb.ans;
-        document.getElementById('exp-text').innerHTML = "【解説】<br>" + currentProb.exp;
-        document.getElementById('ans-area').style.display = 'block';
-        MathJax.typesetPromise();
-    }
-
-    window.onload = nextProblem;
-</script>
+        window.onload = loadQuestion;
+    </script>
 </body>
 </html>
