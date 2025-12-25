@@ -96,20 +96,15 @@
             });
         }
 
+        // index.html の login 関数内
         function login() {
             const org = document.getElementById('org-input').value.trim();
             const key = document.getElementById('key-input').value.trim();
             
-            if (typeof AuthSystem === 'undefined') {
-                alert("システムエラー: 認証モジュールが見つかりません。");
-                return;
-            }
-
-            const status = AuthSystem.verify(key, org);
+            // AuthManager (auth.jsで定義したもの) を使う
+            const status = AuthManager.verify(key, org); 
                     
             if (status !== "DENIED") {
-                localStorage.setItem('math_app_status', status);
-                localStorage.setItem('math_app_org', org);
                 alert("認証に成功しました！");
                 document.getElementById('auth-section').style.display = 'none';
                 renderMenu();
@@ -118,13 +113,40 @@
             }
         }
 
+        function renderMenu() {
+            const menuArea = document.getElementById('menu-area');
+            menuArea.innerHTML = "";
+
+            menuItems.forEach(item => {
+                const btn = document.createElement('button');
+                // AuthManagerの判定機能を使う
+                const isUnlocked = AuthManager.isUnlocked(item.id);
+
+                btn.className = `menu-btn ${isUnlocked ? 'unlocked' : 'locked'}`;
+                btn.innerHTML = `${item.name} <span class="status-badge">${isUnlocked ? '開放中' : '🔒 ロック'}</span>`;
+                
+                btn.onclick = () => {
+                    if (isUnlocked) {
+                        location.href = item.link;
+                    } else {
+                        alert("この機能を開放するには対応するライセンスキーが必要です。");
+                    }
+                };
+                menuArea.appendChild(btn);
+            }); // ここでforEachを閉じる
+        } // ここでrenderMenuを閉じる
+
         window.onload = function() {
             const status = localStorage.getItem('math_app_status');
             if (status && status !== "DENIED") {
-                document.getElementById('auth-section').style.display = 'none';
+                const authSection = document.getElementById('auth-section');
+                if(authSection) authSection.style.display = 'none';
             }
             renderMenu();
-        }
+        };
     </script>
+</body>
+</html>
+
 </body>
 </html>
