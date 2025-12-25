@@ -7,12 +7,13 @@ const AuthManager = {
         // 1. マスターキー または オールインワン があれば全パス
         if (keys.includes('master_key') || keys.includes('all_in_one')) return true;
         
-        // 2. 指定されたキーそのものがあればパス
+        // 2. 指定されたキーそのもの(d1_q1など)があればパス
         if (keys.includes(key)) return true;
 
-        // 3. 大問ごとのセット（daimon1_all等）を持っている場合の特例
-        // 例: 'daimon1_q1' をチェック中、'daimon1_all' を持って入ればOK
-        if (key.startsWith('daimon1_') && keys.includes('daimon1_all')) return true;
+        // 3. 大問ごとのセット（d1_all等）を持っている場合の特例
+        // "d1_q1" をチェック中、"d1_all" を持っていればOKにする
+        const prefix = key.split('_')[0]; // "d1_q1" -> "d1"
+        if (keys.includes(prefix + '_all')) return true;
 
         return false;
     },
@@ -24,4 +25,3 @@ const AuthManager = {
         }
     }
 };
-
