@@ -1,9 +1,7 @@
-// 【認証システム：高度版】
+// 【認証システム：最終完全版】
 const AuthSystem = {
-    // 1. マスターキー（ご指定通り）
     masterKey: "MATHMASTER",
 
-    // 2. 団体キー生成ロジック（そのまま維持）
     generateOrgKey: function(orgName) {
         let hash = 0;
         for (let i = 0; i < orgName.length; i++) {
@@ -13,40 +11,33 @@ const AuthSystem = {
         return "ORG-" + Math.abs(hash).toString(16).toUpperCase();
     },
 
-    // 3. 個人用キー生成（権限を暗号化）
-    // 例: createUserKey("complete_package") -> "USR-Y29tcGxldGVfcGFja2FnZQ=="
+    // 個人キー生成（管理者ツールで使用）
     createUserKey: function(scope) {
-        // btoaは文字列をBase64エンコードするブラウザ標準関数
         return "USR-" + btoa(scope);
     },
 
-    // 4. キー照合
+    // キー照合
     verify: function(inputKey, orgName = "") {
-        // マスターキー判定
-        if (inputKey === this.masterKey) return "FULL_ACCESS";
+        if (inputKey === this.masterKey) return "full_access";
         
-        // 団体キー判定
         if (orgName) {
             const expected = this.generateOrgKey(orgName.toUpperCase());
-            if (inputKey === expected) return "ORG_ACCESS";
+            if (inputKey === expected) return "full_access"; // 団体は基本フルアクセス
         }
         
-        // 個人用キー判定 (USR-から始まる場合)
         if (inputKey.startsWith("USR-")) {
             try {
-                const encodedScope = inputKey.replace("USR-", "");
-                const scope = atob(encodedScope); // デコードして中身を確認
-                
-                // 許可する権限リスト
-                const validScopes = ["daimon1", "daimon1_1", "complete_package"];
-                if (validScopes.includes(scope)) {
-                    return scope; // 権限名をそのまま返す
-                }
-            } catch (e) {
-                return "DENIED";
-            }
+                const scope = atob(inputKey.replace("USR-", ""));
+                // 定義された権限リスト
+                const validScopes = [
+                    "d1_q1", "d1_q2", "d1_q3", "d1_q4", "d1_q5", 
+                    "d1_q6", "d1_q7", "d1_q8", "d1_q9", 
+                    "d1_all", "d2_only", "d3_only", "d4_only", "d5_only", 
+                    "full_access"
+                ];
+                if (validScopes.includes(scope)) return scope;
+            } catch (e) { return "DENIED"; }
         }
-        
         return "DENIED";
     }
 };
