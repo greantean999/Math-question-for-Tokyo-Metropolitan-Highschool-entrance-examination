@@ -35,86 +35,95 @@
             <button onclick="login()" style="width:100%; background:#268bd2; color:white; padding:15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">認証して全機能を開放</button>
         </div>
 
-        <div id="menu-area">
-            </div>
+        <div id="menu-area"></div>
 
         <a href="store.html" class="store-link">ストア・見積もりはこちら</a>
     </div>
 
-    <script src="problems_db.js"></script>
     <script>
-        // メニューの定義
-        const menuItems = [
-    { id: "full_access", name: "【総仕上げ】実戦模試・偏差値診断", link: "final_test.html" },
-    { id: "d1_all", name: "大問1 フルセット演習", link: "daimon1_1.html" }, // 最初のページへ
-    { id: "d1_q1", name: "大問1(1) 計算", link: "daimon1_1.html" },
-    { id: "d1_q2", name: "大問1(2) 平方根", link: "daimon1_2.html" },
-    { id: "d1_q3", name: "大問1(3) 方程式", link: "daimon1_3.html" },
-    { id: "d1_q4", name: "大問1(4) 連立方程式", link: "daimon1_4.html" },
-    { id: "d1_q5", name: "大問1(5) 二次方程式", link: "daimon1_5.html" },
-    { id: "d1_q6", name: "大問1(6) 関数基礎", link: "daimon1_6.html" },
-    { id: "d1_q7", name: "大問1(7) 角度", link: "daimon1_7.html" },
-    { id: "d1_q8", name: "大問1(8) 確率/統計", link: "daimon1_8.html" },
-    { id: "d1_q9", name: "大問1(9) 作図", link: "daimon1_9.html" },
-    { id: "d2_only", name: "大問2 規則性・証明", link: "daimon2.html" },
-    { id: "d3_only", name: "大問3 一次関数", link: "daimon3.html" },
-    { id: "d4_only", name: "大問4 平面図形", link: "daimon4.html" },
-    { id: "d5_only", name: "大問5 空間図形", link: "daimon5.html" }
-];
-
-function renderMenu() {
-    const menuArea = document.getElementById('menu-area');
-    const status = localStorage.getItem('math_app_status') || "DENIED";
-    menuArea.innerHTML = "";
-
-    menuItems.forEach(item => {
-        const btn = document.createElement('button');
-        
-        // 判定ロジック：
-        // 1. full_access なら全部OK
-        // 2. d1_all なら d1_q1 〜 d1_q9 が全部OK
-        // 3. アイテム固有のIDと一致すればOK
-        let isUnlocked = (status === "full_access");
-        if (status === "d1_all" && item.id.startsWith("d1_q")) isUnlocked = true;
-        if (status === item.id) isUnlocked = true;
-        if (status === "d1_all" && item.id === "d1_all") isUnlocked = true;
-
-        btn.className = `menu-btn ${isUnlocked ? 'unlocked' : 'locked'}`;
-        btn.innerHTML = `${item.name} <span class="status-badge">${isUnlocked ? '開放中' : '🔒 ロック'}</span>`;
-        
-        btn.onclick = () => {
-            if (isUnlocked) {
-                location.href = item.link;
-            } else {
-                alert("この機能を開放するには対応するライセンスキーが必要です。");
+        // --- 認証システム（ここが抜けていたため追加しました） ---
+        const AuthSystem = {
+            verify: function(key, org) {
+                // マスターキーの設定（自由に変更してください）
+                if (key === "1234") return "full_access";
+                if (key === "d1all") return "d1_all";
+                return "DENIED";
             }
         };
-        menuArea.appendChild(btn);
-    });
-}
 
-function login() {
-    const org = document.getElementById('org-input').value.trim();
-    const key = document.getElementById('key-input').value.trim();
-    const status = AuthSystem.verify(key, org);
+        const menuItems = [
+            { id: "full_access", name: "【総仕上げ】実戦模試・偏差値診断", link: "final_test.html" },
+            { id: "d1_all", name: "大問1 フルセット演習", link: "daimon1_1.html" },
+            { id: "d1_q1", name: "大問1(1) 計算", link: "daimon1_1.html" },
+            { id: "d1_q2", name: "大問1(2) 平方根", link: "daimon1_2.html" },
+            { id: "d1_q3", name: "大問1(3) 方程式", link: "daimon1_3.html" },
+            { id: "d1_q4", name: "大問1(4) 連立方程式", link: "daimon1_4.html" },
+            { id: "d1_q5", name: "大問1(5) 二次方程式", link: "daimon1_5.html" },
+            { id: "d1_q6", name: "大問1(6) 関数基礎", link: "daimon1_6.html" },
+            { id: "d1_q7", name: "大問1(7) 角度", link: "daimon1_7.html" },
+            { id: "d1_q8", name: "大問1(8) 確率/統計", link: "daimon1_8.html" },
+            { id: "d1_q9", name: "大問1(9) 作図", link: "daimon1_9.html" },
+            { id: "d2_only", name: "大問2 規則性・証明", link: "daimon2.html" },
+            { id: "d3_only", name: "大問3 一次関数", link: "daimon3.html" },
+            { id: "d4_only", name: "大問4 平面図形", link: "daimon4.html" },
+            { id: "d5_only", name: "大問5 空間図形", link: "daimon5.html" }
+        ];
+
+        function renderMenu() {
+            const menuArea = document.getElementById('menu-area');
+            const status = localStorage.getItem('math_app_status') || "DENIED";
+            menuArea.innerHTML = "";
+
+            menuItems.forEach(item => {
+                const btn = document.createElement('button');
+                let isUnlocked = (status === "full_access");
+                if (status === "d1_all" && item.id.startsWith("d1_q")) isUnlocked = true;
+                if (status === item.id) isUnlocked = true;
+                if (status === "d1_all" && item.id === "d1_all") isUnlocked = true;
+
+                btn.className = `menu-btn ${isUnlocked ? 'unlocked' : 'locked'}`;
+                btn.innerHTML = `${item.name} <span class="status-badge">${isUnlocked ? '開放中' : '🔒 ロック'}</span>`;
+                
+                btn.onclick = () => {
+                    if (isUnlocked) {
+                        location.href = item.link;
+                    } else {
+                        alert("この機能を開放するには対応するライセンスキーが必要です。");
+                    }
+                };
+                menuArea.appendChild(btn);
+            });
+        }
+
+        function login() {
+            const org = document.getElementById('org-input').value.trim();
+            const key = document.getElementById('key-input').value.trim();
             
-    if (status !== "DENIED") {
+            // AuthSystemが存在するかチェック
+            if (typeof AuthSystem === 'undefined') {
+                alert("システムエラー: 認証モジュールが見つかりません。");
+                return;
+            }
+
+            const status = AuthSystem.verify(key, org);
+                    
+            if (status !== "DENIED") {
                 localStorage.setItem('math_app_status', status);
                 localStorage.setItem('math_app_org', org);
                 alert("認証に成功しました！");
                 document.getElementById('auth-section').style.display = 'none';
-                renderMenu(); // メニューを再描画
-    } else {
+                renderMenu();
+            } else {
                 alert("キーが正しくありません。");
             }
         }
 
-    window.onload = function() {
-        const status = localStorage.getItem('math_app_status');
-        if (status && status !== "DENIED") {
-            document.getElementById('auth-section').style.display = 'none';
+        window.onload = function() {
+            const status = localStorage.getItem('math_app_status');
+            if (status && status !== "DENIED") {
+                document.getElementById('auth-section').style.display = 'none';
             }
-        renderMenu();
+            renderMenu();
         }
     </script>
 </body>
