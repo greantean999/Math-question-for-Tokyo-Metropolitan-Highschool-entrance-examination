@@ -16,12 +16,32 @@
 <body>
     <h1>教材ストア</h1>
 
-    <div class="card">
-        <h3>🔑 ライセンスキーを入力</h3>
-        <p>購入したキーを入力してください。</p>
-        <input type="text" id="license-key" placeholder="例：D1-SET">
-        <button class="action-btn" onclick="checkKey()">有効化する</button>
-    </div>
+   <div class="card">
+    <h2>ライセンスキー入力</h2>
+    <p style="font-size: 0.9em; color: #666;">購入したキーを入力してください。</p>
+    <input type="text" id="key-input" placeholder="例：D5-SET-XXXX" 
+           style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
+    <button onclick="applyKey()" class="action-btn">有効化する</button>
+    <div id="status-msg" style="margin-top: 10px; font-weight: bold;"></div>
+</div>
+
+<script>
+function applyKey() {
+    const key = document.getElementById('key-input').value;
+    const msg = document.getElementById('status-msg');
+    
+    if (AuthManager.activateKey(key)) {
+        msg.style.color = "#34C759";
+        msg.innerText = "✅ 成功！すべての機能が解放されました。";
+        // 3秒後にトップへ戻る
+        setTimeout(() => { location.href = "index.html"; }, 1500);
+    } else {
+        msg.style.color = "#FF3B30";
+        msg.innerText = "❌ 無効なキーです。";
+    }
+}
+</script>
+
 
     <div class="card" style="border-top-color: #859900;">
         <h3>塾・学校での団体利用</h3>
