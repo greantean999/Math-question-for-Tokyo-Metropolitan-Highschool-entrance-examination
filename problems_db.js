@@ -1,6 +1,7 @@
-// MasterDatabase の初期化
+// 1. MasterDatabase の初期化（これがないと Object.assign が失敗します）
 const MasterDatabase = {};
 
+// 2. データのマージ
 Object.assign(MasterDatabase, {
     // 大問1(1) 正負の数・文字式
     d1_q1: [
