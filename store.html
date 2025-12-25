@@ -39,6 +39,62 @@
 
     <div class="card" style="border-top-color: #666;">
         <h3>対象パッケージ</h3>
+        <div style="background: #eee8d5; padding: 20px; border-radius: 12px; margin-top: 20px;">
+    <h3 style="margin-top:0;">法人・団体様用 見積シミュレーター</h3>
+    
+    <label>1. パックを選択してください：</label><br>
+    <select id="pack-select" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <option value="300">パック(1)〜(9)：大問1 個別 (各300円)</option>
+        <option value="2000">パック(10)：大問1 フルセット (2,000円)</option>
+        <option value="500">パック(11)〜(14)：大問2〜5 個別 (各500円)</option>
+        <option value="3500">パック(15)：全問オールインワン (3,500円)</option>
+    </select>
+
+    <label>2. 利用生徒数を入力：</label><br>
+    <input type="number" id="student-count" value="10" min="1" 
+           style="width: 100px; padding: 10px; margin: 10px 0; border-radius: 5px;"> 名
+
+    <hr style="border: 0; border-top: 1px solid #93a1a1;">
+
+    <div style="text-align: right; font-weight: bold;">
+        <p>1名あたりの単価: <span id="unit-price">¥300</span></p>
+        <p style="font-size: 1.2rem; color: #d33682;">
+            推定合計金額: <span id="total-price">¥3,000</span>
+        </p>
+    </div>
+    
+    <button onclick="requestQuote()" style="width: 100%; background: #268bd2; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer;">
+        この内容で利用を申し込む（窓口へ）
+    </button>
+</div>
+
+<script>
+    const packSelect = document.getElementById('pack-select');
+    const studentInput = document.getElementById('student-count');
+    const unitDisplay = document.getElementById('unit-price');
+    const totalDisplay = document.getElementById('total-price');
+
+    function calculate() {
+        const unit = parseInt(packSelect.value);
+        const count = parseInt(studentInput.value) || 0;
+        const total = unit * count;
+
+        unitDisplay.innerText = `¥${unit.toLocaleString()}`;
+        totalDisplay.innerText = `¥${total.toLocaleString()}`;
+    }
+
+    packSelect.onchange = calculate;
+    studentInput.oninput = calculate;
+
+    function requestQuote() {
+        const packName = packSelect.options[packSelect.selectedIndex].text;
+        const count = studentInput.value;
+        const total = totalDisplay.innerText;
+        
+        alert(`【お申し込み内容の確認】\n内容：${packName}\n人数：${count}名\n合計：${total}\n\nこの内容で事務局へメールを作成します。`);
+        // 実際にはここでmailto:などを飛ばすとスマートです
+    }
+</script>
         <div class="pkg-list">
     <p style="color:#d33682; font-weight:bold; margin-bottom:10px;">★全(1)〜(9) 合計100問以上の圧倒的問題数！</p>
     ・大問1：(1)〜(9) 各300円<br>
