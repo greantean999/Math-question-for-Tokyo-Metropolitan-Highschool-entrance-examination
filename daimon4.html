@@ -1,205 +1,91 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <script src="auth.js"></script>
     <meta charset="UTF-8">
-    <title>都立数学特訓 - 大問4 平面図形</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>都立数学特訓 - 演習</title>
     <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
-    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="problems_db.js"></script>
+    <script>
+        // 【重要】ファイルごとにここを書き換えてください
+        const PAGE_CONFIG = {
+            catId: "d4", // 開く問題カテゴリ (d1_q1, d1_q2, d2, d3...)
+            allowedKeys: ["full_access", "d4_only"] // 閲覧可能な権限
+        };
+
+        // 閲覧権限チェック
+        (function() {
+            const status = localStorage.getItem('math_app_status');
+            if (!PAGE_CONFIG.allowedKeys.includes(status)) {
+                alert("このページへのアクセス権限がありません。メニューに戻ります。");
+                location.href = "index.html";
+            }
+        })();
+    </script>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 10px; background: #fff5f5; }
-        .back-link { text-decoration: none; color: #FF3B30; font-weight: bold; margin-bottom: 15px; display: inline-block; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 6px solid #FF3B30; }
-        #prob-text { font-size: 1.1em; line-height: 1.6; margin: 10px 0; min-height: 60px; font-weight: bold; }
-        .jxgbox { width: 100%; height: 350px; margin: 15px 0; border-radius: 10px; background: white; }
-        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #FF3B30; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
-        .ans-box { display: none; margin-top: 15px; padding: 15px; background: #fff0f0; border-radius: 10px; border: 2px solid #FF3B30; }
-        .hint-badge { display: inline-block; background: #FF9500; color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8em; margin-bottom: 5px; }
+        body { font-family: sans-serif; background: #fdf6e3; color: #657b83; padding: 20px; max-width: 600px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        #jxgbox { width: 100%; height: 300px; border-radius: 10px; margin: 15px 0; display: none; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn-next { background: #268bd2; color: white; }
+        .btn-ans { background: #859900; color: white; }
+        .answer-area { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; }
+        .nav-link { display: block; text-align: center; color: #268bd2; text-decoration: none; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<a href="index.html" class="back-link">← メニューに戻る</a>
+    <div class="card">
+        <div id="q-text" style="font-size: 1.2rem; min-height: 80px;">読み込み中...</div>
+        <div id="jxgbox" class="jxgbox"></div>
 
-<div class="card">
-    <div class="hint-badge">図の点を動かして考えてみよう！</div>
-    <div id="prob-text">問題読み込み中...</div>
-    <div id="jxgbox" class="jxgbox"></div>
-    <button id="show-btn" class="action-btn" onclick="showAnswer()">答え合わせ</button>
-    <button class="action-btn" style="background:#8E8E93;" onclick="loadProblem()">次の問題</button>
-    
-    <div id="ans-area" class="ans-box">
-        <div id="ans" style="font-weight:bold; font-size:1.3em; color:#FF3B30; border-bottom:1px solid #ccc; padding-bottom:5px;"></div>
-        <div id="exp" style="font-size: 0.95em; color: #444; line-height: 1.7; margin-top: 10px;"></div>
+        <button id="show-ans-btn" class="btn btn-ans" onclick="showAnswer()">答え合わせ</button>
+
+        <div id="answer-area" class="answer-area">
+            <div style="color: #dc322f; font-weight: bold;">【正解】</div>
+            <div id="ans-text" style="font-size: 1.3rem; margin: 10px 0;"></div>
+            <div style="color: #268bd2; font-weight: bold;">【解説】</div>
+            <div id="exp-text" style="font-size: 0.9rem; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;"></div>
+            <button class="btn btn-next" onclick="loadQuestion()">次の問題へ</button>
+        </div>
     </div>
-</div>
 
-<script>
-let board = null;
+    <a href="index.html" class="nav-link">← メニューに戻る</a>
 
-const database = [
-    {
-        text: String.raw`円Oの周上に3点A, B, Cがあり、$\angle BOC = 80^{\circ}$ です。$\angle BAC$ の大きさを求めなさい。`,
-        ans: String.raw`$40^{\circ}$`,
-        exp: String.raw`円周角の定理より、同じ弧に対する円周角は中心角の半分です。$80 \div 2 = 40^{\circ}$。`,
-        draw: (brd) => {
-            let o = brd.create('point', [0,0], {name:'O', fixed:true});
-            let b = brd.create('point', [3,0], {name:'B', fixed:true});
-            let c = brd.create('point', [3*Math.cos(80*Math.PI/180), 3*Math.sin(80*Math.PI/180)], {name:'C', fixed:true});
-            let c1 = brd.create('circle', [o, 3], {strokeColor:'#ccc'});
-            let a = brd.create('glider', [-2, 2.2, c1], {name:'A'});
-            brd.create('polygon', [o, b, c], {fillColor:'#FF3B30', fillOpacity:0.1});
-            brd.create('segment', [a, b]); brd.create('segment', [a, c]);
-        }
-    },
-    {
-        text: String.raw`平行な2直線 $l, m$ の間に折れ線があります。$\angle x$ の大きさを求めなさい。`,
-        ans: String.raw`$60^{\circ}$`,
-        exp: String.raw`折れ曲がった点を通る平行な補助線を引くと、錯角により $25^{\circ} + 35^{\circ} = 60^{\circ}$ となります。`,
-        draw: (brd) => {
-            brd.create('line', [[-3,2], [3,2]], {name:'l', withLabel:true, fixed:true});
-            brd.create('line', [[-3,-2], [3,-2]], {name:'m', withLabel:true, fixed:true});
-            brd.create('segment', [[-1.5,2], [1,0]]); 
-            brd.create('segment', [[1,0], [-1.5,-2]]); // 修正：カッコを閉じました
-            brd.create('text', [-0.8, 1.6, "25°"]); brd.create('text', [-0.8, -1.6, "35°"]);
-            brd.create('text', [0.3, 0, "x"]);
-        }
-    },
-    {
-        text: String.raw`線分ABを直径とする円Oがあります。円周上の点Cに対し、$\angle ABC = 55^{\circ}$ のとき、$\angle BAC$ を求めなさい。`,
-        ans: String.raw`$35^{\circ}$`,
-        exp: String.raw`直径に対する円周角は $90^{\circ}$ です。$\angle BAC = 180 - (90 + 55) = 35^{\circ}$。`,
-        draw: (brd) => {
-            let o = brd.create('point', [0,0], {name:'O', fixed:true});
-            brd.create('circle', [o, 3], {strokeColor:'#ccc'});
-            let a = brd.create('point', [-3,0], {name:'A', fixed:true});
-            let b = brd.create('point', [3,0], {name:'B', fixed:true});
-            let c = brd.create('point', [3*Math.cos(110*Math.PI/180), 3*Math.sin(110*Math.PI/180)], {name:'C', fixed:true});
-            brd.create('polygon', [a, b, c], {fillColor:'blue', fillOpacity:0.1});
-        }
-    },
-    {
-        text: String.raw`正五角形ABCDEの1つの内角の大きさを求めなさい。`,
-        ans: String.raw`$108^{\circ}$`,
-        exp: String.raw`多角形の内角の和は $180 \times (n-2)$。正五角形は $180 \times 3 \div 5 = 108^{\circ}$。`,
-        draw: (brd) => {
-            brd.create('regularpolygon', [[-1,-1.5], [1,-1.5], 5], {name:'ABCDE'});
-        }
-    },
-    {
-        text: String.raw`$\triangle ABC$ で、辺BCに平行な直線 $DE$ が辺AB, ACと交わっています。$AD=4, DB=2, AE=6$ のとき、$EC$ の長さを求めなさい。`,
-        ans: String.raw`$3$`,
-        exp: String.raw`平行線と線分の比より、$AD:DB = AE:EC$ です。$4:2 = 6:x \Rightarrow 4x = 12 \Rightarrow x = 3$。`,
-        draw: (brd) => {
-            let a = brd.create('point', [0,2], {name:'A'});
-            let b = brd.create('point', [-2,-2], {name:'B'});
-            let c = brd.create('point', [2,-2], {name:'C'});
-            brd.create('polygon', [a,b,c]);
-            brd.create('segment', [[-0.66, 0.66], [0.66, 0.66]], {name:'DE', color:'red', withLabel:true});
-        }
-    },
-    {
-        text: String.raw`円周上に4点A, B, C, Dがあります。$\angle ABD = 30^{\circ}$ のとき、$\angle ACD$ の大きさを求めなさい。`,
-        ans: String.raw`$30^{\circ}$`,
-        exp: String.raw`円周角の定理より、同じ弧ADに対する円周角は等しくなります。`,
-        draw: (brd) => {
-            let o = brd.create('point', [0,0], {visible:false});
-            let c1 = brd.create('circle', [o, 3], {strokeColor:'#ccc'});
-            let a = brd.create('point', [-1, 2.8], {name:'A'});
-            let d = brd.create('point', [1, 2.8], {name:'D'});
-            let b = brd.create('point', [-2.5, -1.6], {name:'B'});
-            let c = brd.create('point', [2.5, -1.6], {name:'C'});
-            brd.create('segment', [b,a]); brd.create('segment', [b,d]);
-            brd.create('segment', [c,a]); brd.create('segment', [c,d]);
-        }
-    },
-    {
-        text: String.raw`$\triangle ABC$ と $\triangle DEF$ が相似で、相似比が $2:3$ のとき、面積の比を求めなさい。`,
-        ans: String.raw`$4:9$`,
-        exp: String.raw`面積の比は、相似比の2乗になります。$2^2:3^2 = 4:9$。`,
-        draw: (brd) => {
-            brd.create('polygon', [[-3,0], [-1,0], [-2,1.5]], {name:'ABC'});
-            brd.create('polygon', [[0,0], [3,0], [1.5, 2.25]], {name:'DEF'});
-        }
-    },
-    {
-        text: String.raw`長方形ABCDの対角線の交点をOとします。$\angle AOB = 60^{\circ}$ のとき、$\angle OAB$ の大きさを求めなさい。`,
-        ans: String.raw`$60^{\circ}$`,
-        exp: String.raw`長方形の対角線は等しく、中点で交わるので $OA=OB$。$\triangle OAB$ は二等辺三角形で、頂角 $60^{\circ}$ なので正三角形になります。`,
-        draw: (brd) => {
-            brd.create('polygon', [[-2,1], [2,1], [2,-1], [-2,-1]]);
-            brd.create('segment', [[-2,1], [2,-1]], {dash:1}); 
-            brd.create('segment', [[2,1], [-2,-1]], {dash:1});
-            brd.create('text', [-0.2, 0.2, "60°"]);
-        }
-    },
-    {
-        text: String.raw`円Oの外にある点Pから引いた2本の接線の接点をA, Bとします。$\angle APB = 50^{\circ}$ のとき、中心角 $\angle AOB$ を求めなさい。`,
-        ans: String.raw`$130^{\circ}$`,
-        exp: String.raw`接線と半径は垂直なので、四角形OAPBの内角の和 $360^{\circ}$ から引くと、$360 - (90+90+50) = 130^{\circ}$。`,
-        draw: (brd) => {
-            let o = brd.create('point', [0,0], {name:'O'});
-            brd.create('circle', [o, 2]);
-            let p = brd.create('point', [4,0], {name:'P'});
-            brd.create('segment', [[1.2, 1.6], [4,0]]); 
-            brd.create('segment', [[1.2, -1.6], [4,0]]);
-        }
-    },
-    {
-        text: String.raw`△ABCの辺AB, ACの中点をそれぞれD, Eとします。$BC=10$ のとき、$DE$ の長さを求めなさい。`,
-        ans: String.raw`$5$`,
-        exp: String.raw`中点連結定理より、$DE = \frac{1}{2}BC$ です。$10 \div 2 = 5$。`,
-        draw: (brd) => {
-            let a = brd.create('point', [0,2], {name:'A'});
-            let b = brd.create('point', [-3,-1], {name:'B'});
-            let c = brd.create('point', [3,-1], {name:'C'});
-            brd.create('polygon', [a,b,c]);
-            brd.create('segment', [[-1.5, 0.5], [1.5, 0.5]], {name:'DE', color:'red', strokeWidth:3});
-        }
-    }
-];
+    <script>
+        let currentProblem = null;
 
-function loadProblem() {
-    // 1. 解放状況チェック
-    const isUnlocked = AuthManager.isUnlocked('daimon4_all'); 
+        function loadQuestion() {
+            document.getElementById('answer-area').style.display = 'none';
+            document.getElementById('show-ans-btn').style.display = 'block';
+            
+            const problems = MasterDatabase[PAGE_CONFIG.catId];
+            currentProblem = problems[Math.floor(Math.random() * problems.length)];
+            
+            document.getElementById('q-text').innerHTML = currentProblem.q;
+            document.getElementById('ans-text').innerHTML = currentProblem.a;
+            document.getElementById('exp-text').innerHTML = currentProblem.e || "解説はありません。";
 
-    let qIndex;
-    if (!isUnlocked) {
-        qIndex = 0;
-        const probText = document.getElementById('prob-text');
-        if(!document.getElementById('trial-msg')){
-            const msg = document.createElement('div');
-            msg.id = 'trial-msg';
-            msg.style = "color:orange; font-size:0.8em; margin-bottom:5px;";
-            msg.innerText = "⚠️ お試しモード：最初の1問のみ学習可能です";
-            probText.parentNode.insertBefore(msg, probText);
+            if (window.MathJax) MathJax.typesetPromise();
+
+            const box = document.getElementById('jxgbox');
+            if (currentProblem.draw) {
+                box.style.display = 'block';
+                const brd = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: false, showCopyright: false});
+                currentProblem.draw(brd, false);
+            } else {
+                box.style.display = 'none';
+            }
         }
-    } else {
-        qIndex = Math.floor(Math.random() * database.length);
-        if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
-    }
 
-    const q = database[qIndex];
-    document.getElementById('prob-text').innerHTML = q.text;
-    document.getElementById('ans').innerHTML = "正解：" + q.ans;
-    document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
-    document.getElementById('ans-area').style.display = 'none';
-    
-    if(board) JXG.JSXGraph.freeBoard(board);
-    board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-4, 4, 4, -4], axis:false, showCopyright:false});
-    q.draw(board);
-    
-    if(window.MathJax) MathJax.typesetPromise();
-}
+        function showAnswer() {
+            document.getElementById('answer-area').style.display = 'block';
+            document.getElementById('show-ans-btn').style.display = 'none';
+        }
 
-
-function showAnswer() {
-    document.getElementById('ans-area').style.display = 'block';
-}
-
-window.onload = loadProblem;
-</script>
+        window.onload = loadQuestion;
+    </script>
 </body>
 </html>
