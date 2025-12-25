@@ -67,6 +67,46 @@
     let currentProb = null;
 
     function nextProblem() {
+        // 1. 大問2の解放状況をチェック
+        const isUnlocked = AuthManager.isUnlocked('daimon2_all'); 
+
+        // 2. 問題の選定
+        if (!isUnlocked) {
+            // 未購入なら最初の1問（center-square）に固定
+            currentProb = database[0];
+            
+            // お試し通知を出す
+            const qBox = document.getElementById('question');
+            if(!document.getElementById('trial-msg')){
+                const msg = document.createElement('div');
+                msg.id = 'trial-msg';
+                msg.style = "color:#FF9500; font-size:0.8em; margin-bottom:5px; font-weight:bold;";
+                msg.innerText = "⚠️ お試しモード：最初の1問のみ学習可能です";
+                qBox.parentNode.insertBefore(msg, qBox);
+            }
+        } else {
+            // 購入済みならランダムに選ぶ
+            currentProb = database[Math.floor(Math.random() * database.length)];
+            // 通知があれば消す
+            if(document.getElementById('trial-msg')) document.getElementById('trial-msg').remove();
+        }
+
+        // 3. 表示の更新
+        document.getElementById('question').innerHTML = currentProb.text;
+        document.getElementById('ans-area').style.display = 'none';
+        
+        // スライダーの範囲調整
+        const slider = document.getElementById('n-slider');
+        if (currentProb.type.startsWith('calendar') || currentProb.type.startsWith('table')) {
+            slider.min = 8; slider.max = 20; slider.value = 11;
+        } else {
+            slider.min = 1; slider.max = 6; slider.value = 2;
+        }
+        
+        updateVisualizer();
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
         currentProb = database[Math.floor(Math.random() * database.length)];
         document.getElementById('question').innerHTML = currentProb.text;
         document.getElementById('ans-area').style.display = 'none';
