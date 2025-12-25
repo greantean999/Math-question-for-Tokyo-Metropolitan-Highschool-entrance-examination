@@ -41,14 +41,23 @@
     </div>
 
     <script>
-    // メニュー項目
+    // 全メニュー項目（大問1〜5を網羅）
     const menuItems = [
-        { id: "full_access", name: "【総仕上げ】実戦模試", link: "final_test.html" },
+        { id: "full_access", name: "【総仕上げ】実戦模試・偏差値診断", link: "final_test.html" },
         { id: "d1_all", name: "大問1 フルセット演習", link: "practice.html?cat=d1_q1" },
         { id: "d1_q1", name: "大問1(1) 計算", link: "practice.html?cat=d1_q1" },
         { id: "d1_q2", name: "大問1(2) 平方根", link: "practice.html?cat=d1_q2" },
-        { id: "d1_q3", name: "大問1(3) 方程式", link: "practice.html?cat=d1_q3" }
-        // ... (以下、必要に応じて追加してください)
+        { id: "d1_q3", name: "大問1(3) 一次方程式", link: "practice.html?cat=d1_q3" },
+        { id: "d1_q4", name: "大問1(4) 連立方程式", link: "practice.html?cat=d1_q4" },
+        { id: "d1_q5", name: "大問1(5) 二次方程式", link: "practice.html?cat=d1_q5" },
+        { id: "d1_q6", name: "大問1(6) 関数基礎", link: "practice.html?cat=d1_q6" },
+        { id: "d1_q7", name: "大問1(7) 角度・図形性質", link: "practice.html?cat=d1_q7" },
+        { id: "d1_q8", name: "大問1(8) 確率・統計", link: "practice.html?cat=d1_q8" },
+        { id: "d1_q9", name: "大問1(9) 作図", link: "practice.html?cat=d1_q9" },
+        { id: "d2_only", name: "大問2 規則性・文字式利用", link: "practice.html?cat=d2" },
+        { id: "d3_only", name: "大問3 一次関数", link: "practice.html?cat=d3" },
+        { id: "d4_only", name: "大問4 平面図形", link: "practice.html?cat=d4" },
+        { id: "d5_only", name: "大問5 空間図形", link: "practice.html?cat=d5" }
     ];
 
     // ログイン実行
@@ -56,7 +65,12 @@
         const org = document.getElementById('org-input').value.trim();
         const key = document.getElementById('key-input').value.trim();
         
-        // 名前を AuthManager に統一
+        // auth.jsで定義した AuthManager を使用
+        if (typeof AuthManager === 'undefined') {
+            alert("エラー: auth.js が読み込まれていません。");
+            return;
+        }
+
         const status = AuthManager.verify(key, org); 
                 
         if (status !== "DENIED") {
@@ -79,7 +93,10 @@
             const isUnlocked = AuthManager.isUnlocked(item.id);
 
             btn.className = `menu-btn ${isUnlocked ? 'unlocked' : 'locked'}`;
-            btn.innerHTML = `${item.name} <span class="status-badge">${isUnlocked ? '開放中' : '🔒 ロック'}</span>`;
+            btn.innerHTML = `
+                ${item.name} 
+                <span class="status-badge">${isUnlocked ? '開放中' : '🔒 ロック'}</span>
+            `;
             
             btn.onclick = () => {
                 if (isUnlocked) {
@@ -94,6 +111,7 @@
 
     // 起動時の処理
     window.onload = function() {
+        // localStorageから直接取得して表示を切り替え
         const status = localStorage.getItem('math_app_status');
         if (status && status !== "DENIED") {
             const authSection = document.getElementById('auth-section');
@@ -102,6 +120,7 @@
         renderMenu();
     };
 </script>
+
     
 </body>
 </html>
