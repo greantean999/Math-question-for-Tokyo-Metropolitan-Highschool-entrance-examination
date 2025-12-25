@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <script src="auth.js"></script>
+    <meta charset="UTF-8">
+    <title>【限定特典】都立数学 総仕上げ模試</title>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <style>
+        body { font-family: sans-serif; max-width: 650px; margin: auto; padding: 20px; background: #eee8d5; }
+        .test-container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .progress-bar { width: 100%; height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #859900; width: 0%; transition: 0.3s; }
+        .prob-header { font-weight: bold; color: #586e75; border-bottom: 2px solid #859900; margin-bottom: 15px; }
+        .prob-content { min-height: 120px; font-size: 1.2rem; margin-bottom: 20px; }
+        #jxgbox { width: 100%; height: 300px; display: none; margin-bottom: 20px; border: 1px solid #ccc; }
+        .action-area { display: flex; flex-direction: column; gap: 10px; }
+        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-ans { background: #268bd2; color: white; }
+        .btn-next { background: #859900; color: white; display: none; }
+        .result-box { display: none; text-align: center; }
+        .score { font-size: 3rem; color: #d33682; font-weight: bold; }
+        .miss-list { text-align: left; background: #fdf6e3; padding: 15px; border-radius: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <div id="test-ui">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <div id="prob-header" class="prob-header">問題 1 / 13</div>
+        <div id="prob-content" class="prob-content"></div>
+        <div id="jxgbox" class="jxgbox"></div>
+        
+        <div class="action-area">
+            <button id="show-ans-btn" class="btn btn-ans" onclick="revealAnswer()">自分の答え合わせをする</button>
+            <div id="ans-check" style="display:none; text-align:center;">
+                <p id="ans-display" style="font-size:1.5rem; color:#d33682; font-weight:bold;"></p>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" style="flex:1; background:#cb4b16; color:white;" onclick="recordResult(false)">間違えた...</button>
+                    <button class="btn" style="flex:1; background:#859900; color:white;" onclick="recordResult(true)">正解！</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-ui" class="result-box">
+        <h2>試験終了！</h2>
+        <div class="score" id="final-score">0 / 13</div>
+        <div id="judge-msg" style="font-size:1.2rem; margin:10px 0;"></div>
+        <div class="miss-list" id="weak-points">
+            <strong>復習が必要なジャンル:</strong>
+            <ul id="weak-list"></ul>
+        </div>
+        <button class="btn btn-ans" style="margin-top:20px;" onclick="location.reload()">もう一度受ける</button>
+        <button class="btn" style="margin-top:10px; background:#586e75; color:white;" onclick="location.href='index.html'">メニューに戻る</button>
+    </div>
+</div>
+
+<script>
+// 各大問からランダムに1問抽出するための関数
+const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// ここに今まで作った各ページのdatabaseから1問ずつ集約します
+// (実際の実装ではここに各データベースの中身をコピペします)
+const testSuite = [
+    { title: "大問1(1) 正負・文字式", ...database1_1[0] }, // 仮置き。実際はランダム抽出
+    { title: "大問1(2) 平方根", ...database1_2[0] },
+    // ... 大問1(9)まで続く
+    { title: "大問2 規則性/証明", ...database2[0] },
+    { title: "大問3 関数グラフ", ...database3[0] },
+    { title: "大問4 平面図形", ...database4[0] },
+    { title: "大問5 空間図形", ...database5[0] }
+];
+
+// ※実際にはここに全てのdatabase変数を定義する必要があります
+
+let currentIndex = 0;
+let correctCount = 0;
+let weaknesses = [];
+
+function loadProblem() {
+    const prob = testSuite[currentIndex];
+    document.getElementById('prob-header').innerText = `問題 ${currentIndex + 1} / 13 [${prob.title}]`;
+    document.getElementById('prob-content').innerHTML = prob.text || prob.q; // databaseによってプロパティ名が違うので調整
+    
+    // 図形がある場合
+    const boardElem = document.getElementById('jxgbox');
+    if (prob.draw) {
+        boardElem.style.display = 'block';
+        const board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis:false, showCopyright:false});
+        prob.draw(board);
+    } else {
+        boardElem.style.display = 'none';
+    }
+
+    document.getElementById('progress-fill').style.width = `${(currentIndex / 13) * 100}%`;
+    if(window.MathJax) MathJax.typesetPromise();
+}
+
+function revealAnswer() {
+    document.getElementById('show-ans-btn').style.display = 'none';
+    document.getElementById('ans-check').style.display = 'block';
+    const prob = testSuite[currentIndex];
+    document.getElementById('ans-display').innerHTML = "正解: " + (prob.ans || prob.a);
+}
+
+function recordResult(isCorrect) {
+    if (isCorrect) {
+        correctCount++;
+    } else {
+        weaknesses.push(testSuite[currentIndex].title);
+    }
+
+    currentIndex++;
+    if (currentIndex < 13) {
+        document.getElementById('show-ans-btn').style.display = 'block';
+        document.getElementById('ans-check').style.display = 'none';
+        loadProblem();
+    } else {
+        showFinalResult();
+    }
+}
+
+function showFinalResult() {
+    document.getElementById('test-ui').style.display = 'none';
+    document.getElementById('result-ui').style.display = 'block';
+    document.getElementById('final-score').innerText = `${correctCount} / 13`;
+    
+    let msg = "";
+    if(correctCount === 13) msg = "完璧です！合格間違いなし！";
+    else if(correctCount >= 10) msg = "素晴らしい！あと一歩で満点です。";
+    else if(correctCount >= 7) msg = "合格圏内ですが、ケアレスミスに注意。";
+    else msg = "基礎をもう一度復習しましょう。";
+    document.getElementById('judge-msg').innerText = msg;
+
+    const list = document.getElementById('weak-list');
+    weaknesses.forEach(w => {
+        const li = document.createElement('li');
+        li.innerText = w;
+        list.appendChild(li);
+    });
+}
+</script>
+</body>
+</html>
