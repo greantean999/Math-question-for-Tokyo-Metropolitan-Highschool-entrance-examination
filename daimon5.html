@@ -174,22 +174,26 @@ const database = [
 
 function loadProblem() {
     try {
+        // 問題の選定
         const q = database[Math.floor(Math.random() * database.length)];
+        
+        // テキスト等の更新
         document.getElementById('prob-text').innerHTML = q.text;
         document.getElementById('ans').innerHTML = "正解：" + q.ans;
         document.getElementById('exp').innerHTML = "【解説】<br>" + q.exp;
         document.getElementById('ans-area').style.display = 'none';
         
+        // ボードの初期化
         if(board) JXG.JSXGraph.freeBoard(board);
-        
         board = JXG.JSXGraph.initBoard('jxgbox', {
             boundingbox: [-5, 5, 5, -5], 
-            keepaspectratio: false, 
+            keepaspectratio: true, // 歪まないようにtrueに変更
             axis: false, 
             showCopyright: false,
             pan: { enabled: false } 
         });
 
+        // 3Dビューの作成
         let view = board.create('view3d', 
             [[-3, -1], [6, 6], [[-4, 4], [-4, 4], [-4, 4]]], 
             {
@@ -200,12 +204,16 @@ function loadProblem() {
             }
         );
         
-        q.draw(view);
-        board.fullUpdate(); 
+        // 【重要】3Dエンジンの準備を待つために、描画処理をわずかに遅らせる
+        setTimeout(() => {
+            q.draw(view);
+            board.fullUpdate(); // 再描画を強制
+        }, 50); // 50ミリ秒のウェイト
+
         if(window.MathJax) MathJax.typesetPromise();
     } catch (e) {
-        console.error(e);
-        document.getElementById('prob-text').innerHTML = "エラーが発生しました。コンソールを確認してください。";
+        console.error("描画エラー:", e);
+        document.getElementById('prob-text').innerHTML = "エラーが発生しました。リロードしてください。";
     }
 }
 
