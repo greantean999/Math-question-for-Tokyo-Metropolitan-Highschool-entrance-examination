@@ -42,7 +42,17 @@ const MasterDatabase = {
     // 大問1(3)
     d1_q3: [
         { q: String.raw`$9x - 4 = 5(x + 4)$`, a: String.raw`$x = 6$`, e: String.raw`$9x - 4 = 5x + 20$ より $4x = 24$` },
-        // ...10問コピペ
+        { q: String.raw`$9x - 4 = 5(x + 4)$`, a: String.raw`$x = 6$`, e: String.raw`$9x - 4 = 5x + 20$<br>$4x = 24$<br>$x = 6$` },
+        { q: String.raw`$x + 7 = 3(x + 1)$`, a: String.raw`$x = 2$`, e: String.raw`$x + 7 = 3x + 3$<br>$-2x = -4$<br>$x = 2$` },
+        { q: String.raw`$\frac{x + 5}{4} = \frac{2x - 1}{3}$`, a: String.raw`$x = 3.8$ (または $\frac{19}{5}$)`, e: String.raw`両辺を12倍して：<br>$3(x + 5) = 4(2x - 1)$<br>$3x + 15 = 8x - 4$<br>$-5x = -19$<br>$x = \frac{19}{5}$` },
+        { q: String.raw`$0.1x + 0.4 = 0.2x - 0.5$`, a: String.raw`$x = 9$`, e: String.raw`両辺を10倍して：<br>$x + 4 = 2x - 5$<br>$-x = -9$<br>$x = 9$` },
+        { q: String.raw`$\frac{x-1}{2} - \frac{x+2}{3} = 1$`, a: String.raw`$x = 13$`, e: String.raw`両辺を6倍して：<br>$3(x - 1) - 2(x + 2) = 6$<br>$3x - 3 - 2x - 4 = 6$<br>$x - 7 = 6$<br>$x = 13$` },
+        { q: String.raw`$4x - 7 = x + 8$`, a: String.raw`$x = 5$`, e: String.raw`$3x = 15$<br>$x = 5$` },
+        { q: String.raw`$2(3x - 1) = 4x + 10$`, a: String.raw`$x = 6$`, e: String.raw`$6x - 2 = 4x + 10$<br>$2x = 12$<br>$x = 6$` },
+        { q: String.raw`$x - \frac{x-3}{2} = 4$`, a: String.raw`$x = 5$`, e: String.raw`両辺を2倍して：<br>$2x - (x - 3) = 8$<br>$2x - x + 3 = 8$<br>$x = 5$` },
+        { q: String.raw`$7x + 3 = 9x - 5$`, a: String.raw`$x = 4$`, e: String.raw`$-2x = -8$<br>$x = 4$` },
+        { q: String.raw`$3(2x + 1) - 5 = x + 3$`, a: String.raw`$x = 1$`, e: String.raw`$6x + 3 - 5 = x + 3$<br>$5x = 5$<br>$x = 1$` }
+
     ],
     // 同様に d1_q4 〜 d5 まで作成
 };
