@@ -45,71 +45,75 @@
         <a href="index.html" class="btn-home">メニューに戻る</a>
     </div>
 
-    <script>
+    <script src="auth.js"></script>
+<script src="problems_db.js"></script>
+
+<script>
+    // window.onload ではなく、DOMContentLoaded を使うことで確実にデータを待つ
+    document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
         const catId = params.get('cat') || 'd1_q1';
-        let currentProblem = null;
-        let board = null;
+        
+        // 1. 権限チェック
+        if (typeof AuthManager !== 'undefined' && !AuthManager.isUnlocked(catId)) {
+            alert("この分野のアクセス権限がありません。");
+            window.location.href = "index.html";
+            return;
+        }
 
-        function loadQuestion() {
-            // 1. 認証チェック (AuthManagerを使用)
-            if (typeof AuthManager !== 'undefined' && !AuthManager.isUnlocked(catId)) {
-                alert("この分野のアクセス権限がありません。");
-                location.href = "index.html";
-                return;
-            }
-
-            // 2. データ存在チェック
-            if (typeof MasterDatabase === 'undefined' || !MasterDatabase[catId]) {
-                document.getElementById('question-text').innerText = "問題データが見つかりません。(" + catId + ")";
-                document.getElementById('app-container').style.visibility = 'visible';
-                return;
-            }
-
-            // 表示リセット
-            document.getElementById('answer-area').style.display = 'none';
-            document.getElementById('show-ans-btn').style.display = 'block';
-            
-            // 図形の初期化
-            if (board) { JXG.JSXGraph.freeBoard(board); }
-
-            const problems = MasterDatabase[catId];
-            currentProblem = problems[Math.floor(Math.random() * problems.length)];
-            
-            // テキスト反映
-            document.getElementById('question-text').innerHTML = currentProblem.q;
-            document.getElementById('answer-text').innerHTML = currentProblem.a;
-            document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
-
-            // MathJax描画
-            if (window.MathJax) MathJax.typesetPromise();
-
-            // 図形描画判定
-            const box = document.getElementById('jxgbox');
-            if (currentProblem.draw) {
-                box.style.display = 'block';
-                board = JXG.JSXGraph.initBoard('jxgbox', {
-                    boundingbox: [-5, 5, 5, -5], 
-                    axis: true, 
-                    showCopyright: false,
-                    showNavigation: false
-                });
-                currentProblem.draw(board);
-            } else {
-                box.style.display = 'none';
-            }
-            
-            // 全て完了したら表示
+        // 2. データの存在チェック
+        if (typeof MasterDatabase === 'undefined' || !MasterDatabase[catId]) {
+            console.error("Database Error: ", catId);
+            document.getElementById('question-text').innerText = "エラー：問題データ(" + catId + ")が見つかりません。";
             document.getElementById('app-container').style.visibility = 'visible';
+            return;
         }
 
-        function showAnswer() {
-            document.getElementById('answer-area').style.display = 'block';
-            document.getElementById('show-ans-btn').style.display = 'none';
+        // 3. 読み込み実行
+        loadQuestion();
+    });
+
+    let currentProblem = null;
+    let board = null;
+
+    function loadQuestion() {
+        const params = new URLSearchParams(window.location.search);
+        const catId = params.get('cat') || 'd1_q1';
+        
+        const problems = MasterDatabase[catId];
+        currentProblem = problems[Math.floor(Math.random() * problems.length)];
+        
+        // 表示のリセット
+        document.getElementById('answer-area').style.display = 'none';
+        document.getElementById('show-ans-btn').style.display = 'block';
+        if (board) { JXG.JSXGraph.freeBoard(board); }
+
+        // テキスト反映
+        document.getElementById('question-text').innerHTML = currentProblem.q;
+        document.getElementById('answer-text').innerHTML = currentProblem.a;
+        document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
+
+        // 数式描画
+        if (window.MathJax) MathJax.typesetPromise();
+
+        // 図形描画
+        const box = document.getElementById('jxgbox');
+        if (currentProblem.draw) {
+            box.style.display = 'block';
+            board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: true, showCopyright: false});
+            currentProblem.draw(board);
+        } else {
+            box.style.display = 'none';
         }
 
-        // ページ読み込み時に実行
-        window.onload = loadQuestion;
-    </script>
+        document.getElementById('app-container').style.visibility = 'visible';
+    }
+
+    function showAnswer() {
+        document.getElementById('answer-area').style.display = 'block';
+        document.getElementById('show-ans-btn').style.display = 'none';
+    }
+</script>
+
 </body>
 </html>
