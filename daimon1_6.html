@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <script src="auth.js"></script>
+    <meta charset="UTF-8">
+    <title>都立数学特訓 - 大問1(6) 関数(基本)</title>
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #fdf6e3; }
+        .back-link { text-decoration: none; color: #268bd2; font-weight: bold; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .prob-text { font-size: 1.4rem; margin: 30px 0; min-height: 80px; color: #073642; line-height: 1.6; text-align: left; }
+        .action-btn { width: 100%; padding: 15px; font-size: 18px; border-radius: 12px; border: none; background: #268bd2; color: white; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .ans-box { display: none; margin-top: 20px; padding: 20px; background: #eee8d5; border-radius: 10px; border: 2px solid #268bd2; }
+        .step { text-align: left; font-size: 0.9rem; color: #555; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<a href="daimon1.html" class="back-link">← 大問1メニューへ</a>
+
+<div class="card">
+    <div id="prob-text" class="prob-text">読み込み中...</div>
+    <button class="action-btn" onclick="showAnswer()">答えを表示</button>
+    <button class="action-btn" style="background:#859900;" onclick="nextProblem()">次の問題</button>
+
+    <div id="ans-area" class="ans-box">
+        <div id="ans-text" style="font-size: 1.4rem; font-weight: bold; color: #d33682; margin-bottom: 10px;"></div>
+        <div id="exp-text" class="step"></div>
+    </div>
+</div>
+
+<script>
+    const database = [
+        { 
+            q: String.raw`関数 $y = 2x^2$ について、$x$ の値が $1$ から $3$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$8$`, 
+            e: String.raw`$x=1$ のとき $y=2$、$x=3$ のとき $y=18$。 <br>変化の割合 $= \frac{18 - 2}{3 - 1} = \frac{16}{2} = 8$。<br>※裏技：$2(1 + 3) = 8$ でも求められます。` 
+        },
+        { 
+            q: String.raw`関数 $y = \frac{1}{2}x^2$ について、$x$ の変域が $-4 \leqq x \leqq 2$ のとき、$y$ の変域を求めなさい。`, 
+            a: String.raw`$0 \leqq y \leqq 8$`, 
+            e: String.raw`$x=0$ をまたぐので、最小値は必ず $0$ です。<br>$x=-4$ のとき $y=8$、$x=2$ のとき $y=2$。よって $0 \leqq y \leqq 8$。` 
+        },
+        { 
+            q: String.raw`関数 $y = ax^2$ について、$x=3$ のとき $y=18$ である。$a$ の値を求めなさい。`, 
+            a: String.raw`$a = 2$`, 
+            e: String.raw`$18 = a \times 3^2$ <br> $18 = 9a$ <br> $a = 2$` 
+        },
+        { 
+            q: String.raw`一次関数 $y = -2x + 5$ について、$x$ の変域が $-1 \leqq x \leqq 3$ のとき、$y$ の変域を求めなさい。`, 
+            a: String.raw`$-1 \leqq y \leqq 7$`, 
+            e: String.raw`$x=-1$ のとき $y = -2(-1) + 5 = 7$ <br> $x=3$ のとき $y = -2(3) + 5 = -1$ <br> 小さい順に並べて $-1 \leqq y \leqq 7$。` 
+        },
+        { 
+            q: String.raw`関数 $y = \frac{12}{x}$ について、$x=3$ のときの $y$ の値を求めなさい。`, 
+            a: String.raw`$y = 4$`, 
+            e: String.raw`$y = 12 \div 3 = 4$` 
+        },
+        { 
+            q: String.raw`関数 $y = -x^2$ について、$x$ の値が $-3$ から $-1$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$4$`, 
+            e: String.raw`$x=-3$ のとき $y=-9$、$x=-1$ のとき $y=-1$。<br>変化の割合 $= \frac{-1 - (-9)}{-1 - (-3)} = \frac{8}{2} = 4$。` 
+        },
+        { 
+            q: String.raw`関数 $y = ax^2$ において、$x$ の変域が $-2 \leqq x \leqq 3$ のときの $y$ の最大値が $18$ である。$a$ の値を求めなさい。`, 
+            a: String.raw`$a = 2$`, 
+            e: String.raw`最大値が正なので、グラフは上に開いている ($a>0$)。原点を通るので、最大値は端点のどちらか。 <br>$x=3$ のときの方が遠いので、$18 = a \times 3^2$ より $a=2$。` 
+        }
+    ];
+
+    let currentProb = null;
+
+    function nextProblem() {
+        const isUnlocked = AuthManager.isUnlocked('daimon1_q6');
+        let qIndex = isUnlocked ? Math.floor(Math.random() * database.length) : 0;
+
+        currentProb = database[qIndex];
+        document.getElementById('prob-text').innerHTML = currentProb.q;
+        document.getElementById('ans-area').style.display = 'none';
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    function showAnswer() {
+        document.getElementById('ans-text').innerHTML = currentProb.a;
+        document.getElementById('exp-text').innerHTML = "【解説】<br>" + currentProb.e;
+        document.getElementById('ans-area').style.display = 'block';
+        if(window.MathJax) MathJax.typesetPromise();
+    }
+
+    window.onload = nextProblem;
+</script>
+</body>
+</html>
