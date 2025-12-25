@@ -49,6 +49,35 @@
 <script src="problems_db.js"></script>
 
 <script>
+    // iPadでエラーを画面に表示するためのデバッグ用設定
+    window.onerror = function(msg, url, line) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style = "position:fixed; top:0; left:0; width:100%; background:rgba(255,0,0,0.9); color:white; padding:10px; z-index:10000; font-size:12px;";
+        errorDiv.innerText = "エラー検出: " + msg + "\n場所: " + url + "\n行: " + line;
+        document.body.appendChild(errorDiv);
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // MasterDatabaseが読み込まれているかチェック
+        if (typeof MasterDatabase === 'undefined') {
+            alert("problems_db.js が読み込めていません。ファイル名や場所を確認してください。");
+            return;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const catId = params.get('cat') || 'd1_q1';
+        
+        // データの存在チェック
+        if (!MasterDatabase[catId]) {
+            alert("カテゴリ [" + catId + "] のデータが MasterDatabase 内に見つかりません。");
+            return;
+        }
+
+        loadQuestion();
+    });
+
+    // --- 以下、既存の loadQuestion 関数などを貼り付け ---
+
     // window.onload ではなく、DOMContentLoaded を使うことで確実にデータを待つ
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
