@@ -1,34 +1,56 @@
-// 【認証システム】
+// 【認証システム：高度版】
 const AuthSystem = {
-    // 1. マスターキー（例: admin2025）
-    masterKey: "GEMINI_PASS_2025",
+    // 1. マスターキー（ご指定通り）
+    masterKey: "MATHMASTER",
 
-    // 2. 団体キー生成ロジック (簡易ハッシュ)
-    // 団体名から特定の数値を生成してキーを作る
+    // 2. 団体キー生成ロジック（そのまま維持）
     generateOrgKey: function(orgName) {
         let hash = 0;
         for (let i = 0; i < orgName.length; i++) {
             hash = ((hash << 5) - hash) + orgName.charCodeAt(i);
-            hash |= 0; // 32bit整数に変換
+            hash |= 0;
         }
         return "ORG-" + Math.abs(hash).toString(16).toUpperCase();
     },
 
-    // 3. キー照合
+    // 3. 個人用キー生成（権限を暗号化）
+    // 例: createUserKey("complete_package") -> "USR-Y29tcGxldGVfcGFja2FnZQ=="
+    createUserKey: function(scope) {
+        // btoaは文字列をBase64エンコードするブラウザ標準関数
+        return "USR-" + btoa(scope);
+    },
+
+    // 4. キー照合
     verify: function(inputKey, orgName = "") {
+        // マスターキー判定
         if (inputKey === this.masterKey) return "FULL_ACCESS";
         
+        // 団体キー判定
         if (orgName) {
             const expected = this.generateOrgKey(orgName.toUpperCase());
             if (inputKey === expected) return "ORG_ACCESS";
         }
         
-        // 個人用キーの例（簡易的に固定値。本来はDB照合）
-        if (inputKey === "USER-PREMIUM-777") return "FULL_ACCESS";
+        // 個人用キー判定 (USR-から始まる場合)
+        if (inputKey.startsWith("USR-")) {
+            try {
+                const encodedScope = inputKey.replace("USR-", "");
+                const scope = atob(encodedScope); // デコードして中身を確認
+                
+                // 許可する権限リスト
+                const validScopes = ["daimon1", "daimon1_1", "complete_package"];
+                if (validScopes.includes(scope)) {
+                    return scope; // 権限名をそのまま返す
+                }
+            } catch (e) {
+                return "DENIED";
+            }
+        }
         
         return "DENIED";
     }
 };
+
 // problems_db.js
 // 【第0ブロック】大問1(1)〜(3)
 const MasterDatabase = {}; // 最初に一度だけ宣言
