@@ -105,37 +105,55 @@
     let board = null;
 
     function loadQuestion() {
-        const params = new URLSearchParams(window.location.search);
-        const catId = params.get('cat') || 'd1_q1';
-        
-        const problems = MasterDatabase[catId];
-        currentProblem = problems[Math.floor(Math.random() * problems.length)];
-        
-        // 表示のリセット
-        document.getElementById('answer-area').style.display = 'none';
-        document.getElementById('show-ans-btn').style.display = 'block';
-        if (board) { JXG.JSXGraph.freeBoard(board); }
-
-        // テキスト反映
-        document.getElementById('question-text').innerHTML = currentProblem.q;
-        document.getElementById('answer-text').innerHTML = currentProblem.a;
-        document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
-
-        // 数式描画
-        if (window.MathJax) MathJax.typesetPromise();
-
-        // 図形描画
-        const box = document.getElementById('jxgbox');
-        if (currentProblem.draw) {
-            box.style.display = 'block';
-            board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: true, showCopyright: false});
-            currentProblem.draw(board);
-        } else {
-            box.style.display = 'none';
-        }
-
-        document.getElementById('app-container').style.visibility = 'visible';
+    const params = new URLSearchParams(window.location.search);
+    const catId = params.get('cat') || 'd1_q1';
+    
+    // データの取得
+    const problems = MasterDatabase[catId];
+    if (!problems || problems.length === 0) {
+        document.getElementById('question-text').innerText = "問題データが見つかりません。";
+        return;
     }
+
+    currentProblem = problems[Math.floor(Math.random() * problems.length)];
+    
+    // 表示のリセット
+    document.getElementById('answer-area').style.display = 'none';
+    document.getElementById('show-ans-btn').style.display = 'block';
+
+    // テキスト反映
+    document.getElementById('question-text').innerHTML = currentProblem.q;
+    document.getElementById('answer-text').innerHTML = currentProblem.a;
+    document.getElementById('explanation-text').innerHTML = currentProblem.e || "解説はありません。";
+
+    // 数式描画 (MathJax)
+    if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+    }
+
+    // --- 図形描画（ここがエラーの原因になりやすいため保護します） ---
+    const box = document.getElementById('jxgbox');
+    if (currentProblem.draw && typeof JXG !== 'undefined') {
+        try {
+            box.style.display = 'block';
+            if (board) { JXG.JSXGraph.freeBoard(board); }
+            board = JXG.JSXGraph.initBoard('jxgbox', {
+                boundingbox: [-5, 5, 5, -5], 
+                axis: true, 
+                showCopyright: false,
+                pan: {enabled: false}, // iPadでの誤動作防止
+                zoom: {enabled: false}
+            });
+            currentProblem.draw(board);
+        } catch (e) {
+            console.log("Draw Error: ", e);
+            box.innerText = "（図形の読み込みに失敗しました）";
+        }
+    } else {
+        if (box) box.style.display = 'none';
+    }
+}
+
 
     function showAnswer() {
         document.getElementById('answer-area').style.display = 'block';
