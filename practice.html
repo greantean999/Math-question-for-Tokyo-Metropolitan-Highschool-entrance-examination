@@ -15,8 +15,18 @@
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
     <script>
+    // パスワードチェック（セッション中1回だけ）
+    if (!sessionStorage.getItem('auth')) {
+        const pass = prompt("パスワードを入力してください");
+        if (pass === "1234") { // ここに好きなパスワード
+            sessionStorage.setItem('auth', 'true');
+        } else {
+            alert("パスワードが違います");
+            location.href = "about:blank";
+        }
+    }
+
         let MasterDatabase = {
             "d1_q1": [
                 { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
@@ -506,16 +516,6 @@
             box.style.display = 'none';
         }
     }
-
-    // 起動時にパスワードを確認
-    window.onload = function() {
-        const pw = prompt("パスワードを入力してください");
-        if (pw === "1234") { // ここにパスワードを設定
-            loadQuestion();
-        } else {
-            alert("パスワードが違います");
-            document.body.innerHTML = "<h1>アクセス権限がありません</h1>";
-        }
     };
 
     function showAnswer() {
