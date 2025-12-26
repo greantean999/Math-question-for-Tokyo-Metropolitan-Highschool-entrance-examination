@@ -3,71 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>実力判定テスト - Final Test</title>
+    <title>実力判定テスト</title>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #007bff; }
-        .test-progress { text-align: center; margin-bottom: 20px; font-weight: bold; color: #666; }
-        .question-block { display: none; } /* 1問ずつ表示 */
-        .question-block.active { display: block; }
-        .media-box { text-align: center; margin: 15px 0; min-height: 200px; display: flex; justify-content: center; align-items: center; background: #fafafa; }
-        img { max-width: 100%; height: auto; max-height: 300px; border-radius: 8px; }
+        /* スタイルは先ほどと同じなので中略しますが、メニューボタン用に追加 */
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 25px; border-radius: 15px; }
+        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; cursor: pointer; font-size: 1.1rem; margin-top: 10px; }
+        .btn-blue { background: #007bff; color: white; }
+        .btn-gray { background: #6c757d; color: white; }
+        .media-box { text-align: center; margin: 15px 0; background: #fafafa; min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        img { max-width: 100%; height: auto; }
         iframe { width: 100%; height: 350px; border: none; }
-        .input-area { margin-top: 20px; text-align: center; }
-        .ans-input { padding: 10px; width: 80%; font-size: 1.1rem; border: 2px solid #ddd; border-radius: 5px; margin-bottom: 10px; }
-        .btn { width: 100%; padding: 15px; font-size: 1.1rem; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .btn-primary { background: #007bff; color: white; }
-        /* 結果表示 */
-        #result-screen { display: none; text-align: center; }
-        .score-big { font-size: 3rem; color: #d9534f; font-weight: bold; }
-        .deviation-box { font-size: 1.5rem; color: #333; margin: 20px 0; padding: 15px; background: #e9ecef; border-radius: 10px; }
-        .advice-text { text-align: left; background: #fff; border-left: 5px solid #007bff; padding: 15px; margin-top: 20px; line-height: 1.6; }
+        #result-screen, #judge-screen { display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="test-screen">
-        <h1 id="cat-title">実力判定テスト</h1>
-        <div class="test-progress">第 <span id="current-q-num">1</span> / 13 問</div>
-        
-        <div id="question-area">
-            <div id="q-text" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
-            <div class="media-box" id="media-box">
-                <img id="test-img" style="display:none;">
-                <iframe id="test-embed" style="display:none;"></iframe>
-            </div>
+        <h2 style="text-align:center;">実力判定テスト</h2>
+        <div style="text-align:center; color:#666;">第 <span id="current-q-num">1</span> / 13 問</div>
+        <div id="q-text" style="margin:20px 0; font-size:1.1rem;"></div>
+        <div class="media-box">
+            <img id="test-img" style="display:none;">
+            <iframe id="test-embed" style="display:none;"></iframe>
         </div>
-
-        <div class="input-area">
-            <p>※ 自己採点形式です。答えを頭に浮かべてから進んでください。</p>
-            <button class="btn btn-primary" onclick="showJudge()">答え合わせをする</button>
-        </div>
+        <button class="btn btn-blue" onclick="showJudge()">答え合わせをする</button>
     </div>
 
-    <div id="judge-screen" style="display:none; text-align: center;">
-        <h3>正解と解説</h3>
-        <div id="correct-ans" style="font-size: 1.5rem; color: #d9534f; margin-bottom: 10px;"></div>
-        <div id="expl-text" style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-        <p>正解できましたか？</p>
-        <button class="btn" style="background:#28a745; color:white; margin-bottom:10px;" onclick="nextQuestion(true)">正解！</button>
-        <button class="btn" style="background:#6c757d; color:white;" onclick="nextQuestion(false)">不正解...</button>
+    <div id="judge-screen">
+        <h3 style="color:#d9534f; text-align:center;">正解：<span id="correct-ans"></span></h3>
+        <div id="expl-text" style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:20px;"></div>
+        <button class="btn" style="background:#28a745; color:white;" onclick="nextQuestion(true)">正解！</button>
+        <button class="btn btn-gray" onclick="nextQuestion(false)">不正解...</button>
     </div>
 
-    <div id="result-screen">
-        <h1>テスト結果</h1>
-        <div class="score-big"><span id="final-score">0</span> / 13</div>
-        <div class="deviation-box">推定偏差値: <span id="deviation-value">--</span></div>
-        <div id="advice-box" class="advice-text"></div>
-        <button class="btn btn-primary" style="margin-top:20px;" onclick="location.reload()">もう一度挑戦</button>
+    <div id="result-screen" style="text-align:center;">
+        <h2>テスト結果</h2>
+        <div style="font-size:3rem; color:#d9534f; font-weight:bold;"><span id="final-score">0</span> / 13</div>
+        <div style="background:#e9ecef; padding:15px; border-radius:10px; margin:20px 0; font-size:1.3rem;">
+            推定偏差値: <span id="deviation-value">--</span>
+        </div>
+        <div id="advice-box" style="text-align:left; border-left:5px solid #007bff; padding-left:15px;"></div>
+        <button class="btn btn-blue" onclick="location.reload()">もう一度挑戦</button>
+        <button class="btn btn-gray" onclick="location.href='index.html'">メニューに戻る</button>
     </div>
 </div>
 
 <script>
-// MasterDatabase は別途貼り付け
-let MasterDatabase = {
+// --- ここに MasterDatabase を貼り付け ---
+const MasterDatabase = {
     "d1_q1": [
                 { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
                 { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
@@ -720,7 +706,7 @@ let MasterDatabase = {
             embed: "https://www.geogebra.org/material/iframe/id/xpjmrydd/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
         }
     ]
-}; 
+};
 
 const categories = ["d1_q1", "d1_q2", "d1_q3", "d1_q4", "d1_q5", "d1_q6", "d1_q7", "d1_q8", "d1_q9", "d2", "d3", "d4", "d5"];
 let currentIdx = 0;
@@ -728,9 +714,8 @@ let correctCount = 0;
 let testQuestions = [];
 
 function setupTest() {
-    // 各カテゴリーからランダムに1問選出
     testQuestions = categories.map(cat => {
-        const pool = MasterDatabase[cat];
+        const pool = MasterDatabase[cat] || [{q:"データ不足", a:"-", e:"-"}];
         return pool[Math.floor(Math.random() * pool.length)];
     });
     displayQuestion();
@@ -740,21 +725,12 @@ function displayQuestion() {
     const q = testQuestions[currentIdx];
     document.getElementById('current-q-num').innerText = currentIdx + 1;
     document.getElementById('q-text').innerHTML = q.q;
-    
     const img = document.getElementById('test-img');
     const embed = document.getElementById('test-embed');
-    img.style.display = 'none';
-    embed.style.display = 'none';
-
-    if (q.img) {
-        img.src = q.img;
-        img.style.display = 'block';
-    } else if (q.embed) {
-        embed.src = q.embed;
-        embed.style.display = 'block';
-    }
-
-    MathJax.typesetPromise();
+    img.style.display = 'none'; embed.style.display = 'none';
+    if (q.img) { img.src = q.img; img.style.display = 'block'; }
+    else if (q.embed) { embed.src = q.embed; embed.style.display = 'block'; }
+    if(window.MathJax) MathJax.typesetPromise();
 }
 
 function showJudge() {
@@ -763,19 +739,13 @@ function showJudge() {
     document.getElementById('judge-screen').style.display = 'block';
     document.getElementById('correct-ans').innerHTML = q.a;
     document.getElementById('expl-text').innerHTML = q.e;
-    
-    // 作図問題の解説画像差し替え
-    if (q.imgA) {
-        document.getElementById('test-img').src = q.imgA;
-    }
-    
-    MathJax.typesetPromise();
+    if (q.imgA) document.getElementById('test-img').src = q.imgA;
+    if(window.MathJax) MathJax.typesetPromise();
 }
 
 function nextQuestion(isCorrect) {
     if (isCorrect) correctCount++;
     currentIdx++;
-
     if (currentIdx < testQuestions.length) {
         document.getElementById('judge-screen').style.display = 'none';
         document.getElementById('test-screen').style.display = 'block';
@@ -789,20 +759,9 @@ function showResult() {
     document.getElementById('judge-screen').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
     document.getElementById('final-score').innerText = correctCount;
-
-    // 偏差値計算ロジック（簡易版）
     const dev = 35 + (correctCount * 2.7);
     document.getElementById('deviation-value').innerText = dev.toFixed(1);
-
-    // アドバイス
-    let advice = "";
-    if (correctCount <= 4) {
-        advice = "<strong>【基礎固めが必要です】</strong><br>まずは公式の確認から始めましょう。教科書の例題を繰り返し解くことで、偏差値50への道が開けます。";
-    } else if (correctCount <= 9) {
-        advice = "<strong>【標準的な実力です】</strong><br>基本的な問題は解けています。計算ミスを減らし、苦手な図形や関数を克服することで、さらに上位を目指せます。";
-    } else {
-        advice = "<strong>【素晴らしい実力です！】</strong><br>応用問題にも対応できる力がついています。ケアレスミスに注意しつつ、より難易度の高い問題に挑戦して自信を深めましょう。";
-    }
+    let advice = correctCount <= 4 ? "基礎固めを！" : (correctCount <= 9 ? "標準レベルです。" : "素晴らしい！");
     document.getElementById('advice-box').innerHTML = advice;
 }
 
