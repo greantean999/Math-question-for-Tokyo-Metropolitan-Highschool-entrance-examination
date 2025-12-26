@@ -64,7 +64,7 @@
     let score = 0;
     let testData = [];
     let wrongCategories = [];
-    const MasterDatabase = {
+    let MasterDatabase = {
             "d1_q1": [
                 { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
                 { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
@@ -196,7 +196,7 @@
                 { q: String.raw`ある箱の中に白球が多数入っている。黒球を $50$ 個入れて混ぜた後、$40$ 個取り出すと黒球が $2$ 個あった。白球は約何個か。`, a: "約 950 個", e: String.raw`$50 : x = 2 : 40 \to 2x = 2000 \to x=1000$。黒を引いて $950$。` },
                 { q: String.raw`トランプ $52$ 枚から $1$ 枚引くとき、絵札（J,Q,K）が出る確率。`, a: String.raw`$\frac{3}{13}$`, e: String.raw`$12/52 = 3/13$` },
                 { q: String.raw`$A,B,C$ の $3$ 人でリレーの走る順番を決める方法は何通りか。`, a: "6 通り", e: String.raw`$3 \times 2 \times 1 = 6$` },
-                { q: String.raw`くじが $10$ 本あり、$3$ 本が当たり。同時に $2$ 本引いて少なくとも $1$ 本当たる確率。`, a: String.raw`$\frac{8}{15}$`, e: String.raw`余事象（$2$ 本ともハズレ）は \${}_7\mathrm{C}_2 / {}_{10}\mathrm{C}_2 = 21/45 = 7/15$。$1 - 7/15 = 8/15$。` },
+                { q: String.raw`くじが $10$ 本あり、$3$ 本が当たり。同時に $2$ 本引いて少なくとも $1$ 本当たる確率。`, a: String.raw`$\frac{8}{15}$`, e: String.raw`余事象（$2$ 本ともハズレ）は \${}_7\mathrm{C}_2 / \${}_{10}\mathrm{C}_2 = 21/45 = 7/15$。$1 - 7/15 = 8/15$。` },
                 { q: String.raw`サイコロを振り、$1$ または $6$ の目が出る確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`$2/6 = 1/3$` },
                 { q: String.raw`袋に $1,2,3,4$ の数字が書かれた玉。元に戻さず $2$ 回引くとき、和が $5$ になる確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`全 $12$ 通り. 和が $5$ は $(1,4),(4,1),(2,3),(3,2)$ の $4$ 通り。` },
                 { q: String.raw`中央値（メジアン）の意味。`, a: "資料を大きさ順に並べた時の中央の値", e: "データが偶数個の場合は中央の2つの平均。" },
@@ -258,17 +258,99 @@
                 { q: String.raw`辺の長さが $3, 4, 5$ の三角形はどのような三角形か。`, a: "直角三角形", e: String.raw`$3^2 + 4^2 = 5^2$ が成り立つ（三平方の逆）。` }
             ],
             "d5": [
-                { q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, a: String.raw`$12\pi\text{cm}^3$`, e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, draw: (brd) => { brd.create('ellipse', [[0,-2], 3, 0.8]); brd.create('polyline', [[-3,-2],[0,3],[3,-2]]); } },
-                { q: String.raw`1辺 $6\text{cm}$ の立方体の対角線の長さ。`, a: String.raw`$6\sqrt{3}\text{cm}$`, e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。` },
-                { q: String.raw`半径 $3\text{cm}$ の球の表面積。`, a: String.raw`$36\pi\text{cm}^2$`, e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。` },
-                { q: String.raw`半径 $3\text{cm}$ の球の体積。`, a: String.raw`$36\pi\text{cm}^3$`, e: String.raw`公式 $\frac{4}{3}\pi r^3$ より $\frac{4}{3} \times \pi \times 27 = 36\pi$。` },
-                { q: String.raw`底面が 1辺 $4\text{cm}$ の正方形で、高さが $6\text{cm}$ の正四角錐の体積。`, a: String.raw`$32\text{cm}^3$`, e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。` },
-                { q: String.raw`底面の半径 $2\text{cm}$, 高さ $5\text{cm}$ の円柱の側面積。`, a: String.raw`$20\pi\text{cm}^2$`, e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。` },
-                { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
-                { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
-                { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
-                { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
-            ]
+    { 
+        q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
+        a: String.raw`$12\pi\text{cm}^3$`, 
+        e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
+        draw: (brd) => { 
+            brd.setAttribute({axis:false}); // 軸を隠す
+            // 底面の楕円
+            brd.create('ellipse', [[0,-2], [3,-2], [0,-1.2]], {strokeColor:'black', fillOpacity:0.1});
+            // 側面
+            brd.create('polyline', [[-3,-2], [0,3], [3,-2]], {strokeColor:'black'});
+            // 高さの点線
+            brd.create('segment', [[0,3], [0,-2]], {dash:2, strokeColor:'gray'});
+            brd.create('segment', [[0,-2], [3,-2]], {dash:2, strokeColor:'gray'});
+            brd.create('text', [0.2, 0.5, "4cm"]);
+            brd.create('text', [1.5, -2.3, "3cm"]);
+        } 
+    },
+    { 
+        q: String.raw`1辺 $6\text{cm}$ の立方体の対角線の長さ。`, 
+        a: String.raw`$6\sqrt{3}\text{cm}$`, 
+        e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。`,
+        draw: (brd) => {
+            brd.setAttribute({axis:false});
+            // 手前の面
+            let p1 = brd.create('point', [-2,-2], {visible:false});
+            let p2 = brd.create('point', [1,-2], {visible:false});
+            let p3 = brd.create('point', [1,1], {visible:false});
+            let p4 = brd.create('point', [-2,1], {visible:false});
+            brd.create('polygon', [p1,p2,p3,p4], {fillColor:'none', strokeColor:'black'});
+            // 奥の面（ななめにずらす）
+            let offset = 0.8;
+            let q1 = brd.create('point', [-2+offset, -2+offset], {visible:false});
+            let q2 = brd.create('point', [1+offset, -2+offset], {visible:false});
+            let q3 = brd.create('point', [1+offset, 1+offset], {visible:false});
+            let q4 = brd.create('point', [-2+offset, 1+offset], {visible:false});
+            brd.create('polygon', [q1,q2,q3,q4], {fillColor:'none', strokeColor:'gray', dash:2});
+            // 角を結ぶ
+            brd.create('segment', [p1,q1], {strokeColor:'gray', dash:2});
+            brd.create('segment', [p2,q2], {strokeColor:'black'});
+            brd.create('segment', [p3,q3], {strokeColor:'black'});
+            brd.create('segment', [p4,q4], {strokeColor:'black'});
+        }
+    },
+    { 
+        q: String.raw`半径 $3\text{cm}$ の球の表面積。`, 
+        a: String.raw`$36\pi\text{cm}^2$`, 
+        e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。`,
+        draw: (brd) => {
+            brd.setAttribute({axis:false});
+            brd.create('circle', [[0,0], 3], {strokeColor:'black', fillColor:'none'});
+            brd.create('ellipse', [[0,0], [3,0], [0,0.7]], {strokeColor:'gray', dash:2});
+            brd.create('segment', [[0,0], [3,0]], {dash:2});
+            brd.create('text', [1, 0.3, "3cm"]);
+        }
+    },
+    { 
+        q: String.raw`底面が 1辺 $4\text{cm}$ の正方形で、高さが $6\text{cm}$ の正四角錐の体積。`, 
+        a: String.raw`$32\text{cm}^3$`, 
+        e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。`,
+        draw: (brd) => {
+            brd.setAttribute({axis:false});
+            let a = brd.create('point', [-2,-1], {visible:false});
+            let b = brd.create('point', [1,-1.5], {visible:false});
+            let c = brd.create('point', [2.5, -0.5], {visible:false});
+            let d = brd.create('point', [-0.5, 0], {visible:false});
+            let top = brd.create('point', [0.25, 3], {visible:false});
+            brd.create('polyline', [a,b,c], {strokeColor:'black'});
+            brd.create('polyline', [c,d,a], {strokeColor:'gray', dash:2});
+            brd.create('segment', [top, a], {strokeColor:'black'});
+            brd.create('segment', [top, b], {strokeColor:'black'});
+            brd.create('segment', [top, c], {strokeColor:'black'});
+            brd.create('segment', [top, d], {strokeColor:'gray', dash:2});
+        }
+    },
+    { 
+        q: String.raw`底面の半径 $2\text{cm}$, 高さ $5\text{cm}$ の円柱の側面積。`, 
+        a: String.raw`$20\pi\text{cm}^2$`, 
+        e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。`,
+        draw: (brd) => {
+            brd.setAttribute({axis:false});
+            brd.create('ellipse', [[0,2], [2,2], [0,2.5]], {strokeColor:'black'});
+            brd.create('ellipse', [[0,-2], [2,-2], [0,-1.5]], {strokeColor:'black'});
+            brd.create('segment', [[-2,2], [-2,-2]], {strokeColor:'black'});
+            brd.create('segment', [[2,2], [2,-2]], {strokeColor:'black'});
+            brd.create('text', [2.2, 0, "5cm"]);
+            brd.create('text', [0, -2.5, "r=2cm"]);
+        }
+    },
+    { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
+    { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
+    { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
+    { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
+]
         };
     function initTest() {
         // MasterDatabaseから全13問を動的に抽出（各セクション1問ずつ）
