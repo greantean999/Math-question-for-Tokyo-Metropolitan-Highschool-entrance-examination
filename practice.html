@@ -484,24 +484,22 @@
 
             "d5": [
     { 
-    q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
-    a: String.raw`$12\pi\text{cm}^3$`, 
-    e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
-    draw: (brd) => { 
-        brd.setAttribute({axis:false}); 
-        // 頂点と底面の中心
-        let top = brd.create('point', [0, 3], {name: '頂点', visible: false});
-        let center = brd.create('point', [0, -2], {visible: false});
-        // 底面（楕円）
-        let e1 = brd.create('ellipse', [center, [3, -2], [0, -1.2]], {strokeColor:'black', fillOpacity:0.1});
-        // フレームの左右端と頂点を結ぶ
-        brd.create('segment', [[-3, -2], top], {strokeColor:'black', strokeWidth: 2});
-        brd.create('segment', [[3, -2], top], {strokeColor:'black', strokeWidth: 2});
-        // 高さ方向の点線（補助線）
-        brd.create('segment', [center, top], {dash:2, strokeColor:'gray'});
-        brd.create('segment', [center, [3, -2]], {dash:2, strokeColor:'gray'});
-        brd.create('text', [0.2, 0.5, "4cm"]);
-        brd.create('text', [1.5, -2.4, "3cm"]);
+        q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
+        a: String.raw`$12\pi\text{cm}^3$`, 
+        e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
+        draw: (brd) => { 
+            brd.setAttribute({axis:false, boundingbox:[-5,5,5,-5]}); 
+            const center = [0, -2], top = [0, 2], radius = 3;
+            // 底面の楕円（後ろ側を点線、前を実線にすると立体的ですが、簡易的に1つで描画）
+            brd.create('ellipse', [center, [radius, -2], [0, -1.2]], {strokeColor:'black', fillOpacity:0.1});
+            // 輪郭線
+            brd.create('segment', [[-radius, -2], top], {strokeColor:'black'});
+            brd.create('segment', [[radius, -2], top], {strokeColor:'black'});
+            // 補助線
+            brd.create('segment', [center, top], {dash:2, strokeColor:'gray'});
+            brd.create('segment', [center, [radius, -2]], {dash:2, strokeColor:'gray'});
+            brd.create('text', [0.2, 0, "4cm"]);
+            brd.create('text', [1, -2.4, "3cm"]);
         } 
     },
     { 
@@ -510,24 +508,16 @@
         e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。`,
         draw: (brd) => {
             brd.setAttribute({axis:false});
-            // 手前の面
-            let p1 = brd.create('point', [-2,-2], {visible:false});
-            let p2 = brd.create('point', [1,-2], {visible:false});
-            let p3 = brd.create('point', [1,1], {visible:false});
-            let p4 = brd.create('point', [-2,1], {visible:false});
-            brd.create('polygon', [p1,p2,p3,p4], {fillColor:'none', strokeColor:'black'});
-            // 奥の面（ななめにずらす）
-            let offset = 0.8;
-            let q1 = brd.create('point', [-2+offset, -2+offset], {visible:false});
-            let q2 = brd.create('point', [1+offset, -2+offset], {visible:false});
-            let q3 = brd.create('point', [1+offset, 1+offset], {visible:false});
-            let q4 = brd.create('point', [-2+offset, 1+offset], {visible:false});
-            brd.create('polygon', [q1,q2,q3,q4], {fillColor:'none', strokeColor:'gray', dash:2});
-            // 角を結ぶ
-            brd.create('segment', [p1,q1], {strokeColor:'gray', dash:2});
-            brd.create('segment', [p2,q2], {strokeColor:'black'});
-            brd.create('segment', [p3,q3], {strokeColor:'black'});
-            brd.create('segment', [p4,q4], {strokeColor:'black'});
+            const s = 1.5; // 表示上のサイズ
+            const off = 0.7; // 奥行き
+            const p = [[-s,-s],[s,-s],[s,s],[-s,s], [-s+off,-s+off],[s+off,-s+off],[s+off,s+off],[-s+off,s+off]];
+            // 面の描画
+            brd.create('polygon', [p[4],p[5],p[6],p[7]], {fillColor:'none', strokeColor:'gray', dash:2}); // 奥
+            brd.create('polygon', [p[0],p[1],p[2],p[3]], {fillColor:'none', strokeColor:'black'}); // 手前
+            // 柱の部分
+            for(let i=0; i<4; i++) brd.create('segment', [p[i], p[i+4]], {strokeColor: i==0?'gray':'black', dash: i==0?2:0});
+            // 対角線
+            brd.create('segment', [p[3], p[5]], {strokeColor:'red', dash:1});
         }
     },
     { 
@@ -536,10 +526,10 @@
         e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。`,
         draw: (brd) => {
             brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 3], {strokeColor:'black', fillColor:'none'});
-            brd.create('ellipse', [[0,0], [3,0], [0,0.7]], {strokeColor:'gray', dash:2});
+            brd.create('circle', [[0,0], 3], {strokeColor:'black'});
+            brd.create('ellipse', [[0,0], [3,0], [0,0.8]], {strokeColor:'gray', dash:2}); // 赤道
             brd.create('segment', [[0,0], [3,0]], {dash:2});
-            brd.create('text', [1, 0.3, "3cm"]);
+            brd.create('text', [1, 0.4, "3cm"]);
         }
     },
     { 
@@ -548,17 +538,14 @@
         e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。`,
         draw: (brd) => {
             brd.setAttribute({axis:false});
-            let a = brd.create('point', [-2,-1], {visible:false});
-            let b = brd.create('point', [1,-1.5], {visible:false});
-            let c = brd.create('point', [2.5, -0.5], {visible:false});
-            let d = brd.create('point', [-0.5, 0], {visible:false});
-            let top = brd.create('point', [0.25, 3], {visible:false});
-            brd.create('polyline', [a,b,c], {strokeColor:'black'});
-            brd.create('polyline', [c,d,a], {strokeColor:'gray', dash:2});
-            brd.create('segment', [top, a], {strokeColor:'black'});
-            brd.create('segment', [top, b], {strokeColor:'black'});
-            brd.create('segment', [top, c], {strokeColor:'black'});
-            brd.create('segment', [top, d], {strokeColor:'gray', dash:2});
+            const base = [[-2,-1], [1,-1.5], [2.5,-0.5], [-0.5,0]]; // 底面の4点
+            const top = [1, 3];
+            brd.create('polygon', base, {fillColor:'none', strokeColor:'gray', dash:2});
+            brd.create('segment', [top, base[0]], {strokeColor:'black'});
+            brd.create('segment', [top, base[1]], {strokeColor:'black'});
+            brd.create('segment', [top, base[2]], {strokeColor:'black'});
+            brd.create('segment', [top, base[3]], {strokeColor:'gray', dash:2});
+            brd.create('segment', [top, [1, -0.75]], {dash:2, strokeColor:'blue'}); // 高さ
         }
     },
     { 
@@ -567,14 +554,15 @@
         e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。`,
         draw: (brd) => {
             brd.setAttribute({axis:false});
-            brd.create('ellipse', [[0,2], [2,2], [0,2.5]], {strokeColor:'black'});
-            brd.create('ellipse', [[0,-2], [2,-2], [0,-1.5]], {strokeColor:'black'});
-            brd.create('segment', [[-2,2], [-2,-2]], {strokeColor:'black'});
-            brd.create('segment', [[2,2], [2,-2]], {strokeColor:'black'});
-            brd.create('text', [2.2, 0, "5cm"]);
-            brd.create('text', [0, -2.5, "r=2cm"]);
+            const r = 2, h = 2;
+            brd.create('ellipse', [[0,h], [r,h], [0,h+0.6]], {strokeColor:'black'}); // 上面
+            brd.create('ellipse', [[0,-h], [r,-h], [0,-h+0.6]], {strokeColor:'black'}); // 下面
+            brd.create('segment', [[-r,h], [-r,-h]], {strokeColor:'black'});
+            brd.create('segment', [[r,h], [r,-h]], {strokeColor:'black'});
+            brd.create('text', [r+0.2, 0, "5cm"]);
         }
     },
+    // 以下、図解なし問題はそのまま
     { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
     { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
     { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
