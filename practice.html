@@ -3,47 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数学演習システム</title>
+    <title>数学演習 - 練習モード</title>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
         #app-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        #question-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; min-height: 50px; }
-        #media-container { text-align: center; margin-bottom: 20px; min-height: 200px; display: flex; justify-content: center; align-items: center; background: #fafafa; border-radius: 10px; }
+        #question-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; }
+        #media-container { text-align: center; margin-bottom: 20px; background: #fafafa; border-radius: 10px; min-height: 200px; display: flex; align-items: center; justify-content: center; }
         img { max-width: 100%; height: auto; border-radius: 8px; }
         iframe { width: 100%; height: 350px; border: none; border-radius: 8px; }
-        button { width: 100%; padding: 12px; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        #show-ans-btn { background-color: #007bff; color: white; }
-        #next-btn { background-color: #28a745; color: white; display: none; }
+        button { width: 100%; padding: 12px; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        .btn-blue { background-color: #007bff; color: white; }
+        .btn-green { background-color: #28a745; color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid #6c757d; color: #6c757d; }
         #answer-area { display: none; margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 8px; border-left: 5px solid #007bff; }
-        .label { font-weight: bold; color: #495057; display: block; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div id="app-container">
-    <div id="question-text">問題を読み込み中...</div>
-
+    <div id="question-text">読み込み中...</div>
     <div id="media-container">
         <img id="q-image" style="display:none;">
         <iframe id="q-embed" style="display:none;"></iframe>
     </div>
 
-    <button id="show-ans-btn" onclick="showAnswer()">答え合わせを表示</button>
+    <button id="show-ans-btn" class="btn-blue" onclick="showAnswer()">答え合わせを表示</button>
 
     <div id="answer-area">
-        <span class="label">【答え】</span>
-        <div id="answer-text"></div>
-        <hr>
-        <span class="label">【解説】</span>
-        <div id="explanation-text"></div>
-        <button id="next-btn" onclick="init()">次の問題へ</button>
+        <strong>【答え】</strong><div id="answer-text"></div><br>
+        <strong>【解説】</strong><div id="explanation-text"></div>
+        <button id="next-btn" class="btn-green" onclick="init()">次の問題へ</button>
     </div>
+
+    <button class="btn-outline" onclick="location.href='index.html'" style="margin-top:30px;">メニューに戻る</button>
 </div>
 
 <script>
-// --- MasterDatabase はここから後で追加 ---
-let MasterDatabase = {
+// --- ここに MasterDatabase を貼り付け ---
+const MasterDatabase = {
     "d1_q1": [
                 { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
                 { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
@@ -696,8 +694,7 @@ let MasterDatabase = {
             embed: "https://www.geogebra.org/material/iframe/id/xpjmrydd/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
         }
     ]
-}; // MasterDatabase 終了
-// --- ここまで ---
+};
 
 let currentProblem = null;
 
@@ -706,18 +703,15 @@ function init() {
     const cat = params.get('cat') || "d1_q6";
     const questions = MasterDatabase[cat];
 
-    if (!questions || questions.length === 0) {
-        document.getElementById('question-text').innerText = "問題が見つかりませんでした。";
+    if (!questions) {
+        document.getElementById('question-text').innerText = "問題データがありません。";
         return;
     }
 
-    // 問題をランダムに選択
     currentProblem = questions[Math.floor(Math.random() * questions.length)];
     
-    // 表示リセット
     document.getElementById('question-text').innerHTML = currentProblem.q;
     document.getElementById('answer-area').style.display = 'none';
-    document.getElementById('next-btn').style.display = 'none';
     document.getElementById('show-ans-btn').style.display = 'block';
     
     const imgTag = document.getElementById('q-image');
@@ -726,7 +720,6 @@ function init() {
     embedTag.style.display = 'none';
     embedTag.src = "";
 
-    // メディアの表示判定
     if (currentProblem.img) {
         imgTag.src = currentProblem.img;
         imgTag.style.display = 'block';
@@ -735,26 +728,22 @@ function init() {
         embedTag.style.display = 'block';
     }
 
-    // 数式の描画
-    MathJax.typesetPromise();
+    if(window.MathJax) MathJax.typesetPromise();
 }
 
 function showAnswer() {
     document.getElementById('answer-text').innerHTML = currentProblem.a;
     document.getElementById('explanation-text').innerHTML = currentProblem.e;
     document.getElementById('answer-area').style.display = 'block';
-    document.getElementById('next-btn').style.display = 'block';
     document.getElementById('show-ans-btn').style.display = 'none';
 
-    // 作図問題(d1_q9)などで解説用画像(imgA)がある場合は差し替え
     if (currentProblem.imgA) {
         document.getElementById('q-image').src = currentProblem.imgA;
     }
 
-    MathJax.typesetPromise();
+    if(window.MathJax) MathJax.typesetPromise();
 }
 
-// 初回実行
 window.onload = init;
 </script>
 </body>
