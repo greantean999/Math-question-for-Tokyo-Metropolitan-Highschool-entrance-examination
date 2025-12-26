@@ -3,711 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>都立数学 - 実戦模試</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
+    <title>実力判定テスト - Final Test</title>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
     <style>
-        :root { --base: #fdf6e3; --text: #657b83; --accent: #d33682; --blue: #268bd2; --green: #859900; --red: #dc322f; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--base); color: var(--text); margin: 0; padding: 20px; line-height: 1.6; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        
-        /* 問題表示エリア */
-        #jxgbox { width: 100%; height: 320px; border-radius: 12px; margin: 20px 0; border: 1px solid #eee; }
-        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--base); padding-bottom: 10px; }
-        #q-badge { background: var(--blue); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
-        #question-text { font-size: 1.25rem; font-weight: 500; min-height: 60px; color: #333; }
-
-        /* ボタンデザイン */
-        .btn-group { display: flex; gap: 15px; margin-top: 25px; }
-        button { flex: 1; padding: 18px; border: none; border-radius: 12px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: transform 0.1s, opacity 0.2s; }
-        button:active { transform: scale(0.98); }
-        .btn-correct { background-color: var(--green); color: white; box-shadow: 0 4px 0 #6c7a00; }
-        .btn-wrong { background-color: var(--red); color: white; box-shadow: 0 4px 0 #b02422; }
-
-        /* 結果画面 */
-        .result-card { text-align: center; display: none; animation: fadeIn 0.5s ease; }
-        .deviation-circle { width: 140px; height: 140px; line-height: 140px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #ff4d94); color: white; font-size: 3rem; margin: 25px auto; box-shadow: 0 6px 15px rgba(211, 54, 130, 0.3); font-weight: bold; }
-        .analysis-box { background: #f9f9f9; padding: 20px; border-radius: 15px; text-align: left; margin: 20px 0; border-left: 5px solid var(--blue); }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #007bff; }
+        .test-progress { text-align: center; margin-bottom: 20px; font-weight: bold; color: #666; }
+        .question-block { display: none; } /* 1問ずつ表示 */
+        .question-block.active { display: block; }
+        .media-box { text-align: center; margin: 15px 0; min-height: 200px; display: flex; justify-content: center; align-items: center; background: #fafafa; }
+        img { max-width: 100%; height: auto; max-height: 300px; border-radius: 8px; }
+        iframe { width: 100%; height: 350px; border: none; }
+        .input-area { margin-top: 20px; text-align: center; }
+        .ans-input { padding: 10px; width: 80%; font-size: 1.1rem; border: 2px solid #ddd; border-radius: 5px; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 15px; font-size: 1.1rem; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .btn-primary { background: #007bff; color: white; }
+        /* 結果表示 */
+        #result-screen { display: none; text-align: center; }
+        .score-big { font-size: 3rem; color: #d9534f; font-weight: bold; }
+        .deviation-box { font-size: 1.5rem; color: #333; margin: 20px 0; padding: 15px; background: #e9ecef; border-radius: 10px; }
+        .advice-text { text-align: left; background: #fff; border-left: 5px solid #007bff; padding: 15px; margin-top: 20px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="test-ui">
-        <div class="q-header">
-            <span id="q-number" style="font-weight:bold; color:var(--text);">第 -- 問 / 13</span>
-            <span id="q-badge">カテゴリ</span>
+    <div id="test-screen">
+        <h1 id="cat-title">実力判定テスト</h1>
+        <div class="test-progress">第 <span id="current-q-num">1</span> / 13 問</div>
+        
+        <div id="question-area">
+            <div id="q-text" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
+            <div class="media-box" id="media-box">
+                <img id="test-img" style="display:none;">
+                <iframe id="test-embed" style="display:none;"></iframe>
+            </div>
         </div>
-        <div id="question-text">問題を読み込んでいます...</div>
-        <div id="jxgbox" class="jxgbox"></div>
-        <div class="btn-group">
-            <button class="btn-wrong" onclick="processAnswer(false)">わからない・ミス</button>
-            <button class="btn-correct" onclick="processAnswer(true)">正解できた！</button>
+
+        <div class="input-area">
+            <p>※ 自己採点形式です。答えを頭に浮かべてから進んでください。</p>
+            <button class="btn btn-primary" onclick="showJudge()">答え合わせをする</button>
         </div>
     </div>
 
-    <div id="result-ui" class="result-card">
-        <h2 style="color: #333;">模試結果診断</h2>
-        <div class="deviation-circle" id="res-dv">--</div>
-        <p style="font-size: 1.2rem;">あなたの得点: <strong id="res-score" style="font-size: 1.8rem; color: var(--accent);">0</strong> / 100点</p>
-        <div class="analysis-box">
-            <strong style="color: var(--blue);">【AI弱点分析】</strong><br>
-            <span id="res-weakness" style="font-size:0.95rem;"></span>
-        </div>
-        <button onclick="location.href='index.html'" style="background:#586e75; color:white; width:100%; margin-top:10px;">メニューに戻る</button>
+    <div id="judge-screen" style="display:none; text-align: center;">
+        <h3>正解と解説</h3>
+        <div id="correct-ans" style="font-size: 1.5rem; color: #d9534f; margin-bottom: 10px;"></div>
+        <div id="expl-text" style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+        <p>正解できましたか？</p>
+        <button class="btn" style="background:#28a745; color:white; margin-bottom:10px;" onclick="nextQuestion(true)">正解！</button>
+        <button class="btn" style="background:#6c757d; color:white;" onclick="nextQuestion(false)">不正解...</button>
+    </div>
+
+    <div id="result-screen">
+        <h1>テスト結果</h1>
+        <div class="score-big"><span id="final-score">0</span> / 13</div>
+        <div class="deviation-box">推定偏差値: <span id="deviation-value">--</span></div>
+        <div id="advice-box" class="advice-text"></div>
+        <button class="btn btn-primary" style="margin-top:20px;" onclick="location.reload()">もう一度挑戦</button>
     </div>
 </div>
 
 <script>
-    let MasterDatabase = {
-            "d1_q1": [
-                { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
-                { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
-                { q: "$8a + b - (a - 7b)$", a: "$7a + 8b$", e: "$8a + b - a + 7b = 7a + 8b$" },
-                { q: "$(-2)^3 \\times 3 - 4 \\div (-2)$", a: "$-22$", e: "$-24 + 2 = -22$" },
-                { q: "$\\frac{3x - y}{2} - \\frac{x - 4y}{4}$", a: "$\\frac{5x + 2y}{4}$", e: "$\\frac{6x-2y-x+4y}{4}$" },
-                { q: "$18ab^2 \\div 6b \\times (-2a)$", a: "$-6a^2b$", e: "$3ab \\times (-2a) = -6a^2b$" },
-                { q: "$5 + 2 \\times (3 - 8)$", a: "$-5$", e: "$5 - 10 = -5$" },
-                { q: "$6x^2 \\div (-3x)^2 \\times 3x$", a: "$2x$", e: "$6x^2 \\div 9x^2 \\times 3x = 2x$" },
-                { q: "$9 - (-3)^2 \\div 3$", a: "$6$", e: "$9 - 3 = 6$" },
-                { q: "$7 + (-4) - (-9)$", a: "$12$", e: "$7 - 4 + 9 = 12$" },
-                { q: "$4(a-b) - 3(2a-b)$", a: "$-2a-b$", e: "$4a-4b-6a+3b$" },
-                { q: "$(-3)^2 + 5 \\times (-2)$", a: "$-1$", e: "$9 - 10 = -1$" },
-                { q: "$12ab \\div (-4a) \\times 3b$", a: "$-9b^2$", e: "$-3b \\times 3b = -9b^2$" },
-                { q: "$2(3x+y) + (x-2y)$", a: "$7x$", e: "$6x+2y+x-2y$" },
-                { q: "$(-1)^4 \\times 7 - 8$", a: "$-1$", e: "$1 \\times 7 - 8 = -1$" },
-                { q: "$\\frac{1}{3}(6x-9) - 2x$", a: "$-3$", e: "$2x-3-2x = -3$" },
-                { q: "$15x^2y \\div 5xy \\times (-2y)$", a: "$-6y^2$", e: "$3x \\times (-2y)$" },
-                { q: "$7 - 2^3 \\div 4$", a: "$5$", e: "$7 - 2 = 5$" },
-                { q: "$a+2b - \\frac{a-b}{3}$", a: "$\\frac{2a+7b}{3}$", e: "$\\frac{3a+6b-a+b}{3}$" },
-                { q: "$(-6)^2 \\div 4 + (-3)$", a: "$6$", e: "$9 - 3 = 6$" }
-            ],
-            "d1_q2": [
-                { q: String.raw`$(\sqrt{3} + 1)^2$`, a: String.raw`$4 + 2\sqrt{3}$`, e: String.raw`$3 + 2\sqrt{3} + 1$` },
-                { q: String.raw`$(\sqrt{5} + 2)(\sqrt{5} - 2)$`, a: String.raw`$1$`, e: String.raw`$5 - 4 = 1$` },
-                { q: String.raw`$\sqrt{50} - \sqrt{18}$`, a: String.raw`$2\sqrt{2}$`, e: String.raw`$5\sqrt{2} - 3\sqrt{2} = 2\sqrt{2}$` },
-                { q: String.raw`$\frac{12}{\sqrt{6}} - \sqrt{24}$`, a: String.raw`$0$`, e: String.raw`$2\sqrt{6} - 2\sqrt{6} = 0$` },
-                { q: String.raw`$\sqrt{3} + \frac{6}{\sqrt{3}}$`, a: String.raw`$3\sqrt{3}$`, e: String.raw`$\sqrt{3} + 2\sqrt{3} = 3\sqrt{3}$` },
-                { q: String.raw`$(\sqrt{7}-1)(\sqrt{7}+3)$`, a: String.raw`$4+2\sqrt{7}$`, e: String.raw`$7+3\sqrt{7}-\sqrt{7}-3 = 4+2\sqrt{7}$` },
-                { q: String.raw`$\sqrt{32} \div \sqrt{2} - \sqrt{9}$`, a: String.raw`$1$`, e: String.raw`$\sqrt{16} - 3 = 4-3=1$` },
-                { q: String.raw`$\sqrt{2}(\sqrt{8} + \sqrt{18})$`, a: String.raw`$10$`, e: String.raw`$\sqrt{2}(2\sqrt{2}+3\sqrt{2}) = \sqrt{2} \times 5\sqrt{2} = 10$` },
-                { q: String.raw`$(\sqrt{6}+\sqrt{2})(\sqrt{6}-\sqrt{2})$`, a: String.raw`$4$`, e: String.raw`$6-2=4$` },
-                { q: String.raw`$\frac{\sqrt{75}}{\sqrt{3}} - \sqrt{4}$`, a: String.raw`$3$`, e: String.raw`$\sqrt{25}-2 = 5-2=3$` },
-                { q: String.raw`$(\sqrt{3}-2)^2 + \sqrt{12}$`, a: String.raw`$7-2\sqrt{3}$`, e: String.raw`$3-4\sqrt{3}+4+2\sqrt{3} = 7-2\sqrt{3}$` },
-                { q: String.raw`$\sqrt{48} - \frac{9}{\sqrt{3}}$`, a: String.raw`$\sqrt{3}$`, e: String.raw`$4\sqrt{3}-3\sqrt{3} = \sqrt{3}$` },
-                { q: String.raw`$(\sqrt{5}+1)^2 - \sqrt{20}$`, a: String.raw`$6$`, e: String.raw`$5+2\sqrt{5}+1-2\sqrt{5} = 6$` },
-                { q: String.raw`$\sqrt{27} + \sqrt{12} - \sqrt{75}$`, a: String.raw`$0$`, e: String.raw`$3\sqrt{3}+2\sqrt{3}-5\sqrt{3} = 0$` },
-                { q: String.raw`$\frac{10}{\sqrt{5}} + \sqrt{5}$`, a: String.raw`$3\sqrt{5}$`, e: String.raw`$2\sqrt{5}+\sqrt{5} = 3\sqrt{5}$` }
-            ],
-            "d1_q3": [
-                { q: String.raw`$9x - 4 = 5(x + 4)$`, a: String.raw`$x = 6$`, e: String.raw`$9x-4=5x+20 \to 4x=24$` },
-                { q: String.raw`$\frac{x-1}{2} - \frac{x+2}{3} = 1$`, a: String.raw`$x = 13$`, e: String.raw`$3(x-1)-2(x+2)=6 \to 3x-3-2x-4=6 \to x=13$` },
-                { q: String.raw`$0.3x - 0.1 = 0.5x + 0.7$`, a: String.raw`$x = -4$`, e: String.raw`$3x-1=5x+7 \to -2x=8$` },
-                { q: String.raw`$4x - 7 = x + 8$`, a: String.raw`$x = 5$`, e: String.raw`$3x=15 \to x=5$` },
-                { q: String.raw`$3(x-2) = 2x + 5$`, a: String.raw`$x = 11$`, e: String.raw`$3x-6=2x+5$` },
-                { q: String.raw`$\frac{2}{3}x - 1 = \frac{1}{2}x$`, a: String.raw`$x = 6$`, e: String.raw`$4x-6=3x \to x=6$` },
-                { q: String.raw`$5x + 2 = 3(x-4)$`, a: String.raw`$x = -7$`, e: String.raw`$5x+2=3x-12 \to 2x=-14$` },
-                { q: String.raw`$x - 8 = 4x + 10$`, a: String.raw`$x = -6$`, e: String.raw`$-3x=18$` },
-                { q: String.raw`$0.2x + 1.5 = 0.5x$`, a: String.raw`$x = 5$`, e: String.raw`$2x+15=5x \to 3x=15$` },
-                { q: String.raw`$7x - (2x-5) = 15$`, a: String.raw`$x = 2$`, e: String.raw`$5x+5=15 \to 5x=10$` },
-                { q: String.raw`$\frac{x+3}{4} = 2$`, a: String.raw`$x = 5$`, e: String.raw`$x+3=8$` },
-                { q: String.raw`$8 - x = 3x$`, a: String.raw`$x = 2$`, e: String.raw`$8=4x$` },
-                { q: String.raw`$2(x+1) = x-5$`, a: String.raw`$x = -7$`, e: String.raw`$2x+2=x-5$` },
-                { q: String.raw`$0.04x = 0.12$`, a: String.raw`$x = 3$`, e: String.raw`$4x=12$` },
-                { q: String.raw`$12x - 3 = 7x + 12$`, a: String.raw`$x = 3$`, e: String.raw`$5x=15$` }
-            ],
-            "d1_q4": [
-                { q: String.raw`$\begin{cases} x + 2y = 7 \\ 2x - y = 4 \end{cases}$`, a: String.raw`$x = 3, y = 2$`, e: String.raw`下の式を2倍して足す。` },
-                { q: String.raw`$\begin{cases} y = 2x - 1 \\ 3x + 2y = 12 \end{cases}$`, a: String.raw`$x = 2, y = 3$`, e: String.raw`上の式を下の$y$に代入。` },
-                { q: String.raw`$\begin{cases} 3x + 2y = 13 \\ x - 2y = 7 \end{cases}$`, a: String.raw`$x = 5, y = -1$`, e: String.raw`そのまま足すと $4x=20$` },
-                { q: String.raw`$\begin{cases} 2x + 3y = 8 \\ 2x + y = 4 \end{cases}$`, a: String.raw`$x = 1, y = 2$`, e: String.raw`引くと $2y=4$` },
-                { q: String.raw`$\begin{cases} x = 3y \\ 2x - 5y = 1 \end{cases}$`, a: String.raw`$x = 3, y = 1$`, e: String.raw`代入して $6y-5y=1$` },
-                { q: String.raw`$\begin{cases} 4x - y = 9 \\ 2x + y = 3 \end{cases}$`, a: String.raw`$x = 2, y = -1$`, e: String.raw`足すと $6x=12$` },
-                { q: String.raw`$\begin{cases} x - y = 4 \\ 3x + 2y = 7 \end{cases}$`, a: String.raw`$x = 3, y = -1$`, e: String.raw`上の式を2倍して足す。` },
-                { q: String.raw`$\begin{cases} y = x + 2 \\ 2x + y = 8 \end{cases}$`, a: String.raw`$x = 2, y = 4$`, e: String.raw`代入して $3x+2=8$` },
-                { q: String.raw`$\begin{cases} 5x + 2y = 1 \\ 3x + y = 1 \end{cases}$`, a: String.raw`$x = 1, y = -2$`, e: String.raw`下の式を2倍して引く。` },
-                { q: String.raw`$\begin{cases} x + y = 5 \\ x - y = 1 \end{cases}$`, a: String.raw`$x = 3, y = 2$`, e: String.raw`和と差の基本形。` },
-                { q: String.raw`$\begin{cases} 3x - 4y = 10 \\ x = 2y + 4 \end{cases}$`, a: String.raw`$x = 2, y = -1$`, e: String.raw`代入して $3(2y+4)-4y=10 \to 2y=-2$` },
-                { q: String.raw`$\begin{cases} 0.2x + 0.3y = 1.3 \\ x - y = -1 \end{cases}$`, a: String.raw`$x = 2, y = 3$`, e: String.raw`上の式を10倍して $2x+3y=13$` },
-                { q: String.raw`$\begin{cases} \frac{x}{2} + \frac{y}{3} = 4 \\ x + y = 10 \end{cases}$`, a: String.raw`$x = 4, y = 6$`, e: String.raw`上の式を6倍して $3x+2y=24$` },
-                { q: String.raw`$\begin{cases} 7x + 3y = -1 \\ 2x + y = 0 \end{cases}$`, a: String.raw`$x = -1, y = 2$`, e: String.raw`下の式から $y=-2x$ を代入。` },
-                { q: String.raw`$\begin{cases} 2x - 3y = 12 \\ 4x + 5y = 2 \end{cases}$`, a: String.raw`$x = 3, y = -2$`, e: String.raw`上の式を2倍して引く。` }
-            ],
-            "d1_q5": [
-                { q: String.raw`$x^2 + 5x + 6 = 0$`, a: String.raw`$x = -2, -3$`, e: String.raw`$(x+2)(x+3)=0$` },
-                { q: String.raw`$x^2 - 7x + 10 = 0$`, a: String.raw`$x = 2, 5$`, e: String.raw`$(x-2)(x-5)=0$` },
-                { q: String.raw`$x^2 + 2x - 15 = 0$`, a: String.raw`$x = 3, -5$`, e: String.raw`$(x-3)(x+5)=0$` },
-                { q: String.raw`$x^2 - 6x + 9 = 0$`, a: String.raw`$x = 3$`, e: String.raw`$(x-3)^2=0$ (重解)` },
-                { q: String.raw`$x^2 + 4x = 0$`, a: String.raw`$x = 0, -4$`, e: String.raw`$x(x+4)=0$` },
-                { q: String.raw`$x^2 - 16 = 0$`, a: String.raw`$x = \pm 4$`, e: String.raw`$(x-4)(x+4)=0$` },
-                { q: String.raw`$x^2 + 3x + 1 = 0$`, a: String.raw`$x = \frac{-3 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式 $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$` },
-                { q: String.raw`$x^2 - 5x + 2 = 0$`, a: String.raw`$x = \frac{5 \pm \sqrt{17}}{2}$`, e: String.raw`解の公式を利用。` },
-                { q: String.raw`$2x^2 + 5x + 1 = 0$`, a: String.raw`$x = \frac{-5 \pm \sqrt{17}}{4}$`, e: String.raw`解の公式を利用。` },
-                { q: String.raw`$x^2 - 2x - 1 = 0$`, a: String.raw`$x = 1 \pm \sqrt{2}$`, e: String.raw`解の公式より $x = \frac{2 \pm \sqrt{8}}{2} = 1 \pm \sqrt{2}$` },
-                { q: String.raw`$3x^2 - 7x + 2 = 0$`, a: String.raw`$x = 2, \frac{1}{3}$`, e: String.raw`$(x-2)(3x-1)=0$ または解の公式。` },
-                { q: String.raw`$(x-3)^2 = 5$`, a: String.raw`$x = 3 \pm \sqrt{5}$`, e: String.raw`平方根の考え方を利用。` },
-                { q: String.raw`$x^2 + 10x + 25 = 0$`, a: String.raw`$x = -5$`, e: String.raw`$(x+5)^2=0$` },
-                { q: String.raw`$x^2 + x - 1 = 0$`, a: String.raw`$x = \frac{-1 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式を利用。` },
-                { q: String.raw`$x^2 - 8x + 12 = 0$`, a: String.raw`$x = 2, 6$`, e: String.raw`$(x-2)(x-6)=0$` }
-            ],
-            "d1_q6": [
-    { 
-        q: String.raw`$y = 2x^2$ で $x$ が $1$ から $3$ まで増加するときの変化の割合。`, a: String.raw`$8$`, e: String.raw`$2(1+3)=8$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 2*x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = -x^2$ で $x$ が $-4$ から $-2$ まで増加するときの変化の割合。`, a: String.raw`$6$`, e: String.raw`$-1(-4-2)=6$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = 3x^2$ で $x$ の変域が $-1 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=0$ で最小値 $0$, $x=2$ で最大値 $12$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 3*x*x, -1, 2], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`$y = ax^2$ において、$x$ が $2$ から $4$ まで増加するときの変化の割合が $12$ であるとき、$a$ の値。`, a: String.raw`$2$`, e: String.raw`$a(2+4)=12 \to 6a=12$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 2*x*x], {dash:2}); }
-    },
-    { 
-        q: String.raw`$y = \frac{1}{2}x^2$ で $x$ の変域が $-4 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 8$`, e: String.raw`$x=-4$ のとき最大値 $8$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 0.5*x*x, -4, 2], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`関数 $y = -2x^2$ について、$x$ の値が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-10$`, e: String.raw`$-2(1+4)=-10$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -2*x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = ax^2$ で $x$ の変域が $-2 \leqq x \leqq 1$ のとき $y$ の変域が $0 \leqq y \leqq 8$。 $a$ の値。`, a: String.raw`$2$`, e: String.raw`$x=-2$ のとき $y=8$ となるので $4a=8$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 2*x*x, -2, 1], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`$y = \frac{1}{4}x^2$ で $x$ が $2$ から $6$ まで増加するときの変化の割合。`, a: String.raw`$2$`, e: String.raw`$\frac{1}{4}(2+6)=2$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 0.25*x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = -3x^2$ で $x$ の変域が $-1 \leqq x \leqq 3$ のときの $y$ の変域。`, a: String.raw`$-27 \leqq y \leqq 0$`, e: String.raw`$x=3$ で最小値 $-27$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -3*x*x, -1, 3], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`変化の割合が常に $3$ で、点 $(1, 5)$ を通る直線の式。`, a: String.raw`$y = 3x + 2$`, e: String.raw`$y-5=3(x-1)$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [2, 3, -1], {strokeColor:'blue'}); brd.create('point', [1, 5], {name:'(1,5)'}); }
-    },
-    { 
-        q: String.raw`$y = x^2$ と $y = 2x+3$ の交点の $x$ 座標。`, a: String.raw`$x = 3, -1$`, e: String.raw`$x^2-2x-3=0$ を解く。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => x*x]); brd.create('line', [3, 2, -1], {strokeColor:'green'}); }
-    },
-    { 
-        q: String.raw`$y = \frac{4}{x}$ で $x$ が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-1$`, e: String.raw`$(1-4)/(4-1) = -3/3 = -1$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 4/x, 0.1, 10], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = -2x^2$ で $y$ の変域が $-18 \leqq y \leqq 0$ となる $x$ の変域。`, a: String.raw`$-3 \leqq x \leqq 3$`, e: String.raw`$-2x^2 = -18 \to x^2=9$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -2*x*x, -3, 3], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`$y = ax^2$ と $y = -3x-1$ について、$x$ が $1$ から $3$ まで変化する時の変化の割合が一致する時の $a$。`, a: String.raw`$-0.75$`, e: String.raw`$a(1+3)=-3 \to 4a=-3$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -0.75*x*x]); brd.create('line', [-1, -3, -1], {strokeColor:'green'}); }
-    },
-    { 
-        q: String.raw`関数 $y = \frac{1}{3}x^2$ について、$x$ の変域が $-3 \leqq x \leqq 6$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=6$ のとき $y=12$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => (1/3)*x*x, -3, 6], {strokeColor:'red', strokeWidth:3}); }
-    }
-],
+// MasterDatabase は別途貼り付け
+const MasterDatabase = {}; 
 
-            "d1_q7": [
-    { 
-        q: String.raw`正九角形の $1$ つの内角の大きさ。`, a: String.raw`$140^\circ$`, e: String.raw`外角は $360 \div 9 = 40^\circ$。内角は $180 - 40 = 140^\circ$。`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('regularpolygon', [[0,1.2], [0,-1.2], 9], {withLabel:false}); }
-    },
-    { 
-        q: String.raw`半径 $6$cm, 中心角 $120^\circ$ のおうぎ形の弧の長さ。`, a: String.raw`$4\pi \text{cm}$`, e: String.raw`$12\pi \times \frac{120}{360} = 4\pi$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('sector', [[0,0], [3,0], [3*Math.cos(2*Math.PI/3), 3*Math.sin(2*Math.PI/3)]], {strokeColor:'black', fillColor:'orange', fillOpacity:0.3}); }
-    },
-    { 
-        q: String.raw`円周角の定理：中心角が $80^\circ$ のとき、その弧に対する円周角。`, a: String.raw`$40^\circ$`, e: String.raw`円周角は中心角の半分。`,
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); 
-            let c = brd.create('circle', [[0,0], 3]);
-            let p1 = brd.create('point', [3*Math.cos(-0.5), 3*Math.sin(-0.5)], {visible:false});
-            let p2 = brd.create('point', [3*Math.cos(0.9), 3*Math.sin(0.9)], {visible:false});
-            let p3 = brd.create('point', [3*Math.cos(Math.PI), 3*Math.sin(Math.PI)], {visible:false});
-            brd.create('polyline', [[0,0], p1, p3, p2, [0,0]], {strokeColor:'blue'});
-        }
-    },
-    { 
-        q: String.raw`$n$ 角形の内角の和が $1260^\circ$ であるとき、$n$ の値。`, a: String.raw`$9$`, e: String.raw`$180(n-2)=1260 \to n-2=7 \to n=9$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('regularpolygon', [[0,1.2], [0,-1.2], 9], {strokeColor:'gray'}); }
-    },
-    { 
-        q: String.raw`対角線の本数が $20$ 本である多角形は何角形か。`, a: "八角形", e: String.raw`$\frac{n(n-3)}{2}=20 \to n^2-3n-40=0 \to (n-8)(n+5)=0$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); let p = brd.create('regularpolygon', [[0,1.5], [0,-1.5], 8], {withLabel:false}); }
-    },
-    { 
-        q: String.raw`三角形の $2$ つの内角が $45^\circ, 65^\circ$ のとき、残りの外角の大きさ。`, a: String.raw`$110^\circ$`, e: String.raw`$45 + 65 = 110$ (三角形の外角の性質)`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polyline', [[-2,0], [2,0], [0.5,2], [-2,0]]); brd.create('segment', [[2,0], [4,0]], {dash:2}); }
-    },
-    { 
-        q: String.raw`円に内接する四角形で、向かい合う角の和。`, a: String.raw`$180^\circ$`, e: String.raw`円に内接する四角形の性質。`,
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); brd.create('circle', [[0,0], 3]);
-            brd.create('polygon', [[3*Math.cos(0.5), 3*Math.sin(0.5)], [3*Math.cos(2), 3*Math.sin(2)], [3*Math.cos(3.5), 3*Math.sin(3.5)], [3*Math.cos(5.5), 3*Math.sin(5.5)]]);
-        }
-    },
-    { 
-        q: String.raw`中心角 $72^\circ$ のおうぎ形は、円全体の何分の $1$ か。`, a: String.raw`$\frac{1}{5}$`, e: String.raw`$72/360 = 1/5$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('circle', [[0,0], 2.5], {strokeColor:'gray', dash:1}); brd.create('sector', [[0,0], [2.5,0], [2.5*Math.cos(72*Math.PI/180), 2.5*Math.sin(72*Math.PI/180)]], {fillColor:'yellow', fillOpacity:0.3}); }
-    },
-    { 
-        q: String.raw`正六角形の $1$ つの外角。`, a: String.raw`$60^\circ$`, e: String.raw`$360 \div 6 = 60$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); let p = brd.create('regularpolygon', [[0,1.2], [0,-1.2], 6]); brd.create('segment', [[0,-1.2], [2,-1.2]], {dash:2}); }
-    },
-    { 
-        q: String.raw`直角二等辺三角形の鋭角の大きさ。`, a: String.raw`$45^\circ$`, e: String.raw`$(180-90) \div 2 = 45$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polygon', [[0,0], [3,0], [0,3]]); }
-    },
-    { 
-        q: String.raw`半径 $10$cm、弧の長さ $4\pi$cm のおうぎ形の面積。`, a: String.raw`$20\pi \text{cm}^2$`, e: String.raw`$S = \frac{1}{2}lr = \frac{1}{2} \times 4\pi \times 10 = 20\pi$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('sector', [[0,0], [3,0], [3*Math.cos(0.4*Math.PI), 3*Math.sin(0.4*Math.PI)]], {fillColor:'green', fillOpacity:0.2}); }
-    },
-    { 
-        q: String.raw`ひし形の面積。対角線が $8$cm と $6$cm。`, a: String.raw`$24 \text{cm}^2$`, e: String.raw`$(8 \times 6) \div 2 = 24$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polygon', [[0,2], [3,0], [0,-2], [-3,0]]); brd.create('segment', [[0,2], [0,-2]], {dash:1}); brd.create('segment', [[3,0], [-3,0]], {dash:1}); }
-    },
-    { 
-        q: String.raw`平行四辺形 $ABCD$ で $\angle A=110^\circ$ のとき $\angle B$。`, a: String.raw`$70^\circ$`, e: String.raw`隣り合う角の和は $180^\circ$。`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polygon', [[-1,1.5], [2,1.5], [1,-0.5], [-2,-0.5]]); }
-    },
-    { 
-        q: String.raw`円周上に $3$ 点 $A,B,C$。$\angle ABC$ が直径 $AC$ を持つとき、$\angle ABC$ は。`, a: String.raw`$90^\circ$`, e: String.raw`半円の弧に対する円周角は $90^\circ$。`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('circle', [[0,0], 3]); brd.create('segment', [[-3,0], [3,0]]); brd.create('polyline', [[-3,0], [1, 2.82], [3,0]]); }
-    }
-],
+const categories = ["d1_q1", "d1_q2", "d1_q3", "d1_q4", "d1_q5", "d1_q6", "d1_q7", "d1_q8", "d1_q9", "d2", "d3", "d4", "d5"];
+let currentIdx = 0;
+let correctCount = 0;
+let testQuestions = [];
 
-            "d1_q8": [
-                { q: String.raw`$2$ 枚の硬貨を同時に投げるとき、少なくとも $1$ 枚が表になる確率。`, a: String.raw`$\frac{3}{4}$`, e: String.raw`「すべて裏」の $1/4$ を $1$ から引く。` },
-                { q: String.raw`赤玉 $3$ 個、白玉 $2$ 個が入った袋から同時に $2$ 個取り出すとき、両方赤である確率。`, a: String.raw`$\frac{3}{10}$`, e: String.raw`全部で \${}_5\mathrm{C}_2=10$ 通り。赤 $2$ 個は \${}_3\mathrm{C}_2=3$ 通り。` },
-                { q: String.raw`$1$ から $6$ までのカードから $2$ 枚引いて作る $2$ 桁の整数が $3$ の倍数になる確率。`, a: String.raw`$\frac{4}{15}$`, e: String.raw`全 $30$ 通り中、和が $3,6,9$ になる組を探す。` },
-                { q: String.raw`サイコロを $2$ 回振り、出た目の積が奇数になる確率。`, a: String.raw`$\frac{1}{4}$`, e: String.raw`$1$ 回目も $2$ 回目も奇数である確率 $(1/2 \times 1/2)$。` },
-                { q: String.raw`ある箱の中に白球が多数入っている。黒球を $50$ 個入れて混ぜた後、$40$ 個取り出すと黒球が $2$ 個あった。白球は約何個か。`, a: "約 950 個", e: String.raw`$50 : x = 2 : 40 \to 2x = 2000 \to x=1000$。黒を引いて $950$。` },
-                { q: String.raw`トランプ $52$ 枚から $1$ 枚引くとき、絵札（J,Q,K）が出る確率。`, a: String.raw`$\frac{3}{13}$`, e: String.raw`$12/52 = 3/13$` },
-                { q: String.raw`$A,B,C$ の $3$ 人でリレーの走る順番を決める方法は何通りか。`, a: "6 通り", e: String.raw`$3 \times 2 \times 1 = 6$` },
-                { q: String.raw`くじが $10$ 本あり、$3$ 本が当たり。同時に $2$ 本引いて少なくとも $1$ 本当たる確率。`, a: String.raw`$\frac{8}{15}$`, e: String.raw`余事象（$2$ 本ともハズレ）は \${}_7\mathrm{C}_2 / \${}_{10}\mathrm{C}_2 = 21/45 = 7/15$。$1 - 7/15 = 8/15$。` },
-                { q: String.raw`サイコロを振り、$1$ または $6$ の目が出る確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`$2/6 = 1/3$` },
-                { q: String.raw`袋に $1,2,3,4$ の数字が書かれた玉。元に戻さず $2$ 回引くとき、和が $5$ になる確率。`, a: String.raw`$\frac{1}{3}$`, e: String.raw`全 $12$ 通り. 和が $5$ は $(1,4),(4,1),(2,3),(3,2)$ の $4$ 通り。` },
-                { q: String.raw`中央値（メジアン）の意味。`, a: "資料を大きさ順に並べた時の中央の値", e: "データが偶数個の場合は中央の2つの平均。" },
-                { q: String.raw`相対度数の合計は必ずいくつになるか。`, a: String.raw`$1$`, e: "各階級の割合の合計なので必ず $1$。" },
-                { q: String.raw`最頻値（モード）とは何か。`, a: "最も頻繁に現れる値", e: "度数が最大の階級の階級値など。" },
-                { q: String.raw`$5$ 回のテストの平均が $72$ 点。$6$ 回目に何点取れば平均 $75$ 点になるか。`, a: "90 点", e: String.raw`$75 \times 6 - 72 \times 5 = 450 - 360 = 90$` },
-                { q: String.raw`$2$ つのサイコロを振り、目の差が $4$ になる確率。`, a: String.raw`$\frac{1}{9}$`, e: String.raw`$(1,5),(2,6),(5,1),(6,2)$ の $4$ 通り。$4/36 = 1/9$` }
-            ],
-            "d1_q9": [
-                { q: String.raw`線分 $AB$ の垂直二等分線を作図せよ。`, a: "（垂直二等分線）", e: "2点A,Bから等しい半径の弧を描き、その交点を結ぶ。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]], {name:'AB', withLabel:true}); } },
-                { q: String.raw`$\angle ABC$ の二等分線を作図せよ。`, a: "（角の二等分線）", e: "頂点Bから弧を描き、辺との交点からさらに等しい半径の弧を描く。", draw: (brd) => { brd.create('polyline', [[0,3],[0,0],[4,0]], {strokeColor:'black'}); } },
-                { q: String.raw`点 $P$ を通り直線 $l$ に垂直な直線を作図せよ。`, a: "（垂線）", e: "Pからlに弧を描き、交点からさらに弧を描いて交点を作る。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]], {name:'l', withLabel:true}); brd.create('point', [0,1], {name:'P'}); } },
-                { q: String.raw`円の接線を作図せよ（円上の点 $A$ を通るもの）。`, a: "（接線）", e: "中心Oと点Aを結び、点Aを通る垂線を引く。", draw: (brd) => { brd.create('circle', [[0,0], 2]); brd.create('point', [2,0], {name:'A'}); } },
-                { q: String.raw`$3$ 点 $A,B,C$ から等しい距離にある点 $P$ を作図せよ。`, a: "（外心）", e: "2つの辺の垂直二等分線の交点を求める。", draw: (brd) => { brd.create('point', [0,2], {name:'A'}); brd.create('point', [-2,-1], {name:'B'}); brd.create('point', [3,-1], {name:'C'}); } },
-                { q: String.raw`辺 $BC$ を底辺とした時の、$\triangle ABC$ の高さを示す線分。`, a: "（垂線）", e: "点Aから辺BCへの垂線。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[4,0]]); } },
-                { q: String.raw`長方形 $ABCD$ を、対角線 $AC$ を軸に折り返した時の頂点 $B$ の移動先 $B'$。`, a: "（作図）", e: "ACを対称軸とした線対称な点。", draw: (brd) => { brd.create('polygon', [[0,2],[4,2],[4,0],[0,0]]); } },
-                { q: String.raw`円の中心 $O$ を作図で求めよ。`, a: "（中心）", e: "任意の2つの弦の垂直二等分線の交点。", draw: (brd) => { brd.create('circle', [[1,1], 2.5], {strokeDashArray:[2,2]}); } },
-                { q: String.raw`点 $P$ を通り直線 $l$ に平行な直線。`, a: "（平行線）", e: "ひし形を作るように作図するか、垂線を2回引く。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]]); brd.create('point', [1,1], {name:'P'}); } },
-                { q: String.raw`$60^\circ$ の角度を作図せよ。`, a: "（正三角形の角）", e: "正三角形の作図と同じ手順で行う。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
-                { q: String.raw`$30^\circ$ の角度を作図せよ。`, a: "（60度の二等分）", e: "まず60度を作り、それを二等分する。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
-                { q: String.raw`線分 $AB$ を $1:3$ に分ける点。`, a: "（垂直二等分線の利用）", e: "垂直二等分線を2回引き、4等分する。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]]); } },
-                { q: String.raw`辺 $AB$ 上にあり、辺 $AC, BC$ から等距離にある点。`, a: "（角の二等分線の交点）", e: "∠Cの二等分線とABの交点。", draw: (brd) => { brd.create('polygon', [[0,3],[-2,0],[3,0]]); } },
-                { q: String.raw`円の外の点 $P$ から円への接線。`, a: "（接線）", e: "OPの中点を中心としPを通る円を描き、元の円との交点を結ぶ。", draw: (brd) => { brd.create('circle', [[0,0], 1.5]); brd.create('point', [4,0], {name:'P'}); } },
-                { q: String.raw`$\triangle ABC$ で、辺 $BC$ 上にあり $\triangle ABP = \triangle ACP$ となる点 $P$。`, a: "（中点）", e: "辺BCの中点を作図する。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[3,0]]); } }
-            ],
-            "d2": [
-    { 
-        q: String.raw`$n$ 段目のタイルの個数を $n$ で表せ（1, 4, 9...）`, a: String.raw`$n^2$`, e: String.raw`$1^2, 2^2, 3^2 \dots$ と続く2乗の規則性です。`,
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); 
-            for(let i=0; i<3; i++) for(let j=0; j<3; j++) {
-                brd.create('polygon', [[i,-j], [i+1,-j], [i+1,-j-1], [i,-j-1]], {fillColor:'gray', strokeColor:'white', fixed:true});
-            }
-            brd.create('text', [0.5, 0.5, "n=1"]); brd.create('text', [1.5, 0.5, "n=2..."]);
-        }
-    },
-    { 
-        q: String.raw`連続する3つの整数の和が3の倍数になることを証明せよ。`, a: String.raw`$n+(n+1)+(n+2) = 3n+3 = 3(n+1)$`, e: String.raw`$3 \times (\text{整数})$ の形になるため3の倍数といえます。` 
-    },
-    { 
-        q: String.raw`底面の半径 $r$, 高さ $h$ の円柱の体積 $V$ を $h$ について解け。`, a: String.raw`$h = \frac{V}{\pi r^2}$`, e: String.raw`$V = \pi r^2 h$ より。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('ellipse', [[0,1.5], [1.5,1.5], [0,2]], {strokeColor:'black'});
-            brd.create('ellipse', [[0,-1.5], [1.5,-1.5], [0,-1]], {strokeColor:'black'});
-            brd.create('segment', [[-1.5,1.5], [-1.5,-1.5]], {strokeColor:'black'});
-            brd.create('segment', [[1.5,1.5], [1.5,-1.5]], {strokeColor:'black'});
-            brd.create('text', [1.7, 0, "h"]); brd.create('segment', [[0,-1.5], [1.5,-1.5]], {dash:2}); brd.create('text', [0.5, -1.8, "r"]);
-        }
-    },
-    { 
-        q: String.raw`奇数と奇数の和が偶数になることを証明せよ。`, a: String.raw`$(2m+1)+(2n+1) = 2(m+n+1)$`, e: String.raw`$2 \times (\text{整数})$ は偶数です。` 
-    },
-    { 
-        q: String.raw`2けたの正の整数で、十の位の数と一の位の数を入れかえた数との和。`, a: String.raw`"$11$ の倍数"`, e: String.raw`$(10a+b)+(10b+a) = 11a+11b = 11(a+b)$` 
-    },
-    { 
-        q: String.raw`$n$ 角形の対角線の本数を $n$ を用いて表せ。`, a: String.raw`$\frac{n(n-3)}{2}$`, e: String.raw`1つの頂点から $(n-3)$ 本引けます。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            let p = brd.create('regularpolygon', [[0,1.5], [0,-1.5], 5], {withLabel:false});
-            brd.create('segment', [p.vertices[0], p.vertices[2]], {strokeColor:'red', dash:2});
-            brd.create('segment', [p.vertices[0], p.vertices[3]], {strokeColor:'red', dash:2});
-        }
-    },
-    { 
-        q: String.raw`1辺 $a$ cmの正方形の周の長さ $L$ を $a$ について解け。`, a: String.raw`$a = \frac{L}{4}$`, e: String.raw`$L = 4a$ より。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('polygon', [[-1.5,1.5], [1.5,1.5], [1.5,-1.5], [-1.5,-1.5]]);
-            brd.create('text', [0, -1.8, "a"]);
-        }
-    },
-    { 
-        q: String.raw`連続する2つの奇数の積に1を足した数は、何の倍数か。`, a: "4 の倍数", e: String.raw`$(2n-1)(2n+1)+1 = 4n^2-1+1 = 4n^2$` 
-    },
-    { 
-        q: String.raw`半径 $r$ の円の周の長さを $l$ とするとき、$r$ について解け。`, a: String.raw`$r = \frac{l}{2\pi}$`, e: String.raw`$l = 2\pi r$ より。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 2]);
-            brd.create('segment', [[0,0], [2,0]], {dash:2});
-            brd.create('text', [0.8, 0.2, "r"]);
-        }
-    }
-],
+function setupTest() {
+    // 各カテゴリーからランダムに1問選出
+    testQuestions = categories.map(cat => {
+        const pool = MasterDatabase[cat];
+        return pool[Math.floor(Math.random() * pool.length)];
+    });
+    displayQuestion();
+}
 
-            "d3": [
-    { 
-        q: String.raw`2点 $A(2, 6), B(4, 10)$ を通る直線の式。`, a: String.raw`$y = 2x + 2$`, e: String.raw`傾き $2$, 切片 $2$。`, 
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [[2,6],[4,10]], {strokeColor:'blue'}); brd.create('point', [2,6], {name:'A'}); brd.create('point', [4,10], {name:'B'}); } 
-    },
-    { 
-        q: String.raw`直線 $y = -x + 8$ と $x$ 軸、 $y$ 軸で囲まれた三角形の面積。`, a: "32", e: String.raw`$8 \times 8 \div 2 = 32$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('polygon', [[0,0],[8,0],[0,8]], {fillColor:'yellow', fillOpacity:0.3}); brd.create('line', [[8,0],[0,8]], {strokeColor:'blue'}); }
-    },
-    { 
-        q: String.raw`$y = 2x + 3$ に平行で、点 $(1, 2)$ を通る直線の式。`, a: String.raw`$y = 2x$`, e: String.raw`$y - 2 = 2(x - 1)$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [3,2,-1], {strokeColor:'gray', dash:2}); brd.create('line', [0,2,-1], {strokeColor:'blue'}); brd.create('point', [1,2], {name:'(1,2)'}); }
-    },
-    { 
-        q: String.raw`2直線 $y = x + 2$ と $y = -2x + 8$ の交点の座標。`, a: String.raw`$(2, 4)$`, e: String.raw`連立方程式として解く。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [2,1,-1], {strokeColor:'green'}); brd.create('line', [8,-2,-1], {strokeColor:'red'}); brd.create('point', [2,4], {name:'(2,4)', color:'black'}); }
-    },
-    { 
-        q: String.raw`点 $(3, -1)$ を通り、傾きが $-2$ の直線の式。`, a: String.raw`$y = -2x + 5$`, e: String.raw`$-1 = -2(3) + b \to b = 5$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [5,-2,-1], {strokeColor:'blue'}); brd.create('point', [3,-1], {name:'(3,-1)'}); }
-    },
-    { 
-        q: String.raw`$x$ 切片が $4$, $y$ 切片が $3$ の直線の式。`, a: String.raw`$y = -\frac{3}{4}x + 3$`, e: String.raw`$(4, 0)$ と $(0, 3)$ を通る。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [[4,0],[0,3]], {strokeColor:'blue'}); brd.create('point', [4,0]); brd.create('point', [0,3]); }
-    },
-    { 
-        q: String.raw`関数 $y = 3x - 5$ で、$x$ の変域が $1 \leqq x \leqq 4$ のときの $y$ の変域。`, a: String.raw`$-2 \leqq y \leqq 7$`, e: String.raw`$x=1$ で $y=-2$, $x=4$ で $y=7$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('segment', [[1,-2],[4,7]], {strokeColor:'red', strokeWidth:3}); brd.create('line', [-5,3,-1], {dash:1, strokeColor:'gray'}); }
-    },
-    { 
-        q: String.raw`2点 $(-1, 4), (2, -2)$ を通る直線の式。`, a: String.raw`$y = -2x + 2$`, e: String.raw`傾き $(-2-4)/(2-(-1)) = -2$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [[-1,4],[2,-2]], {strokeColor:'blue'}); brd.create('point', [-1,4]); brd.create('point', [2,-2]); }
-    },
-    { 
-        q: String.raw`直線 $y = \frac{1}{2}x + 1$ 上にあり、$x$ 座標が $4$ である点の $y$ 座標。`, a: "3", e: String.raw`$y = \frac{1}{2}(4) + 1 = 3$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [1,0.5,-1], {strokeColor:'blue'}); brd.create('point', [4,3], {name:'(4,3)', color:'red'}); }
-    },
-    { 
-        q: String.raw`3点 $(0, 2), (2, 6), (a, 10)$ が一直線上にあるとき、 $a$ の値。`, a: "4", e: String.raw`前の2点から $y = 2x + 2$。これに代入して $10 = 2a + 2$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [2,2,-1], {strokeColor:'blue'}); brd.create('point', [0,2]); brd.create('point', [2,6]); brd.create('point', [4,10], {name:'a=4', color:'red'}); }
-    }
-],
+function displayQuestion() {
+    const q = testQuestions[currentIdx];
+    document.getElementById('current-q-num').innerText = currentIdx + 1;
+    document.getElementById('q-text').innerHTML = q.q;
+    
+    const img = document.getElementById('test-img');
+    const embed = document.getElementById('test-embed');
+    img.style.display = 'none';
+    embed.style.display = 'none';
 
-            "d4": [
-    { 
-        q: String.raw`$\triangle ABC$ で $DE // BC, AD:DB = 1:2$ のとき、$DE:BC$ を求めよ。`, a: String.raw`$1:3$`, e: String.raw`相似比は $AD:AB = 1:(1+2) = 1:3$。`, 
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); 
-            let a = brd.create('point', [0,4], {name:'A'});
-            let b = brd.create('point', [-2,0], {name:'B'});
-            let c = brd.create('point', [4,0], {name:'C'});
-            brd.create('polygon', [a,b,c]);
-            let d = brd.create('point', [-0.66,2.66], {name:'D'});
-            let e = brd.create('point', [1.33,2.66], {name:'E'});
-            brd.create('segment', [d,e], {strokeColor:'red', strokeWidth:3});
-        } 
-    },
-    { 
-        q: String.raw`半径 $5\text{cm}$ の円で、中心からの距離が $3\text{cm}$ である弦の長さ。`, a: "8cm", e: String.raw`三平方の定理より $\sqrt{5^2-3^2} = 4$。弦はその2倍の $8$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 5]);
-            brd.create('segment', [[-4,3], [4,3]], {strokeColor:'red', strokeWidth:2});
-            brd.create('segment', [[0,0], [0,3]], {dash:2});
-            brd.create('segment', [[0,0], [4,3]], {dash:2});
-            brd.create('text', [0.2, 1.5, "3"]); brd.create('text', [2, 1, "5"]);
-        }
-    },
-    { 
-        q: String.raw`1辺 $6\text{cm}$ の正三角形の高さ。`, a: String.raw`$3\sqrt{3}\text{cm}$`, e: String.raw`辺の比 $1:2:\sqrt{3}$ を利用。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('regularpolygon', [[-2,0], [2,0], 3]);
-            brd.create('segment', [[0,3.46], [0,0]], {dash:2, strokeColor:'red'});
-        }
-    },
-    { 
-        q: String.raw`相似比が $2:3$ の2つの図形の面積比。`, a: String.raw`$4:9$`, e: String.raw`面積比は相似比の2乗になる。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('polygon', [[-4,0], [-2,0], [-2,2], [-4,2]], {fillColor:'blue'});
-            brd.create('polygon', [[0,0], [3,0], [3,3], [0,3]], {fillColor:'red'});
-        }
-    },
-    { 
-        q: String.raw`円周角の定理より、半円の弧に対する円周角の大きさ。`, a: String.raw`$90^\circ$`, e: String.raw`中心角が $180^\circ$ なのでその半分。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('arc', [[0,0], [3,0], [-3,0]], {strokeColor:'black'});
-            brd.create('segment', [[-3,0], [3,0]]);
-            brd.create('polyline', [[-3,0], [1,2.82], [3,0]]);
-        }
-    },
-    { 
-        q: String.raw`2つの同心円があり、半径が $3\text{cm}$ と $5\text{cm}$ のとき、ドーナツ部分の面積。`, a: String.raw`$16\pi\text{cm}^2$`, e: String.raw`$25\pi - 9\pi = 16\pi$`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 5], {fillColor:'orange', fillOpacity:0.3});
-            brd.create('circle', [[0,0], 3], {fillColor:'white', fillOpacity:1});
-        }
-    },
-    { 
-        q: String.raw`$\triangle ABC$ が直角二等辺三角形で、斜辺が $10\text{cm}$ のとき、他の辺の長さ。`, a: String.raw`$5\sqrt{2}\text{cm}$`, e: String.raw`$x : 10 = 1 : \sqrt{2} \to \sqrt{2}x = 10$`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('polygon', [[0,0], [4,0], [0,4]]);
-            brd.create('text', [1.5, 2.5, "10"]);
-        }
-    },
-    { 
-        q: String.raw`対角線の長さが $8\text{cm}, 10\text{cm}$ のひし形の面積。`, a: String.raw`$40\text{cm}^2$`, e: String.raw`$(8 \times 10) \div 2 = 40$`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('polygon', [[0,2.5], [2,0], [0,-2.5], [-2,0]]);
-            brd.create('segment', [[0,2.5], [0,-2.5]], {dash:1});
-            brd.create('segment', [[2,0], [-2,0]], {dash:1});
-        }
-    },
-    { 
-        q: String.raw`円に内接する四角形 $ABCD$ で、$\angle A = 85^\circ$ のとき $\angle C$ の大きさ。`, a: String.raw`$95^\circ$`, e: String.raw`対角の和は $180^\circ$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 3]);
-            brd.create('polygon', [[3*Math.cos(1), 3*Math.sin(1)], [3*Math.cos(2.5), 3*Math.sin(2.5)], [3*Math.cos(4), 3*Math.sin(4)], [3*Math.cos(5.8), 3*Math.sin(5.8)]]);
-        }
-    },
-    { 
-        q: String.raw`辺の長さが $3, 4, 5$ の三角形はどのような三角形か。`, a: "直角三角形", e: String.raw`$3^2 + 4^2 = 5^2$ が成り立つ（三平方の逆）。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('polygon', [[0,0], [4,0], [0,3]]);
-            brd.create('text', [2, -0.5, "4"]); brd.create('text', [-0.5, 1.5, "3"]); brd.create('text', [2.2, 1.8, "5"]);
-        }
-    }
-],
-
-            "d5": [
-    { 
-        q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
-        a: String.raw`$12\pi\text{cm}^3$`, 
-        e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
-        draw: (brd) => { 
-            brd.setAttribute({axis:false, boundingbox:[-5,5,5,-5]}); 
-            const center = [0, -2], top = [0, 2], radius = 3;
-            // 底面の楕円（後ろ側を点線、前を実線にすると立体的ですが、簡易的に1つで描画）
-            brd.create('ellipse', [center, [radius, -2], [0, -1.2]], {strokeColor:'black', fillOpacity:0.1});
-            // 輪郭線
-            brd.create('segment', [[-radius, -2], top], {strokeColor:'black'});
-            brd.create('segment', [[radius, -2], top], {strokeColor:'black'});
-            // 補助線
-            brd.create('segment', [center, top], {dash:2, strokeColor:'gray'});
-            brd.create('segment', [center, [radius, -2]], {dash:2, strokeColor:'gray'});
-            brd.create('text', [0.2, 0, "4cm"]);
-            brd.create('text', [1, -2.4, "3cm"]);
-        } 
-    },
-    { 
-        q: String.raw`1辺 $6\text{cm}$ の立方体の対角線の長さ。`, 
-        a: String.raw`$6\sqrt{3}\text{cm}$`, 
-        e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            const s = 1.5; // 表示上のサイズ
-            const off = 0.7; // 奥行き
-            const p = [[-s,-s],[s,-s],[s,s],[-s,s], [-s+off,-s+off],[s+off,-s+off],[s+off,s+off],[-s+off,s+off]];
-            // 面の描画
-            brd.create('polygon', [p[4],p[5],p[6],p[7]], {fillColor:'none', strokeColor:'gray', dash:2}); // 奥
-            brd.create('polygon', [p[0],p[1],p[2],p[3]], {fillColor:'none', strokeColor:'black'}); // 手前
-            // 柱の部分
-            for(let i=0; i<4; i++) brd.create('segment', [p[i], p[i+4]], {strokeColor: i==0?'gray':'black', dash: i==0?2:0});
-            // 対角線
-            brd.create('segment', [p[3], p[5]], {strokeColor:'red', dash:1});
-        }
-    },
-    { 
-        q: String.raw`半径 $3\text{cm}$ の球の表面積。`, 
-        a: String.raw`$36\pi\text{cm}^2$`, 
-        e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 3], {strokeColor:'black'});
-            brd.create('ellipse', [[0,0], [3,0], [0,0.8]], {strokeColor:'gray', dash:2}); // 赤道
-            brd.create('segment', [[0,0], [3,0]], {dash:2});
-            brd.create('text', [1, 0.4, "3cm"]);
-        }
-    },
-    { 
-        q: String.raw`底面が 1辺 $4\text{cm}$ の正方形で、高さが $6\text{cm}$ の正四角錐の体積。`, 
-        a: String.raw`$32\text{cm}^3$`, 
-        e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            const base = [[-2,-1], [1,-1.5], [2.5,-0.5], [-0.5,0]]; // 底面の4点
-            const top = [1, 3];
-            brd.create('polygon', base, {fillColor:'none', strokeColor:'gray', dash:2});
-            brd.create('segment', [top, base[0]], {strokeColor:'black'});
-            brd.create('segment', [top, base[1]], {strokeColor:'black'});
-            brd.create('segment', [top, base[2]], {strokeColor:'black'});
-            brd.create('segment', [top, base[3]], {strokeColor:'gray', dash:2});
-            brd.create('segment', [top, [1, -0.75]], {dash:2, strokeColor:'blue'}); // 高さ
-        }
-    },
-    { 
-        q: String.raw`底面の半径 $2\text{cm}$, 高さ $5\text{cm}$ の円柱の側面積。`, 
-        a: String.raw`$20\pi\text{cm}^2$`, 
-        e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            const r = 2, h = 2;
-            brd.create('ellipse', [[0,h], [r,h], [0,h+0.6]], {strokeColor:'black'}); // 上面
-            brd.create('ellipse', [[0,-h], [r,-h], [0,-h+0.6]], {strokeColor:'black'}); // 下面
-            brd.create('segment', [[-r,h], [-r,-h]], {strokeColor:'black'});
-            brd.create('segment', [[r,h], [r,-h]], {strokeColor:'black'});
-            brd.create('text', [r+0.2, 0, "5cm"]);
-        }
-    },
-    // 以下、図解なし問題はそのまま
-    { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
-    { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
-    { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
-    { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
-]
-        };
-    let currentIdx = 0;
-    let totalScore = 0;
-    let testData = [];
-    let wrongCategories = [];
-
-    // 模試の構成（都立入試の配点・構成をシミュレート）
-    function initTest() {
-        const testConfig = [
-            { id: 'd1_q1', name: '計算(基本)', w: 5 },
-            { id: 'd1_q2', name: '平方根', w: 5 },
-            { id: 'd1_q3', name: '一次方程式', w: 5 },
-            { id: 'd1_q4', name: '連立方程式', w: 5 },
-            { id: 'd1_q5', name: '二次方程式', w: 5 },
-            { id: 'd1_q6', name: '関数(変化・変域)', w: 5 },
-            { id: 'd1_q7', name: '平面図形(角度)', w: 5 },
-            { id: 'd1_q8', name: '確率・統計', w: 6 },
-            { id: 'd1_q9', name: '作図', w: 6 },
-            { id: 'd2', name: '数と言葉(規則性)', w: 12 },
-            { id: 'd3', name: '一次関数(グラフ応用)', w: 12 },
-            { id: 'd4', name: '図形の性質(相似・三平方)', w: 12 },
-            { id: 'd5', name: '空間図形', w: 12 }
-        ];
-
-        // 各カテゴリからランダムに1問選出
-        testData = testConfig.map(config => {
-            const questions = MasterDatabase[config.id];
-            if (!questions) return null;
-            const randomQ = questions[Math.floor(Math.random() * questions.length)];
-            return { ...randomQ, ...config };
-        }).filter(q => q !== null);
-
-        if (testData.length === 0) {
-            alert("問題データベースが見つかりません。MasterDatabaseを貼り付けてください。");
-            return;
-        }
-        showQuestion();
+    if (q.img) {
+        img.src = q.img;
+        img.style.display = 'block';
+    } else if (q.embed) {
+        embed.src = q.embed;
+        embed.style.display = 'block';
     }
 
-    function showQuestion() {
-        const q = testData[currentIdx];
-        document.getElementById('q-number').innerText = `第 ${currentIdx + 1} 問 / ${testData.length}`;
-        document.getElementById('q-badge').innerText = q.name;
-        document.getElementById('question-text').innerHTML = q.q;
+    MathJax.typesetPromise();
+}
 
-        // 数式レンダリング（MathJax）
-        if (window.MathJax) MathJax.typesetPromise();
-
-        // 図形描画（JSXGraph）
-        const box = document.getElementById('jxgbox');
-        if (q.draw) {
-            box.style.display = 'block';
-            // ボードの初期化（以前の描画を消去）
-            JXG.JSXGraph.freeBoard(board); 
-            var board = JXG.JSXGraph.initBoard('jxgbox', {
-                boundingbox: [-5, 5, 5, -5], 
-                axis: true, 
-                showCopyright: false,
-                showNavigation: false
-            });
-            q.draw(board);
-        } else {
-            box.style.display = 'none';
-        }
+function showJudge() {
+    const q = testQuestions[currentIdx];
+    document.getElementById('test-screen').style.display = 'none';
+    document.getElementById('judge-screen').style.display = 'block';
+    document.getElementById('correct-ans').innerHTML = q.a;
+    document.getElementById('expl-text').innerHTML = q.e;
+    
+    // 作図問題の解説画像差し替え
+    if (q.imgA) {
+        document.getElementById('test-img').src = q.imgA;
     }
+    
+    MathJax.typesetPromise();
+}
 
-    function processAnswer(isCorrect) {
-        if (isCorrect) {
-            totalScore += testData[currentIdx].w;
-        } else {
-            wrongCategories.push(testData[currentIdx].name);
-        }
+function nextQuestion(isCorrect) {
+    if (isCorrect) correctCount++;
+    currentIdx++;
 
-        if (currentIdx < testData.length - 1) {
-            currentIdx++;
-            showQuestion();
-        } else {
-            showFinalResult();
-        }
+    if (currentIdx < testQuestions.length) {
+        document.getElementById('judge-screen').style.display = 'none';
+        document.getElementById('test-screen').style.display = 'block';
+        displayQuestion();
+    } else {
+        showResult();
     }
+}
 
-    function showFinalResult() {
-        document.getElementById('test-ui').style.display = 'none';
-        document.getElementById('result-ui').style.display = 'block';
-        
-        // 偏差値の簡易計算 (平均60、標準偏差15と仮定)
-        const dv = Math.round(((totalScore - 60) / 15) * 10 + 50);
-        document.getElementById('res-score').innerText = totalScore;
-        document.getElementById('res-dv').innerText = Math.max(30, Math.min(75, dv));
+function showResult() {
+    document.getElementById('judge-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    document.getElementById('final-score').innerText = correctCount;
 
-        const weaknessText = wrongCategories.length > 0 
-            ? "集中強化すべき分野: <br><span style='color:var(--red);'>" + [...new Set(wrongCategories)].join('、') + "</span>"
-            : "素晴らしい！全問正解です。基礎から応用まで完璧に定着しています。";
-        document.getElementById('res-weakness').innerHTML = weaknessText;
+    // 偏差値計算ロジック（簡易版）
+    const dev = 35 + (correctCount * 2.7);
+    document.getElementById('deviation-value').innerText = dev.toFixed(1);
+
+    // アドバイス
+    let advice = "";
+    if (correctCount <= 4) {
+        advice = "<strong>【基礎固めが必要です】</strong><br>まずは公式の確認から始めましょう。教科書の例題を繰り返し解くことで、偏差値50への道が開けます。";
+    } else if (correctCount <= 9) {
+        advice = "<strong>【標準的な実力です】</strong><br>基本的な問題は解けています。計算ミスを減らし、苦手な図形や関数を克服することで、さらに上位を目指せます。";
+    } else {
+        advice = "<strong>【素晴らしい実力です！】</strong><br>応用問題にも対応できる力がついています。ケアレスミスに注意しつつ、より難易度の高い問題に挑戦して自信を深めましょう。";
     }
+    document.getElementById('advice-box').innerHTML = advice;
+}
 
-    // 起動
-    window.onload = function() {
-        if (typeof MasterDatabase === 'undefined') {
-            document.getElementById('question-text').innerText = "エラー: MasterDatabaseが定義されていません。コード内にデータを貼り付けてください。";
-        } else {
-            initTest();
-        }
-    };
+window.onload = setupTest;
 </script>
 </body>
 </html>
