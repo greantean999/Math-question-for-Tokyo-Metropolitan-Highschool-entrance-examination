@@ -222,20 +222,25 @@
             ],
             "d5": [
     { 
-        q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
-        a: String.raw`$12\pi\text{cm}^3$`, 
-        e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); // 軸を隠す
-            // 底面の楕円
-            brd.create('ellipse', [[0,-2], [3,-2], [0,-1.2]], {strokeColor:'black', fillOpacity:0.1});
-            // 側面
-            brd.create('polyline', [[-3,-2], [0,3], [3,-2]], {strokeColor:'black'});
-            // 高さの点線
-            brd.create('segment', [[0,3], [0,-2]], {dash:2, strokeColor:'gray'});
-            brd.create('segment', [[0,-2], [3,-2]], {dash:2, strokeColor:'gray'});
-            brd.create('text', [0.2, 0.5, "4cm"]);
-            brd.create('text', [1.5, -2.3, "3cm"]);
+        { 
+    q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
+    a: String.raw`$12\pi\text{cm}^3$`, 
+    e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
+    draw: (brd) => { 
+        brd.setAttribute({axis:false}); 
+        // 頂点と底面の中心
+        let top = brd.create('point', [0, 3], {name: '頂点', visible: false});
+        let center = brd.create('point', [0, -2], {visible: false});
+        // 底面（楕円）
+        let e1 = brd.create('ellipse', [center, [3, -2], [0, -1.2]], {strokeColor:'black', fillOpacity:0.1});
+        // フレームの左右端と頂点を結ぶ
+        brd.create('segment', [[-3, -2], top], {strokeColor:'black', strokeWidth: 2});
+        brd.create('segment', [[3, -2], top], {strokeColor:'black', strokeWidth: 2});
+        // 高さ方向の点線（補助線）
+        brd.create('segment', [center, top], {dash:2, strokeColor:'gray'});
+        brd.create('segment', [center, [3, -2]], {dash:2, strokeColor:'gray'});
+        brd.create('text', [0.2, 0.5, "4cm"]);
+        brd.create('text', [1.5, -2.4, "3cm"]);
         } 
     },
     { 
