@@ -4,31 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数学演習システム</title>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        #app-container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        #question-text { font-size: 1.2rem; line-height: 1.6; margin-bottom: 20px; min-height: 50px; }
+        #media-container { text-align: center; margin-bottom: 20px; min-height: 200px; display: flex; justify-content: center; align-items: center; background: #fafafa; border-radius: 10px; }
+        img { max-width: 100%; height: auto; border-radius: 8px; }
+        iframe { width: 100%; height: 350px; border: none; border-radius: 8px; }
+        button { width: 100%; padding: 12px; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        #show-ans-btn { background-color: #007bff; color: white; }
+        #next-btn { background-color: #28a745; color: white; display: none; }
+        #answer-area { display: none; margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 8px; border-left: 5px solid #007bff; }
+        .label { font-weight: bold; color: #495057; display: block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraphcore.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsxgraph/distrib/jsxgraph.css">
-    
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            chtml: { displayAlign: 'left' }
-        };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-    // パスワードチェック（セッション中1回だけ）
-    if (!sessionStorage.getItem('auth')) {
-        const pass = prompt("パスワードを入力してください");
-        if (pass === "1234") { // ここに好きなパスワード
-            sessionStorage.setItem('auth', 'true');
-        } else {
-            alert("パスワードが違います");
-            location.href = "about:blank";
-        }
-    }
+<div id="app-container">
+    <div id="question-text">問題を読み込み中...</div>
 
-        let MasterDatabase = {
-            "d1_q1": [
+    <div id="media-container">
+        <img id="q-image" style="display:none;">
+        <iframe id="q-embed" style="display:none;"></iframe>
+    </div>
+
+    <button id="show-ans-btn" onclick="showAnswer()">答え合わせを表示</button>
+
+    <div id="answer-area">
+        <span class="label">【答え】</span>
+        <div id="answer-text"></div>
+        <hr>
+        <span class="label">【解説】</span>
+        <div id="explanation-text"></div>
+        <button id="next-btn" onclick="init()">次の問題へ</button>
+    </div>
+</div>
+
+<script>
+// --- MasterDatabase はここから後で追加 ---
+let MasterDatabase = {
+    "d1_q1": [
                 { q: "$1 - 6 \\times (-2)$", a: "$13$", e: "$1 - (-12) = 13$" },
                 { q: "$(-4)^2 \\div 8 - 5$", a: "$-3$", e: "$16 \\div 8 - 5 = 2 - 5 = -3$" },
                 { q: "$8a + b - (a - 7b)$", a: "$7a + 8b$", e: "$8a + b - a + 7b = 7a + 8b$" },
@@ -118,137 +134,182 @@
                 { q: String.raw`$x^2 + x - 1 = 0$`, a: String.raw`$x = \frac{-1 \pm \sqrt{5}}{2}$`, e: String.raw`解の公式を利用。` },
                 { q: String.raw`$x^2 - 8x + 12 = 0$`, a: String.raw`$x = 2, 6$`, e: String.raw`$(x-2)(x-6)=0$` }
             ],
-            "d1_q6": [
-    { 
-        q: String.raw`$y = 2x^2$ で $x$ が $1$ から $3$ まで増加するときの変化の割合。`, a: String.raw`$8$`, e: String.raw`$2(1+3)=8$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 2*x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = -x^2$ で $x$ が $-4$ から $-2$ まで増加するときの変化の割合。`, a: String.raw`$6$`, e: String.raw`$-1(-4-2)=6$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = 3x^2$ で $x$ の変域が $-1 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=0$ で最小値 $0$, $x=2$ で最大値 $12$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 3*x*x, -1, 2], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`$y = ax^2$ において、$x$ が $2$ から $4$ まで増加するときの変化の割合が $12$ であるとき、$a$ の値。`, a: String.raw`$2$`, e: String.raw`$a(2+4)=12 \to 6a=12$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 2*x*x], {dash:2}); }
-    },
-    { 
-        q: String.raw`$y = \frac{1}{2}x^2$ で $x$ の変域が $-4 \leqq x \leqq 2$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 8$`, e: String.raw`$x=-4$ のとき最大値 $8$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 0.5*x*x, -4, 2], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`関数 $y = -2x^2$ について、$x$ の値が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-10$`, e: String.raw`$-2(1+4)=-10$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -2*x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = ax^2$ で $x$ の変域が $-2 \leqq x \leqq 1$ のとき $y$ の変域が $0 \leqq y \leqq 8$。 $a$ の値。`, a: String.raw`$2$`, e: String.raw`$x=-2$ のとき $y=8$ となるので $4a=8$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 2*x*x, -2, 1], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`$y = \frac{1}{4}x^2$ で $x$ が $2$ から $6$ まで増加するときの変化の割合。`, a: String.raw`$2$`, e: String.raw`$\frac{1}{4}(2+6)=2$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 0.25*x*x], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = -3x^2$ で $x$ の変域が $-1 \leqq x \leqq 3$ のときの $y$ の変域。`, a: String.raw`$-27 \leqq y \leqq 0$`, e: String.raw`$x=3$ で最小値 $-27$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -3*x*x, -1, 3], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`変化の割合が常に $3$ で、点 $(1, 5)$ を通る直線の式。`, a: String.raw`$y = 3x + 2$`, e: String.raw`$y-5=3(x-1)$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('line', [2, 3, -1], {strokeColor:'blue'}); brd.create('point', [1, 5], {name:'(1,5)'}); }
-    },
-    { 
-        q: String.raw`$y = x^2$ と $y = 2x+3$ の交点の $x$ 座標。`, a: String.raw`$x = 3, -1$`, e: String.raw`$x^2-2x-3=0$ を解く。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => x*x]); brd.create('line', [3, 2, -1], {strokeColor:'green'}); }
-    },
-    { 
-        q: String.raw`$y = \frac{4}{x}$ で $x$ が $1$ から $4$ まで増加するときの変化の割合。`, a: String.raw`$-1$`, e: String.raw`$(1-4)/(4-1) = -3/3 = -1$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => 4/x, 0.1, 10], {strokeWidth:2}); }
-    },
-    { 
-        q: String.raw`$y = -2x^2$ で $y$ の変域が $-18 \leqq y \leqq 0$ となる $x$ の変域。`, a: String.raw`$-3 \leqq x \leqq 3$`, e: String.raw`$-2x^2 = -18 \to x^2=9$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -2*x*x, -3, 3], {strokeColor:'red', strokeWidth:3}); }
-    },
-    { 
-        q: String.raw`$y = ax^2$ と $y = -3x-1$ について、$x$ が $1$ から $3$ まで変化する時の変化の割合が一致する時の $a$。`, a: String.raw`$-0.75$`, e: String.raw`$a(1+3)=-3 \to 4a=-3$`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => -0.75*x*x]); brd.create('line', [-1, -3, -1], {strokeColor:'green'}); }
-    },
-    { 
-        q: String.raw`関数 $y = \frac{1}{3}x^2$ について、$x$ の変域が $-3 \leqq x \leqq 6$ のときの $y$ の変域。`, a: String.raw`$0 \leqq y \leqq 12$`, e: String.raw`$x=6$ のとき $y=12$。`,
-        draw: (brd) => { brd.create('axis', [[0,0],[1,0]]); brd.create('axis', [[0,0],[0,1]]); brd.create('functiongraph', [x => (1/3)*x*x, -3, 6], {strokeColor:'red', strokeWidth:3}); }
-    }
-],
+                "d1_q6": [
+        { 
+            q: String.raw`関数 $y = 2x^2$ で、$x$ の値が $1$ から $3$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$8$`, 
+            e: String.raw`変化の割合 $= a(x_1 + x_2) = 2(1 + 3) = 8$`,
+            img: "assets/graphs/d1_q6_1.png" 
+        },
+        { 
+            q: String.raw`関数 $y = -x^2$ で、$x$ の値が $-4$ から $-2$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$6$`, 
+            e: String.raw`変化の割合 $= -1(-4 + (-2)) = -1(-6) = 6$`,
+            img: "assets/graphs/d1_q6_2.png" 
+        },
+        { 
+            q: String.raw`関数 $y = 3x^2$ で、$x$ の変域が $-1 \leqq x \leqq 2$ のときの $y$ の変域を求めなさい。`, 
+            a: String.raw`$0 \leqq y \leqq 12$`, 
+            e: String.raw`$x=0$ で最小値 $0$、$x=2$ で最大値 $3(2)^2=12$ となります。`,
+            img: "assets/graphs/d1_q6_3.png" 
+        },
+        { 
+            q: String.raw`関数 $y = ax^2$ において、$x$ の値が $2$ から $4$ まで増加するときの変化の割合が $12$ であるとき、$a$ の値を求めなさい。`, 
+            a: String.raw`$a = 2$`, 
+            e: String.raw`$a(2 + 4) = 12$ より $6a = 12 \to a = 2$`,
+            img: "assets/graphs/d1_q6_4.png" 
+        },
+        { 
+            q: String.raw`関数 $y = \frac{1}{2}x^2$ で、$x$ の変域が $-4 \leqq x \leqq 2$ のときの $y$ の変域を求めなさい。`, 
+            a: String.raw`$0 \leqq y \leqq 8$`, 
+            e: String.raw`$x=0$ で最小値 $0$、$x=-4$ で最大値 $\frac{1}{2}(-4)^2=8$ となります。`,
+            img: "assets/graphs/d1_q6_5.png" 
+        },
+        { 
+            q: String.raw`関数 $y = -2x^2$ について、$x$ の値が $1$ から $4$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$-10$`, 
+            e: String.raw`変化の割合 $= -2(1 + 4) = -10$`,
+            img: "assets/graphs/d1_q6_6.png" 
+        },
+        { 
+            q: String.raw`関数 $y = ax^2$ で、$x$ の変域が $-2 \leqq x \leqq 1$ のとき、$y$ の変域が $0 \leqq y \leqq 8$ となります。$a$ の値を求めなさい。`, 
+            a: String.raw`$a = 2$`, 
+            e: String.raw`$y$ の最大値が正なので $a>0$。$x=-2$ のとき $y=8$ となるので $a(-2)^2=8 \to 4a=8 \to a=2$`,
+            img: "assets/graphs/d1_q6_7.png" 
+        },
+        { 
+            q: String.raw`関数 $y = \frac{1}{4}x^2$ で、$x$ の値が $2$ から $6$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$2$`, 
+            e: String.raw`変化の割合 $= \frac{1}{4}(2 + 6) = \frac{1}{4} \times 8 = 2$`,
+            img: "assets/graphs/d1_q6_8.png" 
+        },
+        { 
+            q: String.raw`関数 $y = -3x^2$ で、$x$ の変域が $-1 \leqq x \leqq 3$ のときの $y$ の変域を求めなさい。`, 
+            a: String.raw`$-27 \leqq y \leqq 0$`, 
+            e: String.raw`$x=3$ のとき最小値 $-3(3)^2 = -27$、$x=0$ で最大値 $0$ となります。`,
+            img: "assets/graphs/d1_q6_9.png" 
+        },
+        { 
+            q: String.raw`変化の割合が常に $3$ で、点 $(1, 5)$ を通る直線の式を求めなさい。`, 
+            a: String.raw`$y = 3x + 2$`, 
+            e: String.raw`$y = 3x + b$ に $(1, 5)$ を代入。 $5 = 3(1) + b \to b = 2$`,
+            img: "assets/graphs/d1_q6_10.png" 
+        },
+        { 
+            q: String.raw`関数 $y = x^2$ と $y = 2x + 3$ のグラフの交点の $x$ 座標をすべて求めなさい。`, 
+            a: String.raw`$x = 3, -1$`, 
+            e: String.raw`$x^2 = 2x + 3 \to x^2 - 2x - 3 = 0 \to (x-3)(x+1) = 0$`,
+            img: "assets/graphs/d1_q6_11.png" 
+        },
+        { 
+            q: String.raw`関数 $y = \frac{4}{x}$ で、$x$ の値が $1$ から $4$ まで増加するときの変化の割合を求めなさい。`, 
+            a: String.raw`$-1$`, 
+            e: String.raw`$x=1$ のとき $y=4$、$x=4$ のとき $y=1$。 変化の割合 $= \frac{1 - 4}{4 - 1} = \frac{-3}{3} = -1$`,
+            img: "assets/graphs/d1_q6_12.png" 
+        },
+        { 
+            q: String.raw`関数 $y = -2x^2$ で、$y$ の変域が $-18 \leqq y \leqq 0$ となるような $x$ の変域を求めなさい。`, 
+            a: String.raw`$-3 \leqq x \leqq 3$`, 
+            e: String.raw`$-2x^2 = -18$ より $x^2 = 9 \to x = \pm 3$。よって変域は $-3 \leqq x \leqq 3$`,
+            img: "assets/graphs/d1_q6_13.png" 
+        },
+        { 
+            q: String.raw`関数 $y = ax^2$ と $y = -3x - 1$ について、$x$ の値が $1$ から $3$ まで変化するときの変化の割合が一致するとき、$a$ の値を求めなさい。`, 
+            a: String.raw`$a = -0.75$`, 
+            e: String.raw`$a(1 + 3) = -3 \to 4a = -3 \to a = -3/4$`,
+            img: "assets/graphs/d1_q6_14.png" 
+        },
+        { 
+            q: String.raw`関数 $y = \frac{1}{3}x^2$ について、$x$ の変域が $-3 \leqq x \leqq 6$ のときの $y$ の変域を求めなさい。`, 
+            a: String.raw`$0 \leqq y \leqq 12$`, 
+            e: String.raw`$x=0$ で最小値 $0$、$x=6$ で最大値 $\frac{1}{3}(6)^2 = 12$ となります。`,
+            img: "assets/graphs/d1_q6_15.png" 
+        }
+    ],
 
-            "d1_q7": [
-    { 
-        q: String.raw`正九角形の $1$ つの内角の大きさ。`, a: String.raw`$140^\circ$`, e: String.raw`外角は $360 \div 9 = 40^\circ$。内角は $180 - 40 = 140^\circ$。`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('regularpolygon', [[0,1.2], [0,-1.2], 9], {withLabel:false}); }
-    },
-    { 
-        q: String.raw`半径 $6$cm, 中心角 $120^\circ$ のおうぎ形の弧の長さ。`, a: String.raw`$4\pi \text{cm}$`, e: String.raw`$12\pi \times \frac{120}{360} = 4\pi$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('sector', [[0,0], [3,0], [3*Math.cos(2*Math.PI/3), 3*Math.sin(2*Math.PI/3)]], {strokeColor:'black', fillColor:'orange', fillOpacity:0.3}); }
-    },
-    { 
-        q: String.raw`円周角の定理：中心角が $80^\circ$ のとき、その弧に対する円周角。`, a: String.raw`$40^\circ$`, e: String.raw`円周角は中心角の半分。`,
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); 
-            let c = brd.create('circle', [[0,0], 3]);
-            let p1 = brd.create('point', [3*Math.cos(-0.5), 3*Math.sin(-0.5)], {visible:false});
-            let p2 = brd.create('point', [3*Math.cos(0.9), 3*Math.sin(0.9)], {visible:false});
-            let p3 = brd.create('point', [3*Math.cos(Math.PI), 3*Math.sin(Math.PI)], {visible:false});
-            brd.create('polyline', [[0,0], p1, p3, p2, [0,0]], {strokeColor:'blue'});
+                "d1_q7": [
+        { 
+            q: String.raw`正九角形の $1$ つの内角の大きさを求めなさい。`, 
+            a: String.raw`$140^\circ$`, 
+            e: String.raw`外角の和は $360^\circ$ なので、一つの外角は $360 \div 9 = 40^\circ$。内角は $180 - 40 = 140^\circ$。`,
+            img: "assets/geometry/d1_q7_1.PNG" 
+        },
+        { 
+            q: String.raw`半径 $6\text{cm}$, 中心角 $120^\circ$ のおうぎ形の弧の長さを求めなさい。`, 
+            a: String.raw`$4\pi \text{cm}$`, 
+            e: String.raw`$2\pi \times 6 \times \frac{120}{360} = 4\pi$`,
+            img: "assets/geometry/d1_q7_2.PNG" 
+        },
+        { 
+            q: String.raw`円周角の定理において、中心角が $80^\circ$ のとき、同じ弧に対する円周角の大きさを求めなさい。`, 
+            a: String.raw`$40^\circ$`, 
+            e: String.raw`円周角は中心角の半分になります。$80 \div 2 = 40$`,
+            img: "assets/geometry/d1_q7_3.PNG" 
+        },
+        { 
+            q: String.raw`$n$ 角形の内角の和が $1260^\circ$ であるとき、$n$ の値を求めなさい。`, 
+            a: String.raw`$9$`, 
+            e: String.raw`内角の和の公式 $180(n-2) = 1260$ より、$n-2 = 7$。よって $n=9$。`
+        },
+        { 
+            q: String.raw`対角線の本数が $20$ 本である多角形は何角形か答えなさい。`, 
+            a: "八角形", 
+            e: String.raw`対角線の公式 $\frac{n(n-3)}{2} = 20$ より、$n^2-3n-40=0 \to (n-8)(n+5)=0$。よって $n=8$。`
+        },
+        { 
+            q: String.raw`三角形の $2$ つの内角が $45^\circ, 65^\circ$ のとき、残りの $1$ つの角の外角の大きさを求めなさい。`, 
+            a: String.raw`$110^\circ$`, 
+            e: String.raw`三角形の外角の性質（他の2つの内角の和に等しい）より、$45 + 65 = 110$。`,
+            img: "assets/geometry/d1_q7_6.PNG" 
+        },
+        { 
+            q: String.raw`円に内接する四角形で、向かい合う角の和は何度になるか答えなさい。`, 
+            a: String.raw`$180^\circ$`, 
+            e: String.raw`円に内接する四角形の性質です。`
+        },
+        { 
+            q: String.raw`中心角 $72^\circ$ のおうぎ形は、円全体の何分の $1$ か求めなさい。`, 
+            a: String.raw`$\frac{1}{5}$`, 
+            e: String.raw`$\frac{72}{360} = \frac{1}{5}$`,
+            img: "assets/geometry/d1_q7_8.PNG" 
+        },
+        { 
+            q: String.raw`正六角形の $1$ つの外角の大きさを求めなさい。`, 
+            a: String.raw`$60^\circ$`, 
+            e: String.raw`$360 \div 6 = 60$`,
+            img: "assets/geometry/d1_q7_9.PNG" 
+        },
+        { 
+            q: String.raw`直角二等辺三角形の鋭角の大きさを求めなさい。`, 
+            a: String.raw`$45^\circ$`, 
+            e: String.raw`$(180 - 90) \div 2 = 45$`,
+            img: "assets/geometry/d1_q7_10.PNG" 
+        },
+        { 
+            q: String.raw`半径 $10\text{cm}$、弧の長さ $4\pi\text{cm}$ のおうぎ形の面積を求めなさい。`, 
+            a: String.raw`$20\pi \text{cm}^2$`, 
+            e: String.raw`面積 $S = \frac{1}{2}lr = \frac{1}{2} \times 4\pi \times 10 = 20\pi$`,
+            img: "assets/geometry/d1_q7_11.PNG" 
+        },
+        { 
+            q: String.raw`対角線の長さが $8\text{cm}$ と $6\text{cm}$ であるひし形の面積を求めなさい。`, 
+            a: String.raw`$24 \text{cm}^2$`, 
+            e: String.raw`$(8 \times 6) \div 2 = 24$`,
+            img: "assets/geometry/d1_q7_12.PNG" 
+        },
+        { 
+            q: String.raw`平行四辺形 $ABCD$ で $\angle A=110^\circ$ のとき、$\angle B$ の大きさを求めなさい。`, 
+            a: String.raw`$70^\circ$`, 
+            e: String.raw`平行四辺形の隣り合う角の和は $180^\circ$ です。$180 - 110 = 70$`,
+            img: "assets/geometry/d1_q7_13.PNG" 
+        },
+        { 
+            q: String.raw`円周上に $3$ 点 $A,B,C$ があり、線分 $AC$ が円の直径であるとき、$\angle ABC$ の大きさを求めなさい。`, 
+            a: String.raw`$90^\circ$`, 
+            e: String.raw`半円の弧に対する円周角は常に $90^\circ$ です。`,
+            img: "assets/geometry/d1_q7_14.PNG" 
         }
-    },
-    { 
-        q: String.raw`$n$ 角形の内角の和が $1260^\circ$ であるとき、$n$ の値。`, a: String.raw`$9$`, e: String.raw`$180(n-2)=1260 \to n-2=7 \to n=9$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('regularpolygon', [[0,1.2], [0,-1.2], 9], {strokeColor:'gray'}); }
-    },
-    { 
-        q: String.raw`対角線の本数が $20$ 本である多角形は何角形か。`, a: "八角形", e: String.raw`$\frac{n(n-3)}{2}=20 \to n^2-3n-40=0 \to (n-8)(n+5)=0$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); let p = brd.create('regularpolygon', [[0,1.5], [0,-1.5], 8], {withLabel:false}); }
-    },
-    { 
-        q: String.raw`三角形の $2$ つの内角が $45^\circ, 65^\circ$ のとき、残りの外角の大きさ。`, a: String.raw`$110^\circ$`, e: String.raw`$45 + 65 = 110$ (三角形の外角の性質)`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polyline', [[-2,0], [2,0], [0.5,2], [-2,0]]); brd.create('segment', [[2,0], [4,0]], {dash:2}); }
-    },
-    { 
-        q: String.raw`円に内接する四角形で、向かい合う角の和。`, a: String.raw`$180^\circ$`, e: String.raw`円に内接する四角形の性質。`,
-        draw: (brd) => { 
-            brd.setAttribute({axis:false}); brd.create('circle', [[0,0], 3]);
-            brd.create('polygon', [[3*Math.cos(0.5), 3*Math.sin(0.5)], [3*Math.cos(2), 3*Math.sin(2)], [3*Math.cos(3.5), 3*Math.sin(3.5)], [3*Math.cos(5.5), 3*Math.sin(5.5)]]);
-        }
-    },
-    { 
-        q: String.raw`中心角 $72^\circ$ のおうぎ形は、円全体の何分の $1$ か。`, a: String.raw`$\frac{1}{5}$`, e: String.raw`$72/360 = 1/5$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('circle', [[0,0], 2.5], {strokeColor:'gray', dash:1}); brd.create('sector', [[0,0], [2.5,0], [2.5*Math.cos(72*Math.PI/180), 2.5*Math.sin(72*Math.PI/180)]], {fillColor:'yellow', fillOpacity:0.3}); }
-    },
-    { 
-        q: String.raw`正六角形の $1$ つの外角。`, a: String.raw`$60^\circ$`, e: String.raw`$360 \div 6 = 60$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); let p = brd.create('regularpolygon', [[0,1.2], [0,-1.2], 6]); brd.create('segment', [[0,-1.2], [2,-1.2]], {dash:2}); }
-    },
-    { 
-        q: String.raw`直角二等辺三角形の鋭角の大きさ。`, a: String.raw`$45^\circ$`, e: String.raw`$(180-90) \div 2 = 45$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polygon', [[0,0], [3,0], [0,3]]); }
-    },
-    { 
-        q: String.raw`半径 $10$cm、弧の長さ $4\pi$cm のおうぎ形の面積。`, a: String.raw`$20\pi \text{cm}^2$`, e: String.raw`$S = \frac{1}{2}lr = \frac{1}{2} \times 4\pi \times 10 = 20\pi$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('sector', [[0,0], [3,0], [3*Math.cos(0.4*Math.PI), 3*Math.sin(0.4*Math.PI)]], {fillColor:'green', fillOpacity:0.2}); }
-    },
-    { 
-        q: String.raw`ひし形の面積。対角線が $8$cm と $6$cm。`, a: String.raw`$24 \text{cm}^2$`, e: String.raw`$(8 \times 6) \div 2 = 24$`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polygon', [[0,2], [3,0], [0,-2], [-3,0]]); brd.create('segment', [[0,2], [0,-2]], {dash:1}); brd.create('segment', [[3,0], [-3,0]], {dash:1}); }
-    },
-    { 
-        q: String.raw`平行四辺形 $ABCD$ で $\angle A=110^\circ$ のとき $\angle B$。`, a: String.raw`$70^\circ$`, e: String.raw`隣り合う角の和は $180^\circ$。`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('polygon', [[-1,1.5], [2,1.5], [1,-0.5], [-2,-0.5]]); }
-    },
-    { 
-        q: String.raw`円周上に $3$ 点 $A,B,C$。$\angle ABC$ が直径 $AC$ を持つとき、$\angle ABC$ は。`, a: String.raw`$90^\circ$`, e: String.raw`半円の弧に対する円周角は $90^\circ$。`,
-        draw: (brd) => { brd.setAttribute({axis:false}); brd.create('circle', [[0,0], 3]); brd.create('segment', [[-3,0], [3,0]]); brd.create('polyline', [[-3,0], [1, 2.82], [3,0]]); }
-    }
-],
+    ],
 
             "d1_q8": [
                 { q: String.raw`$2$ 枚の硬貨を同時に投げるとき、少なくとも $1$ 枚が表になる確率。`, a: String.raw`$\frac{3}{4}$`, e: String.raw`「すべて裏」の $1/4$ を $1$ から引く。` },
@@ -267,23 +328,114 @@
                 { q: String.raw`$5$ 回のテストの平均が $72$ 点。$6$ 回目に何点取れば平均 $75$ 点になるか。`, a: "90 点", e: String.raw`$75 \times 6 - 72 \times 5 = 450 - 360 = 90$` },
                 { q: String.raw`$2$ つのサイコロを振り、目の差が $4$ になる確率。`, a: String.raw`$\frac{1}{9}$`, e: String.raw`$(1,5),(2,6),(5,1),(6,2)$ の $4$ 通り。$4/36 = 1/9$` }
             ],
-            "d1_q9": [
-                { q: String.raw`線分 $AB$ の垂直二等分線を作図せよ。`, a: "（垂直二等分線）", e: "2点A,Bから等しい半径の弧を描き、その交点を結ぶ。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]], {name:'AB', withLabel:true}); } },
-                { q: String.raw`$\angle ABC$ の二等分線を作図せよ。`, a: "（角の二等分線）", e: "頂点Bから弧を描き、辺との交点からさらに等しい半径の弧を描く。", draw: (brd) => { brd.create('polyline', [[0,3],[0,0],[4,0]], {strokeColor:'black'}); } },
-                { q: String.raw`点 $P$ を通り直線 $l$ に垂直な直線を作図せよ。`, a: "（垂線）", e: "Pからlに弧を描き、交点からさらに弧を描いて交点を作る。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]], {name:'l', withLabel:true}); brd.create('point', [0,1], {name:'P'}); } },
-                { q: String.raw`円の接線を作図せよ（円上の点 $A$ を通るもの）。`, a: "（接線）", e: "中心Oと点Aを結び、点Aを通る垂線を引く。", draw: (brd) => { brd.create('circle', [[0,0], 2]); brd.create('point', [2,0], {name:'A'}); } },
-                { q: String.raw`$3$ 点 $A,B,C$ から等しい距離にある点 $P$ を作図せよ。`, a: "（外心）", e: "2つの辺の垂直二等分線の交点を求める。", draw: (brd) => { brd.create('point', [0,2], {name:'A'}); brd.create('point', [-2,-1], {name:'B'}); brd.create('point', [3,-1], {name:'C'}); } },
-                { q: String.raw`辺 $BC$ を底辺とした時の、$\triangle ABC$ の高さを示す線分。`, a: "（垂線）", e: "点Aから辺BCへの垂線。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[4,0]]); } },
-                { q: String.raw`長方形 $ABCD$ を、対角線 $AC$ を軸に折り返した時の頂点 $B$ の移動先 $B'$。`, a: "（作図）", e: "ACを対称軸とした線対称な点。", draw: (brd) => { brd.create('polygon', [[0,2],[4,2],[4,0],[0,0]]); } },
-                { q: String.raw`円の中心 $O$ を作図で求めよ。`, a: "（中心）", e: "任意の2つの弦の垂直二等分線の交点。", draw: (brd) => { brd.create('circle', [[1,1], 2.5], {strokeDashArray:[2,2]}); } },
-                { q: String.raw`点 $P$ を通り直線 $l$ に平行な直線。`, a: "（平行線）", e: "ひし形を作るように作図するか、垂線を2回引く。", draw: (brd) => { brd.create('line', [[-3,-1],[3,-1]]); brd.create('point', [1,1], {name:'P'}); } },
-                { q: String.raw`$60^\circ$ の角度を作図せよ。`, a: "（正三角形の角）", e: "正三角形の作図と同じ手順で行う。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
-                { q: String.raw`$30^\circ$ の角度を作図せよ。`, a: "（60度の二等分）", e: "まず60度を作り、それを二等分する。", draw: (brd) => { brd.create('point', [0,0], {name:'O'}); brd.create('segment', [[0,0],[3,0]]); } },
-                { q: String.raw`線分 $AB$ を $1:3$ に分ける点。`, a: "（垂直二等分線の利用）", e: "垂直二等分線を2回引き、4等分する。", draw: (brd) => { brd.create('segment', [[-2,0],[2,0]]); } },
-                { q: String.raw`辺 $AB$ 上にあり、辺 $AC, BC$ から等距離にある点。`, a: "（角の二等分線の交点）", e: "∠Cの二等分線とABの交点。", draw: (brd) => { brd.create('polygon', [[0,3],[-2,0],[3,0]]); } },
-                { q: String.raw`円の外の点 $P$ から円への接線。`, a: "（接線）", e: "OPの中点を中心としPを通る円を描き、元の円との交点を結ぶ。", draw: (brd) => { brd.create('circle', [[0,0], 1.5]); brd.create('point', [4,0], {name:'P'}); } },
-                { q: String.raw`$\triangle ABC$ で、辺 $BC$ 上にあり $\triangle ABP = \triangle ACP$ となる点 $P$。`, a: "（中点）", e: "辺BCの中点を作図する。", draw: (brd) => { brd.create('polygon', [[1,3],[-2,0],[3,0]]); } }
-            ],
+                "d1_q9": [
+        { 
+            q: String.raw`線分 $AB$ の垂直二等分線を作図しなさい。`, 
+            a: "（垂直二等分線の作図）", 
+            e: "2点A, Bから等しい半径の弧を描き、その2つの交点を通る直線を引きます。",
+            img: "assets/geometry/d1_q9_1.PNG",
+            imgA: "assets/geometry/d1_q9_1A.PNG"
+        },
+        { 
+            q: String.raw`$\angle ABC$ の二等分線を作図しなさい。`, 
+            a: "（角の二等分線の作図）", 
+            e: "頂点Bを中心とする弧を描き、辺との交点からさらに等しい半径の弧を描いて交点を作ります。",
+            img: "assets/geometry/d1_q9_2.PNG",
+            imgA: "assets/geometry/d1_q9_2A.PNG"
+        },
+        { 
+            q: String.raw`点 $P$ を通り直線 $l$ に垂直な直線を作図しなさい。`, 
+            a: "（垂線の作図）", 
+            e: "点Pを中心とする弧を描き、直線 $l$ との交点からさらに弧を描いて交点を作ります。",
+            img: "assets/geometry/d1_q9_3.PNG",
+            imgA: "assets/geometry/d1_q9_3A.PNG"
+        },
+        { 
+            q: String.raw`円の周上の点 $A$ を通る、この円の接線を作図しなさい。`, 
+            a: "（接線の作図）", 
+            e: "中心 $O$ と点 $A$ を結ぶ半直線を引き、点 $A$ を通る垂線を引きます。",
+            img: "assets/geometry/d1_q9_4.PNG",
+            imgA: "assets/geometry/d1_q9_4A.PNG"
+        },
+        { 
+            q: String.raw`$3$ 点 $A, B, C$ から等しい距離にある点 $P$ を作図しなさい。`, 
+            a: "（外心の作図）", 
+            e: "2つの線分（例：ABとBC）の垂直二等分線を引き、その交点を $P$ とします。",
+            img: "assets/geometry/d1_q9_5.PNG",
+            imgA: "assets/geometry/d1_q9_5A.PNG"
+        },
+        { 
+            q: String.raw`辺 $BC$ を底辺としたときの、$\triangle ABC$ の高さを示す線分を作図しなさい。`, 
+            a: "（高さの作図）", 
+            e: "点 $A$ から辺 $BC$（またはその延長線）へ下ろした垂線が高さとなります。",
+            img: "assets/geometry/d1_q9_6.PNG",
+            imgA: "assets/geometry/d1_q9_6A.PNG"
+        },
+        { 
+            q: String.raw`長方形 $ABCD$ を、対角線 $AC$ を軸に折り返したときの頂点 $B$ の移動先 $B'$ を作図しなさい。`, 
+            a: "（線対称の作図）", 
+            e: "点 $B$ から対角線 $AC$ へ垂線を引き、同じ距離だけ反対側へ伸ばした点が $B'$ です。",
+            img: "assets/geometry/d1_q9_7.PNG",
+            imgA: "assets/geometry/d1_q9_7A.PNG"
+        },
+        { 
+            q: String.raw`円の中心 $O$ を作図によって求めなさい。`, 
+            a: "（円の中心の作図）", 
+            e: "円周上の任意の2つの弦について、それぞれの垂直二等分線を引き、その交点を $O$ とします。",
+            img: "assets/geometry/d1_q9_8.PNG",
+            imgA: "assets/geometry/d1_q9_8A.PNG"
+        },
+        { 
+            q: String.raw`点 $P$ を通り直線 $l$ に平行な直線を作図しなさい。`, 
+            a: "（平行線の作図）", 
+            e: "点 $P$ を通る垂線を引いた後、その垂線に対して点 $P$ を通る垂線をもう一度引きます。",
+            img: "assets/geometry/d1_q9_9.PNG",
+            imgA: "assets/geometry/d1_q9_9A.PNG"
+        },
+        { 
+            q: String.raw`$60^\circ$ の角度を作図しなさい。`, 
+            a: "（正三角形の利用）", 
+            e: "1つの線分を1辺とする正三角形を描くと、その内角はすべて $60^\circ$ になります。",
+            img: "assets/geometry/d1_q9_10.PNG",
+            imgA: "assets/geometry/d1_q9_10A.PNG"
+        },
+        { 
+            q: String.raw`$30^\circ$ の角度を作図しなさい。`, 
+            a: "（60度の二等分）", 
+            e: "まず $60^\circ$ を作図し、その角の二等分線を引くことで $30^\circ$ を作ります。",
+            img: "assets/geometry/d1_q9_11.PNG",
+            imgA: "assets/geometry/d1_q9_11A.PNG"
+        },
+        { 
+            q: String.raw`線分 $AB$ を $1:3$ に分ける点を作図しなさい。`, 
+            a: "（垂直二等分線の繰り返し）", 
+            e: "線分 $AB$ の垂直二等分線で2等分し、さらに $A$ 側の線分を二等分することで $1:3$ の点を作ります。",
+            img: "assets/geometry/d1_q9_12.PNG",
+            imgA: "assets/geometry/d1_q9_12A.PNG"
+        },
+        { 
+            q: String.raw`辺 $AB$ 上にあり、辺 $AC, BC$ から等しい距離にある点を作図しなさい。`, 
+            a: "（角の二等分線と辺の交点）", 
+            e: "$\angle C$ の二等分線を引き、辺 $AB$ との交点を求めます。",
+            img: "assets/geometry/d1_q9_13.PNG",
+            imgA: "assets/geometry/d1_q9_13A.PNG"
+        },
+        { 
+            q: String.raw`円の外の点 $P$ から、この円への接線を作図しなさい。`, 
+            a: "（接線の作図）", 
+            e: "中心 $O$ と $P$ の中点を中心とし、点 $P$ を通る円を描き、元の円との交点を結びます。",
+            img: "assets/geometry/d1_q9_14.PNG",
+            imgA: "assets/geometry/d1_q9_14A.PNG"
+        },
+        { 
+            q: String.raw`$\triangle ABC$ において、辺 $BC$ 上にあり $\triangle ABP = \triangle ACP$ となる点 $P$ を作図しなさい。`, 
+            a: "（辺の中点の作図）", 
+            e: "底辺が共通の直線上にあり面積が等しいので、辺 $BC$ の中点を求めます。",
+            img: "assets/geometry/d1_q9_15.PNG",
+            imgA: "assets/geometry/d1_q9_15A.PNG"
+        }
+    ],
+
             "d2": [
     { 
         q: String.raw`$n$ 段目のタイルの個数を $n$ で表せ（1, 4, 9...）`, a: String.raw`$n^2$`, e: String.raw`$1^2, 2^2, 3^2 \dots$ と続く2乗の規則性です。`,
@@ -482,165 +634,128 @@
     }
 ],
 
-            "d5": [
-    { 
-        q: String.raw`底面の半径 $3\text{cm}$, 高さ $4\text{cm}$ の円錐の体積。`, 
-        a: String.raw`$12\pi\text{cm}^3$`, 
-        e: String.raw`$\frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$。`, 
-        draw: (brd) => { 
-            brd.setAttribute({axis:false, boundingbox:[-5,5,5,-5]}); 
-            const center = [0, -2], top = [0, 2], radius = 3;
-            // 底面の楕円（後ろ側を点線、前を実線にすると立体的ですが、簡易的に1つで描画）
-            brd.create('ellipse', [center, [radius, -2], [0, -1.2]], {strokeColor:'black', fillOpacity:0.1});
-            // 輪郭線
-            brd.create('segment', [[-radius, -2], top], {strokeColor:'black'});
-            brd.create('segment', [[radius, -2], top], {strokeColor:'black'});
-            // 補助線
-            brd.create('segment', [center, top], {dash:2, strokeColor:'gray'});
-            brd.create('segment', [center, [radius, -2]], {dash:2, strokeColor:'gray'});
-            brd.create('text', [0.2, 0, "4cm"]);
-            brd.create('text', [1, -2.4, "3cm"]);
-        } 
-    },
-    { 
-        q: String.raw`1辺 $6\text{cm}$ の立方体の対角線の長さ。`, 
-        a: String.raw`$6\sqrt{3}\text{cm}$`, 
-        e: String.raw`$\sqrt{6^2+6^2+6^2} = 6\sqrt{3}$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            const s = 1.5; // 表示上のサイズ
-            const off = 0.7; // 奥行き
-            const p = [[-s,-s],[s,-s],[s,s],[-s,s], [-s+off,-s+off],[s+off,-s+off],[s+off,s+off],[-s+off,s+off]];
-            // 面の描画
-            brd.create('polygon', [p[4],p[5],p[6],p[7]], {fillColor:'none', strokeColor:'gray', dash:2}); // 奥
-            brd.create('polygon', [p[0],p[1],p[2],p[3]], {fillColor:'none', strokeColor:'black'}); // 手前
-            // 柱の部分
-            for(let i=0; i<4; i++) brd.create('segment', [p[i], p[i+4]], {strokeColor: i==0?'gray':'black', dash: i==0?2:0});
-            // 対角線
-            brd.create('segment', [p[3], p[5]], {strokeColor:'red', dash:1});
+                "d5": [
+        { 
+            q: String.raw`底面の半径 $3\text{cm}$，高さ $4\text{cm}$ の円錐の体積を求めなさい。`, 
+            a: String.raw`$12\pi\text{cm}^3$`, 
+            e: String.raw`円錐の体積 $= \frac{1}{3} \times \pi \times 3^2 \times 4 = 12\pi$`,
+            embed: "https://www.geogebra.org/material/iframe/id/equbuznt/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`1辺が $6\text{cm}$ の立方体の対角線の長さを求めなさい。`, 
+            a: String.raw`$6\sqrt{3}\text{cm}$`, 
+            e: String.raw`直方体の対角線の公式 $\sqrt{a^2+b^2+c^2}$ より，$\sqrt{6^2+6^2+6^2} = \sqrt{108} = 6\sqrt{3}$`,
+            embed: "https://www.geogebra.org/material/iframe/id/yefdycms/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`半径 $3\text{cm}$ の球の表面積を求めなさい。`, 
+            a: String.raw`$36\pi\text{cm}^2$`, 
+            e: String.raw`球の表面積 $= 4\pi r^2$ より，$4\pi \times 3^2 = 36\pi$`,
+            embed: "https://www.geogebra.org/material/iframe/id/ufvgrabv/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`底面が1辺 $4\text{cm}$ の正方形で，高さが $6\text{cm}$ の正四角錐の体積を求めなさい。`, 
+            a: String.raw`$32\text{cm}^3$`, 
+            e: String.raw`角錐の体積 $= \frac{1}{3} \times (4 \times 4) \times 6 = 32$`,
+            embed: "https://www.geogebra.org/material/iframe/id/xd4jjz7e/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`底面の半径が $2\text{cm}$，高さが $5\text{cm}$ の円柱の側面積を求めなさい。`, 
+            a: String.raw`$20\pi\text{cm}^2$`, 
+            e: String.raw`側面積 $= （底面の周）\times（高さ）= (2\pi \times 2) \times 5 = 20\pi$`,
+            embed: "https://www.geogebra.org/material/iframe/id/yjz8ye3b/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`正四面体の展開図として正しいものを選びなさい。`, 
+            a: "正三角形が4つつながった図", 
+            e: String.raw`正四面体は4つの正三角形が図のように結合した形になります。<br><img src='assets/models/d5_6T.png' style='width:100px;'>（正しい図）`,
+            img: "assets/models/d5_6T.png"
+        },
+        { 
+            q: String.raw`1辺が $6\text{cm}$ の正四面体の高さを求めなさい。`, 
+            a: String.raw`$2\sqrt{6}\text{cm}$`, 
+            e: String.raw`高さ $h = \frac{\sqrt{6}}{3}a$ より，$\frac{\sqrt{6}}{3} \times 6 = 2\sqrt{6}$`,
+            embed: "https://www.geogebra.org/material/iframe/id/mxqskcwk/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`縦 $3\text{cm}$，横 $4\text{cm}$，高さ $5\text{cm}$ の直方体の対角線の長さを求めなさい。`, 
+            a: String.raw`$5\sqrt{2}\text{cm}$`, 
+            e: String.raw`$\sqrt{3^2+4^2+5^2} = \sqrt{50} = 5\sqrt{2}$`,
+            embed: "https://www.geogebra.org/material/iframe/id/dcg5c2xy/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
+        },
+        { 
+            q: String.raw`半径 $9\text{cm}$，中心角 $120^\circ$ のおうぎ形を側面とする円錐の，底面の半径を求めなさい。`, 
+            a: String.raw`$3\text{cm}$`, 
+            e: String.raw`底面の円周は側面のおうぎ形の弧の長さに等しいので，$2\pi r = 2\pi \times 9 \times \frac{120}{360}$ より $r=3$`,
+            img: "assets/models/d5_9.png"
+        },
+        { 
+            q: String.raw`半径 $5\text{cm}$ の球を，中心から $3\text{cm}$ の距離にある平面で切ったとき，切り口の面積を求めなさい。`, 
+            a: String.raw`$16\pi\text{cm}^2$`, 
+            e: String.raw`三平方の定理より，切り口の円の半径は $\sqrt{5^2-3^2} = 4$。よって面積は $\pi \times 4^2 = 16\pi$`,
+            embed: "https://www.geogebra.org/material/iframe/id/xpjmrydd/width/400/height/300/ai/false/smb/false/stb/false/stbh/false/asb/false/sri/false/rc/false"
         }
-    },
-    { 
-        q: String.raw`半径 $3\text{cm}$ の球の表面積。`, 
-        a: String.raw`$36\pi\text{cm}^2$`, 
-        e: String.raw`公式 $4\pi r^2$ より $4 \times \pi \times 9 = 36\pi$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            brd.create('circle', [[0,0], 3], {strokeColor:'black'});
-            brd.create('ellipse', [[0,0], [3,0], [0,0.8]], {strokeColor:'gray', dash:2}); // 赤道
-            brd.create('segment', [[0,0], [3,0]], {dash:2});
-            brd.create('text', [1, 0.4, "3cm"]);
-        }
-    },
-    { 
-        q: String.raw`底面が 1辺 $4\text{cm}$ の正方形で、高さが $6\text{cm}$ の正四角錐の体積。`, 
-        a: String.raw`$32\text{cm}^3$`, 
-        e: String.raw`$\frac{1}{3} \times (4 \times 4) \times 6 = 32$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            const base = [[-2,-1], [1,-1.5], [2.5,-0.5], [-0.5,0]]; // 底面の4点
-            const top = [1, 3];
-            brd.create('polygon', base, {fillColor:'none', strokeColor:'gray', dash:2});
-            brd.create('segment', [top, base[0]], {strokeColor:'black'});
-            brd.create('segment', [top, base[1]], {strokeColor:'black'});
-            brd.create('segment', [top, base[2]], {strokeColor:'black'});
-            brd.create('segment', [top, base[3]], {strokeColor:'gray', dash:2});
-            brd.create('segment', [top, [1, -0.75]], {dash:2, strokeColor:'blue'}); // 高さ
-        }
-    },
-    { 
-        q: String.raw`底面の半径 $2\text{cm}$, 高さ $5\text{cm}$ の円柱の側面積。`, 
-        a: String.raw`$20\pi\text{cm}^2$`, 
-        e: String.raw`底面の周 $4\pi \times$ 高さ $5 = 20\pi$。`,
-        draw: (brd) => {
-            brd.setAttribute({axis:false});
-            const r = 2, h = 2;
-            brd.create('ellipse', [[0,h], [r,h], [0,h+0.6]], {strokeColor:'black'}); // 上面
-            brd.create('ellipse', [[0,-h], [r,-h], [0,-h+0.6]], {strokeColor:'black'}); // 下面
-            brd.create('segment', [[-r,h], [-r,-h]], {strokeColor:'black'});
-            brd.create('segment', [[r,h], [r,-h]], {strokeColor:'black'});
-            brd.create('text', [r+0.2, 0, "5cm"]);
-        }
-    },
-    // 以下、図解なし問題はそのまま
-    { q: String.raw`正四面体の展開図で、面の形はすべて何か。`, a: "正三角形", e: "4つの等しい正三角形で構成されます。" },
-    { q: String.raw`1辺 $4\text{cm}$ の正四面体の高さ。`, a: String.raw`$\frac{4\sqrt{6}}{3}\text{cm}$`, e: String.raw`公式 $h = \frac{\sqrt{6}}{3}a$ より。` },
-    { q: String.raw`直方体の縦 $2$, 横 $3$, 高さ $6$ のとき、対角線の長さ。`, a: "7", e: String.raw`$\sqrt{2^2+3^2+6^2} = \sqrt{4+9+36} = \sqrt{49} = 7$。` },
-    { q: String.raw`円錐の展開図で、側面のおうぎ形の中心角 $x$ を求める公式（母線 $L$, 半径 $r$）。`, a: String.raw`$x = 360 \times \frac{r}{L}$`, e: "（弧の長さ）＝（底面の円周）の関係から導けます。" }
-]
-        };
-    </script>
+    ]
+}; // MasterDatabase 終了
+// --- ここまで ---
+
+let currentProblem = null;
+
+function init() {
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get('cat') || "d1_q6";
+    const questions = MasterDatabase[cat];
+
+    if (!questions || questions.length === 0) {
+        document.getElementById('question-text').innerText = "問題が見つかりませんでした。";
+        return;
+    }
+
+    // 問題をランダムに選択
+    currentProblem = questions[Math.floor(Math.random() * questions.length)];
     
-    <style>
-        #app-container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; font-family: sans-serif; }
-        #question-text { font-size: 1.2em; margin-bottom: 20px; min-height: 50px; }
-        #jxgbox { width: 300px; height: 300px; margin: 10px auto; border: 1px solid #ddd; }
-        #answer-area { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 5px solid #4CAF50; }
-        button { padding: 10px 20px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 5px; margin: 5px; }
-        button:hover { background: #45a049; }
-        .label { font-weight: bold; color: #333; }
-        .nav-btn { background: #666; }
-    </style>
-</head>
-<body>
+    // 表示リセット
+    document.getElementById('question-text').innerHTML = currentProblem.q;
+    document.getElementById('answer-area').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('show-ans-btn').style.display = 'block';
+    
+    const imgTag = document.getElementById('q-image');
+    const embedTag = document.getElementById('q-embed');
+    imgTag.style.display = 'none';
+    embedTag.style.display = 'none';
+    embedTag.src = "";
 
-<div id="app-container">
-    <div id="question-text">読み込み中……</div>
-    <div id="jxgbox" style="display:none;"></div>
-    <button id="show-ans-btn" onclick="showAnswer()">答え合わせを表示</button>
-
-    <div id="answer-area" style="display:none;">
-        <p><span class="label">【正解】</span> <span id="answer-text"></span></p>
-        <p><span class="label">【解説】</span> <span id="explanation-text"></span></p>
-        <button onclick="location.reload()">次の問題へ</button>
-    </div>
-    <br>
-    <button class="nav-btn" onclick="location.href='index.html'">トップに戻る</button>
-</div>
-
-<script>
-    let currentProblem = null;
-    let board = null; // ← これを必ず追加！
-
-    function loadQuestion() {
-        const params = new URLSearchParams(window.location.search);
-        const cat = params.get('cat') || "d1_q1";
-        const questions = MasterDatabase[cat];
-        
-        // ランダムに1問選択
-        currentProblem = questions[Math.floor(Math.random() * questions.length)];
-        document.getElementById('question-text').innerHTML = currentProblem.q;
-
-        // --- 図形の描画処理 ---
-        const box = document.getElementById('jxgbox');
-        if (currentProblem.draw) {
-            box.style.display = 'block';
-            if (board) { JXG.JSXGraph.freeBoard(board); }
-            board = JXG.JSXGraph.initBoard('jxgbox', {
-                boundingbox: [-5, 5, 5, -5], 
-                axis: true, 
-                showCopyright: false,
-                showNavigation: false
-            });
-            currentProblem.draw(board);
-        } else {
-            box.style.display = 'none';
-        }
-        
-        // 数式を再描画
-        MathJax.typeset();
+    // メディアの表示判定
+    if (currentProblem.img) {
+        imgTag.src = currentProblem.img;
+        imgTag.style.display = 'block';
+    } else if (currentProblem.embed) {
+        embedTag.src = currentProblem.embed;
+        embedTag.style.display = 'block';
     }
 
-    function showAnswer() {
-        document.getElementById('answer-text').innerHTML = currentProblem.a;
-        document.getElementById('explanation-text').innerHTML = currentProblem.e;
-        document.getElementById('answer-area').style.display = 'block';
-        document.getElementById('show-ans-btn').style.display = 'none';
-        MathJax.typeset();
+    // 数式の描画
+    MathJax.typesetPromise();
+}
+
+function showAnswer() {
+    document.getElementById('answer-text').innerHTML = currentProblem.a;
+    document.getElementById('explanation-text').innerHTML = currentProblem.e;
+    document.getElementById('answer-area').style.display = 'block';
+    document.getElementById('next-btn').style.display = 'block';
+    document.getElementById('show-ans-btn').style.display = 'none';
+
+    // 作図問題(d1_q9)などで解説用画像(imgA)がある場合は差し替え
+    if (currentProblem.imgA) {
+        document.getElementById('q-image').src = currentProblem.imgA;
     }
 
-    window.onload = loadQuestion;
+    MathJax.typesetPromise();
+}
+
+// 初回実行
+window.onload = init;
 </script>
-
 </body>
 </html>
