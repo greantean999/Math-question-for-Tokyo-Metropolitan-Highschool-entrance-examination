@@ -329,21 +329,29 @@ function displayProblem(problem) {
 }
 
     function init() {
-        console.log("初期化開始");
-    
-    // 例：最初の問題データ
-    const firstProblem = {
-        q: "次の計算をせよ：$x^2 + 2x + 1 = 0$",
-        img: null, // 画像があればパスを入れる
-        // draw: (board) => { ... } // グラフがあれば関数を入れる
-    };
+    // 1. URLから ?cat=... の値を取得
+    const params = new URLSearchParams(window.location.search);
+    const cat = params.get('cat');
 
-    // 問題を表示する関数を呼び出す
-    displayProblem(firstProblem);
+    // 2. MasterDatabase から該当する問題を直接取り出す
+    // 例: MasterDatabase["d1_q1"]
+    const targetProblem = MasterDatabase[cat];
+
+    if (targetProblem) {
+        // 問題が見つかれば表示
+        displayProblem(targetProblem);
+    } else {
+        // 見つからない場合の処理
+        const qText = document.getElementById('question-text') || document.getElementById('q-text');
+        if (qText) {
+            qText.innerHTML = "エラー：問題「" + (cat || "指定なし") + "」が見つかりませんでした。";
+        }
+    }
 }
 
 // ページ読み込み完了時に init を実行
 window.onload = init;
+
 
 </script>
 </body>
