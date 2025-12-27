@@ -17,7 +17,6 @@
         .btn-green { background-color: #28a745; color: white; }
         .btn-outline { background-color: transparent; border: 1px solid #6c757d; color: #6c757d; }
         #answer-area { display: none; margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 8px; border-left: 5px solid #007bff; }
-        window.onload = init;
     </style>
 </head>
 <body>
@@ -328,6 +327,23 @@ function displayProblem(problem) {
         MathJax.typesetPromise();
     }
 }
+
+    function init() {
+        console.log("初期化開始");
+    
+    // 例：最初の問題データ
+    const firstProblem = {
+        q: "次の計算をせよ：$x^2 + 2x + 1 = 0$",
+        img: null, // 画像があればパスを入れる
+        // draw: (board) => { ... } // グラフがあれば関数を入れる
+    };
+
+    // 問題を表示する関数を呼び出す
+    displayProblem(firstProblem);
+}
+
+// ページ読み込み完了時に init を実行
+window.onload = init;
 
 </script>
 </body>
