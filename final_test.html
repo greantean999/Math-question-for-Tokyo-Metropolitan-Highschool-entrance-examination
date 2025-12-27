@@ -721,17 +721,46 @@ function setupTest() {
     displayQuestion();
 }
 
-function displayQuestion() {
-    const q = testQuestions[currentIdx];
-    document.getElementById('current-q-num').innerText = currentIdx + 1;
-    document.getElementById('q-text').innerHTML = q.q;
-    const img = document.getElementById('test-img');
-    const embed = document.getElementById('test-embed');
-    img.style.display = 'none'; embed.style.display = 'none';
-    if (q.img) { img.src = q.img; img.style.display = 'block'; }
-    else if (q.embed) { embed.src = q.embed; embed.style.display = 'block'; }
-    if(window.MathJax) MathJax.typesetPromise();
+// 問題を表示するコアロジック
+function displayProblem(problem) {
+    // 1. テキスト（数式）の表示
+    const qText = document.getElementById('question-text') || document.getElementById('q-text');
+    qText.innerHTML = problem.q;
+
+    // 2. メディア表示のリセット
+    const imgTag = document.getElementById('q-image') || document.getElementById('test-img');
+    const embedTag = document.getElementById('q-embed') || document.getElementById('test-embed');
+    const jxgBox = document.getElementById('jxgbox'); // 動的グラフ用（あれば）
+
+    if (imgTag) imgTag.style.display = 'none';
+    if (embedTag) {
+        embedTag.style.display = 'none';
+        embedTag.src = ""; // 前の動画を止める
+    }
+    if (jxgBox) jxgBox.style.display = 'none';
+
+    // 3. データの種類に応じて表示を切り替え
+    if (problem.img) {
+        imgTag.src = problem.img;
+        imgTag.style.display = 'block';
+    } else if (problem.embed) {
+        embedTag.src = problem.embed;
+        embedTag.style.display = 'block';
+    } else if (problem.draw && typeof problem.draw === 'function') {
+        // drawが「命令文」として表示されないよう、ここで実行する
+        if (jxgBox) {
+            jxgBox.style.display = 'block';
+            const board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: true});
+            problem.draw(board);
+        }
+    }
+
+    // 4. 数式を綺麗にレンダリング
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
 }
+
 
 function showJudge() {
     const q = testQuestions[currentIdx];
