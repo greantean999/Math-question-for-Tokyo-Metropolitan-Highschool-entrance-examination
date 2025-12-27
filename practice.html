@@ -698,50 +698,44 @@ const MasterDatabase = {
 
 let currentProblem = null;
 
-function init() {
-    const params = new URLSearchParams(window.location.search);
-    const cat = params.get('cat') || "d1_q6";
-    const questions = MasterDatabase[cat];
+// 問題を表示するコアロジック
+function displayProblem(problem) {
+    // 1. テキスト（数式）の表示
+    const qText = document.getElementById('question-text') || document.getElementById('q-text');
+    qText.innerHTML = problem.q;
 
-    if (!questions) {
-        document.getElementById('question-text').innerText = "問題データがありません。";
-        return;
+    // 2. メディア表示のリセット
+    const imgTag = document.getElementById('q-image') || document.getElementById('test-img');
+    const embedTag = document.getElementById('q-embed') || document.getElementById('test-embed');
+    const jxgBox = document.getElementById('jxgbox'); // 動的グラフ用（あれば）
+
+    if (imgTag) imgTag.style.display = 'none';
+    if (embedTag) {
+        embedTag.style.display = 'none';
+        embedTag.src = ""; // 前の動画を止める
     }
+    if (jxgBox) jxgBox.style.display = 'none';
 
-    currentProblem = questions[Math.floor(Math.random() * questions.length)];
-    
-    document.getElementById('question-text').innerHTML = currentProblem.q;
-    document.getElementById('answer-area').style.display = 'none';
-    document.getElementById('show-ans-btn').style.display = 'block';
-    
-    const imgTag = document.getElementById('q-image');
-    const embedTag = document.getElementById('q-embed');
-    imgTag.style.display = 'none';
-    embedTag.style.display = 'none';
-    embedTag.src = "";
-
-    if (currentProblem.img) {
-        imgTag.src = currentProblem.img;
+    // 3. データの種類に応じて表示を切り替え
+    if (problem.img) {
+        imgTag.src = problem.img;
         imgTag.style.display = 'block';
-    } else if (currentProblem.embed) {
-        embedTag.src = currentProblem.embed;
+    } else if (problem.embed) {
+        embedTag.src = problem.embed;
         embedTag.style.display = 'block';
+    } else if (problem.draw && typeof problem.draw === 'function') {
+        // drawが「命令文」として表示されないよう、ここで実行する
+        if (jxgBox) {
+            jxgBox.style.display = 'block';
+            const board = JXG.JSXGraph.initBoard('jxgbox', {boundingbox: [-5, 5, 5, -5], axis: true});
+            problem.draw(board);
+        }
     }
 
-    if(window.MathJax) MathJax.typesetPromise();
-}
-
-function showAnswer() {
-    document.getElementById('answer-text').innerHTML = currentProblem.a;
-    document.getElementById('explanation-text').innerHTML = currentProblem.e;
-    document.getElementById('answer-area').style.display = 'block';
-    document.getElementById('show-ans-btn').style.display = 'none';
-
-    if (currentProblem.imgA) {
-        document.getElementById('q-image').src = currentProblem.imgA;
+    // 4. 数式を綺麗にレンダリング
+    if (window.MathJax) {
+        MathJax.typesetPromise();
     }
-
-    if(window.MathJax) MathJax.typesetPromise();
 }
 
 window.onload = init;
