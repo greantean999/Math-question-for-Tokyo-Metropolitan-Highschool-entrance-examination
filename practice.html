@@ -288,6 +288,8 @@ const MasterDatabase = {
 
 let currentProblem = null;
 
+    window.onload = init;
+    
 // 問題を表示するコアロジック
 function displayProblem(problem) {
     // 1. テキスト（数式）の表示
@@ -328,7 +330,6 @@ function displayProblem(problem) {
     }
 }
 
-window.onload = init;
 </script>
 </body>
 </html>
