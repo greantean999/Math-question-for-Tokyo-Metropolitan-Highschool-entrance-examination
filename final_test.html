@@ -310,7 +310,9 @@ function setupTest() {
     });
     displayQuestion();
 }
-
+    
+    window.onload = setupTest;
+    
 // 問題を表示するコアロジック
 function displayProblem(problem) {
     // 1. テキスト（数式）の表示
@@ -384,7 +386,6 @@ function showResult() {
     document.getElementById('advice-box').innerHTML = advice;
 }
 
-window.onload = setupTest;
 </script>
 </body>
 </html>
